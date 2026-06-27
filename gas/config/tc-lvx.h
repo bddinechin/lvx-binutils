@@ -139,7 +139,7 @@ struct lvx_as_params {
   int abi;
   /* The target's OS/ABI.  */
   int osabi;
-  /* The target core (0: KV3-1, 1: KV3-2, 2: KV4-1).  */
+  /* The target core (0: KV4-1, 1: LVX-1, 2: LVX-2).  */
   int core;
   /* Guard to check if LVX_CORE has been set.  */
   int core_set;
@@ -281,7 +281,7 @@ extern int lvx_force_reloc_sub_same (struct fix *, segT);
    symbol is not resolved by the assembler.  */
 
 #define TC_RELOC_RTSYM_LOC_FIXUP(FIX)                                          \
-  ((FIX)->fx_r_type != BFD_RELOC_KVX_23_PCREL                                  \
+  ((FIX)->fx_r_type != BFD_RELOC_LVX_23_PCREL                                  \
    || (FIX)->fx_addsy == NULL                                                  \
    || (! S_IS_EXTERNAL ((FIX)->fx_addsy)                                       \
        && ! S_IS_WEAK ((FIX)->fx_addsy)                                        \

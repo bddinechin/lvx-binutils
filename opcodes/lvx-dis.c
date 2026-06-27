@@ -32,9 +32,6 @@
 #include "elf/lvx.h"
 #include "opcode/lvx.h"
 
-/* KV3 cores are not supported by LVX; stub out for dead-code branches. */
-#define kv3_v1_optab ((struct lvx_opc *)NULL)
-#define kv3_v2_optab ((struct lvx_opc *)NULL)
 
 #define FAIL(s) ((s) != NULL)
 
@@ -53,37 +50,24 @@ typedef enum {
 typedef uint8_t Steering;
 #define Steering_EXT Steering_MAU
 
-/*
- * KV3_EXU enumeration.
- */
-typedef enum {
-  KV3_EXU_BCU,
-  KV3_EXU_EXT,
-  KV3_EXU_ALU0,
-  KV3_EXU_ALU1,
-  KV3_EXU_MAU,
-  KV3_EXU_LSU,
-  KV3_EXU__,
-} enum_KV3_EXU;
-typedef uint8_t KV3_EXU;
 
 /*
- * KV4_EXU enumeration.
+ * LVX_EXU enumeration.
  */
 typedef enum {
-  KV4_EXU_BCU0,
-  KV4_EXU_BCU1,
-  KV4_EXU_ALU0,
-  KV4_EXU_ALU1,
-  KV4_EXU_LSU0,
-  KV4_EXU_LSU1,
-  KV4_EXU_EXT0,
-  KV4_EXU_EXT1,
-  KV4_EXU_EXT2,
-  KV4_EXU_EXT3,
-  KV4_EXU__,
-} enum_KV4_EXU;
-typedef uint8_t KV4_EXU;
+  LVX_EXU_BCU0,
+  LVX_EXU_BCU1,
+  LVX_EXU_ALU0,
+  LVX_EXU_ALU1,
+  LVX_EXU_LSU0,
+  LVX_EXU_LSU1,
+  LVX_EXU_EXT0,
+  LVX_EXU_EXT1,
+  LVX_EXU_EXT2,
+  LVX_EXU_EXT3,
+  LVX_EXU__,
+} enum_LVX_EXU;
+typedef uint8_t LVX_EXU;
 
 static inline int
 lvx_steering(uint32_t x)
@@ -109,12 +93,6 @@ lvx_is_nop_opcode(uint32_t x)
   return ((x)<<1) == 0xFFFFFFFE;
 }
 
-static inline int
-kv3_is_tca_opcode(uint32_t x)
-{
-  unsigned major = ((x)>>24) & 0x1F;
-  return (major > 1) && (major < 8);
-}
 
 /* End synchronize with processor/lvx-family/BE/LAO/lvx-Bundle.c  */
 
@@ -236,12 +214,12 @@ lvx_dis_init (struct disassemble_info *info)
     case bfd_mach_lvx_1:
     case bfd_mach_lvx_1_64:
     default:
-      env.opc_table = kv4_v1_optab;
-      env.lvx_regfiles = kv4_v1_regfiles;
-      env.lvx_registers = kv4_v1_registers;
-      env.lvx_modifiers = kv4_v1_modifiers;
-      env.lvx_dec_registers = kv4_v1_dec_registers;
-      env.lvx_max_dec_registers = kv4_v1_regfiles[KV4_V1_REGFILE_DEC_REGISTERS];
+      env.opc_table = lvx_v1_optab;
+      env.lvx_regfiles = lvx_v1_regfiles;
+      env.lvx_registers = lvx_v1_registers;
+      env.lvx_modifiers = lvx_v1_modifiers;
+      env.lvx_dec_registers = lvx_v1_dec_registers;
+      env.lvx_max_dec_registers = lvx_v1_regfiles[LVX_V1_REGFILE_DEC_REGISTERS];
       break;
     }
 
@@ -251,166 +229,9 @@ lvx_dis_init (struct disassemble_info *info)
   env.initialized_p = 1;
 }
 
-static int
-kv3_steer_bundle_insns (int word_cnt, int *_insn_cnt)
-{
-  /* Issue lanes taken.  */
-  int bcu_taken = 0;
-  int ext_taken = 0;
-  int alu0_taken = 0;
-  int alu1_taken = 0;
-  int mau_taken = 0;
-  int lsu_taken = 0;
-
-  struct issued_insn issued_insns[KV3_EXU__];
-  memset (issued_insns, 0, sizeof (issued_insns));
-
-  if (word_cnt == 0)
-    return FAIL("Bundle word count == 0");
-
-  int index = 0;
-  for (; index < word_cnt; index++)
-    {
-      uint32_t syllable = lvx_bundle_words[index];
-      switch (lvx_steering (syllable))
-	{
-	case Steering_BCU:
-	  /* BCU or EXT instruction.  */
-	  if (index == 0)
-	    {
-	      if (kv3_is_tca_opcode (syllable))
-		{
-		  if (ext_taken)
-		    return FAIL("Too many KV3_EXT instructions");
-
-		  issued_insns[KV3_EXU_EXT].opcode = syllable;
-		  issued_insns[KV3_EXU_EXT].nb_syllables = 1;
-		  ext_taken = 1;
-		}
-	      else
-		{
-		  issued_insns[KV3_EXU_BCU].opcode = syllable;
-		  issued_insns[KV3_EXU_BCU].nb_syllables = 1;
-		  bcu_taken = 1;
-		}
-	    }
-	  else
-	    {
-	      if (index == 1 && bcu_taken && kv3_is_tca_opcode (syllable))
-		{
-		  if (ext_taken)
-		    return FAIL("Too many KV3_EXT instructions");
-
-		  issued_insns[KV3_EXU_EXT].opcode = syllable;
-		  issued_insns[KV3_EXU_EXT].nb_syllables = 1;
-		  ext_taken = 1;
-		}
-	      else
-		{
-		  /* Not first syllable in bundle, IMMX.  */
-		  struct issued_insn *issued_insn =
-		    &(issued_insns[KV3_EXU_ALU0 + lvx_exu_tag (syllable)]);
-		  int immx_count = issued_insn->immx_count;
-		  if (immx_count > 1)
-		    return FAIL("Too many IMMX syllables");
-
-		  issued_insn->immx_words[immx_count] = syllable;
-		  issued_insn->immx_valid[immx_count] = true;
-		  issued_insn->nb_syllables++;
-		  issued_insn->immx_count = immx_count + 1;
-		}
-	    }
-	  break;
-
-	case Steering_ALU:
-	  if (alu0_taken == 0)
-	    {
-	      issued_insns[KV3_EXU_ALU0].opcode = syllable;
-	      issued_insns[KV3_EXU_ALU0].nb_syllables = 1;
-	      alu0_taken = 1;
-	    }
-	  else if (alu1_taken == 0)
-	    {
-	      issued_insns[KV3_EXU_ALU1].opcode = syllable;
-	      issued_insns[KV3_EXU_ALU1].nb_syllables = 1;
-	      alu1_taken = 1;
-	    }
-	  else if (mau_taken == 0)
-	    {
-	      issued_insns[KV3_EXU_MAU].opcode = syllable;
-	      issued_insns[KV3_EXU_MAU].nb_syllables = 1;
-	      mau_taken = 1;
-	    }
-	  else if (lsu_taken == 0)
-	    {
-	      issued_insns[KV3_EXU_LSU].opcode = syllable;
-	      issued_insns[KV3_EXU_LSU].nb_syllables = 1;
-	      lsu_taken = 1;
-	    }
-	  else if (!lvx_is_nop_opcode (syllable))
-	    return FAIL("Too many ALU instructions");
-	  break;
-
-	case Steering_MAU:
-	  if (mau_taken == 1)
-	    return FAIL("Too many MAU instructions");
-
-	  issued_insns[KV3_EXU_MAU].opcode = syllable;
-	  issued_insns[KV3_EXU_MAU].nb_syllables = 1;
-	  mau_taken = 1;
-	  break;
-
-	case Steering_LSU:
-	  if (lsu_taken == 1)
-	    return FAIL("Too many LSU instructions");
-
-	  issued_insns[KV3_EXU_LSU].opcode = syllable;
-	  issued_insns[KV3_EXU_LSU].nb_syllables = 1;
-	  lsu_taken = 1;
-	}
-
-      if (!(lvx_has_parallel_bit (syllable)))
-	break;
-    }
-
-  if (lvx_has_parallel_bit (lvx_bundle_words[index]))
-    return FAIL("Bundle exceeds maximum size");
-
-  /* Fill LVX_BUNDLE_INSNS and count read syllables.  */
-  int insn_idx = 0;
-  for (int exu = 0; exu < KV3_EXU__; exu++)
-    {
-      if (issued_insns[exu].nb_syllables)
-	{
-	  int syllable_idx = 0;
-
-	  /* First copy the opcode.  */
-	  lvx_bundle_insns[insn_idx].syllables[syllable_idx++] =
-	      issued_insns[exu].opcode;
-	  lvx_bundle_insns[insn_idx].length = 1;
-
-	  /* Copy up to two immediate extension words.  */
-	  for (int j = 0; j < 2; j++)
-	    if (issued_insns[exu].immx_valid[j])
-	      {
-		lvx_bundle_insns[insn_idx].syllables[syllable_idx++] =
-		    issued_insns[exu].immx_words[j];
-		lvx_bundle_insns[insn_idx].length++;
-	      }
-	
-	  lvx_bundle_insns[insn_idx].read_size =
-	      lvx_bundle_insns[insn_idx].length * 4;
-
-	  insn_idx++;
-	}
-    }
-
-  *_insn_cnt = insn_idx;
-  return 0;
-}
 
 static int
-kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
+lvx_v1_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 {
   /* Issue lanes in use.  */
   int bcu_inuse = 0;
@@ -418,7 +239,7 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
   int ext_inuse = 0;
   int lsu_inuse = 0;
 
-  struct issued_insn issued_insns[KV4_EXU__];
+  struct issued_insn issued_insns[LVX_EXU__];
   memset (issued_insns, 0, sizeof (issued_insns));
 
   if (word_cnt == 0)
@@ -434,8 +255,8 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 	  if (index == 0)
 	    /* First BCU syllable in bundle issues in BCU0.  */
 	    {
-	      issued_insns[KV4_EXU_BCU0].opcode = syllable;
-	      issued_insns[KV4_EXU_BCU0].nb_syllables = 1;
+	      issued_insns[LVX_EXU_BCU0].opcode = syllable;
+	      issued_insns[LVX_EXU_BCU0].nb_syllables = 1;
 	      bcu_inuse++;
 	    }
 	  else if (index == 1 && bcu_inuse == 1)
@@ -444,22 +265,22 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 	      if (lvx_exu_tag (syllable) == 0)
 		/* Case of BCU with extended offset.  */
 		{
-		  issued_insns[KV4_EXU_BCU0].immx_words[0] = syllable;
-		  issued_insns[KV4_EXU_BCU0].immx_valid[0] = true;
-		  issued_insns[KV4_EXU_BCU0].immx_count = 1;
-		  issued_insns[KV4_EXU_BCU0].nb_syllables = 2;
+		  issued_insns[LVX_EXU_BCU0].immx_words[0] = syllable;
+		  issued_insns[LVX_EXU_BCU0].immx_valid[0] = true;
+		  issued_insns[LVX_EXU_BCU0].immx_count = 1;
+		  issued_insns[LVX_EXU_BCU0].nb_syllables = 2;
 		}
 	      else
 		{
-		  issued_insns[KV4_EXU_BCU1].opcode = syllable;
-		  issued_insns[KV4_EXU_BCU1].nb_syllables = 1;
+		  issued_insns[LVX_EXU_BCU1].opcode = syllable;
+		  issued_insns[LVX_EXU_BCU1].nb_syllables = 1;
 		}
 	      bcu_inuse++;
 	    }
 	  else
 	    {
 	      /* Steering BCU and not first or second, must be IMMX.  */
-	      int exu_tag = KV4_EXU_ALU0 + lvx_exu_tag(syllable);
+	      int exu_tag = LVX_EXU_ALU0 + lvx_exu_tag(syllable);
 	      struct issued_insn *issued_insn = &(issued_insns[exu_tag]);
 	      int immx_count = issued_insn->immx_count;
 	      if (immx_count > 1)
@@ -475,26 +296,26 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 	case Steering_ALU:
 	  if (alu_inuse == 0)
 	    {
-	      issued_insns[KV4_EXU_ALU0].opcode = syllable;
-	      issued_insns[KV4_EXU_ALU0].nb_syllables = 1;
+	      issued_insns[LVX_EXU_ALU0].opcode = syllable;
+	      issued_insns[LVX_EXU_ALU0].nb_syllables = 1;
 	      alu_inuse++;
 	    }
 	  else if (alu_inuse == 1)
 	    {
-	      issued_insns[KV4_EXU_ALU1].opcode = syllable;
-	      issued_insns[KV4_EXU_ALU1].nb_syllables = 1;
+	      issued_insns[LVX_EXU_ALU1].opcode = syllable;
+	      issued_insns[LVX_EXU_ALU1].nb_syllables = 1;
 	      alu_inuse++;
 	    }
 	  else if (lsu_inuse == 0)
 	    {
-	      issued_insns[KV4_EXU_LSU0].opcode = syllable;
-	      issued_insns[KV4_EXU_LSU0].nb_syllables = 1;
+	      issued_insns[LVX_EXU_LSU0].opcode = syllable;
+	      issued_insns[LVX_EXU_LSU0].nb_syllables = 1;
 	      lsu_inuse++;
 	    }
 	  else if (lsu_inuse == 1)
 	    {
-	      issued_insns[KV4_EXU_LSU1].opcode = syllable;
-	      issued_insns[KV4_EXU_LSU1].nb_syllables = 1;
+	      issued_insns[LVX_EXU_LSU1].opcode = syllable;
+	      issued_insns[LVX_EXU_LSU1].nb_syllables = 1;
 	      lsu_inuse++;
 	    }
 	  else
@@ -505,14 +326,14 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 	case Steering_LSU:
 	  if (lsu_inuse == 0)
 	    {
-	      issued_insns[KV4_EXU_LSU0].opcode = syllable;
-	      issued_insns[KV4_EXU_LSU0].nb_syllables = 1;
+	      issued_insns[LVX_EXU_LSU0].opcode = syllable;
+	      issued_insns[LVX_EXU_LSU0].nb_syllables = 1;
 	      lsu_inuse++;
 	    }
 	  else if (lsu_inuse == 1)
 	    {
-	      issued_insns[KV4_EXU_LSU1].opcode = syllable;
-	      issued_insns[KV4_EXU_LSU1].nb_syllables = 1;
+	      issued_insns[LVX_EXU_LSU1].opcode = syllable;
+	      issued_insns[LVX_EXU_LSU1].nb_syllables = 1;
 	      lsu_inuse++;
 	    }
 	  else
@@ -523,30 +344,30 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 	case Steering_EXT:
 	  if (ext_inuse == 0)
 	    {
-	      issued_insns[KV4_EXU_EXT0].opcode = syllable;
-	      issued_insns[KV4_EXU_EXT0].nb_syllables = 1;
+	      issued_insns[LVX_EXU_EXT0].opcode = syllable;
+	      issued_insns[LVX_EXU_EXT0].nb_syllables = 1;
 	      ext_inuse++;
 	    }
 	  else if (ext_inuse == 1)
 	    {
-	      issued_insns[KV4_EXU_EXT1].opcode = syllable;
-	      issued_insns[KV4_EXU_EXT1].nb_syllables = 1;
+	      issued_insns[LVX_EXU_EXT1].opcode = syllable;
+	      issued_insns[LVX_EXU_EXT1].nb_syllables = 1;
 	      ext_inuse++;
 	    }
 	  else if (ext_inuse == 2)
 	    {
-	      issued_insns[KV4_EXU_EXT2].opcode = syllable;
-	      issued_insns[KV4_EXU_EXT2].nb_syllables = 1;
+	      issued_insns[LVX_EXU_EXT2].opcode = syllable;
+	      issued_insns[LVX_EXU_EXT2].nb_syllables = 1;
 	      ext_inuse++;
 	    }
 	  else if (ext_inuse == 3)
 	    {
-	      issued_insns[KV4_EXU_EXT3].opcode = syllable;
-	      issued_insns[KV4_EXU_EXT3].nb_syllables = 1;
+	      issued_insns[LVX_EXU_EXT3].opcode = syllable;
+	      issued_insns[LVX_EXU_EXT3].nb_syllables = 1;
 	      ext_inuse++;
 	    }
 	  else
-	    return FAIL("Too many KV4_EXT instructions");
+	    return FAIL("Too many LVX_EXT instructions");
 
 	  break;
 	}
@@ -561,7 +382,7 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 
   /* Fill LVX_BUNDLE_INSNS and count read syllables.  */
   int insn_idx = 0;
-  for (int exu = 0; exu < KV4_EXU__; exu++)
+  for (int exu = 0; exu < LVX_EXU__; exu++)
     {
       if (issued_insns[exu].nb_syllables)
 	{
@@ -603,7 +424,7 @@ lvx_steer_bundle_insns (struct disassemble_info *info,
     case bfd_mach_lvx_2:
     case bfd_mach_lvx_2_64:
     default:
-      return kv4_steer_bundle_insns (word_cnt, _insn_cnt);
+      return lvx_v1_steer_bundle_insns (word_cnt, _insn_cnt);
       break;
     }
   return FAIL("Unknown machine architecture.");
@@ -708,63 +529,88 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 	idx++; \
     }
 
-	      if (env.opc_table == kv3_v1_optab)
+	      if (env.opc_table == lvx_v1_optab)
 		{
 		  switch (type)
 		    {
-		    case RegClass_kv3_v1_singleReg:
-		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_GPR, value)
+		    case RegClass_lvx_v1_singleReg:
+		    case RegClass_lvx_v1_worddRegE:
+		    case RegClass_lvx_v1_worddRegO:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_GPR, value)
 		      break;
-		    case RegClass_kv3_v1_pairedReg:
-		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_PGR, value)
+		    case RegClass_lvx_v1_pairedReg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_PGR, value)
 		      break;
-		    case RegClass_kv3_v1_quadReg:
-		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_QGR, value)
+		    case RegClass_lvx_v1_quadReg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_QGR, value)
 		      break;
-		    case RegClass_kv3_v1_systemReg:
-		    case RegClass_kv3_v1_aloneReg:
-		    case RegClass_kv3_v1_onlyraReg:
-		    case RegClass_kv3_v1_onlygetReg:
-		    case RegClass_kv3_v1_onlysetReg:
-		    case RegClass_kv3_v1_onlyfxReg:
-		    case RegClass_kv3_v1_onlyswapReg:
-		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_SFR, value)
+		    case RegClass_lvx_v1_systemReg:
+		    case RegClass_lvx_v1_aloneReg:
+		    case RegClass_lvx_v1_onlyraReg:
+		    case RegClass_lvx_v1_onlygetReg:
+		    case RegClass_lvx_v1_onlysetReg:
+		    case RegClass_lvx_v1_onlyfxReg:
+		    case RegClass_lvx_v1_onlyswapReg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_SFR, value)
 		      break;
-		    case RegClass_kv3_v1_xworddReg0M4:
-		    case RegClass_kv3_v1_xworddReg1M4:
-		    case RegClass_kv3_v1_xworddReg2M4:
-		    case RegClass_kv3_v1_xworddReg3M4:
-		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_XCR, value)
+		    case RegClass_lvx_v1_xworddReg:
+		    case RegClass_lvx_v1_xworddReg0M4:
+		    case RegClass_lvx_v1_xworddReg1M4:
+		    case RegClass_lvx_v1_xworddReg2M4:
+		    case RegClass_lvx_v1_xworddReg3M4:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_XCR, value)
 		      break;
-		    case RegClass_kv3_v1_xwordqRegE:
-		    case RegClass_kv3_v1_xwordqRegO:
-		    case RegClass_kv3_v1_xwordqReg0M4:
-		    case RegClass_kv3_v1_xwordqReg1M4:
-		    case RegClass_kv3_v1_xwordqReg2M4:
-		    case RegClass_kv3_v1_xwordqReg3M4:
-		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_XBR, value)
+		    case RegClass_lvx_v1_xwordqReg:
+		    case RegClass_lvx_v1_xwordqRegE:
+		    case RegClass_lvx_v1_xwordqRegO:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_XBR, value)
 		      break;
-		    case RegClass_kv3_v1_xwordoReg:
-		    case RegClass_kv3_v1_xwordoRegE:
-		    case RegClass_kv3_v1_xwordoRegO:
-		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_XVR, value)
+		    case RegClass_lvx_v1_xwordoReg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_XVR, value)
 		      break;
-		    case RegClass_kv3_v1_xwordxReg:
-		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_XTR, value)
+		    case RegClass_lvx_v1_xwordxReg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_XTR, value)
 		      break;
-		    case RegClass_kv3_v1_xwordvReg:
-		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_XMR, value)
+		    case RegClass_lvx_v1_xwordvReg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_XMR, value)
 		      break;
-		    case Immediate_kv3_v1_sysnumber:
-		    case Immediate_kv3_v1_signed10:
-		    case Immediate_kv3_v1_signed16:
-		    case Immediate_kv3_v1_signed27:
-		    case Immediate_kv3_v1_wrapped32:
-		    case Immediate_kv3_v1_signed37:
-		    case Immediate_kv3_v1_signed43:
-		    case Immediate_kv3_v1_signed54:
-		    case Immediate_kv3_v1_wrapped64:
-		    case Immediate_kv3_v1_unsigned6:
+		    case RegClass_lvx_v1_buffer2Reg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_X2R, value)
+		      break;
+		    case RegClass_lvx_v1_buffer4Reg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_X4R, value)
+		      break;
+		    case RegClass_lvx_v1_buffer8Reg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_X8R, value)
+		      break;
+		    case RegClass_lvx_v1_buffer16Reg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_X16R, value)
+		      break;
+		    case RegClass_lvx_v1_buffer32Reg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_X32R, value)
+		      break;
+		    case RegClass_lvx_v1_buffer64Reg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_X64R, value)
+		      break;
+		    case RegClass_lvx_v1_mainReg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_FIRST_RV_BIR, value)
+		      break;
+		    case RegClass_lvx_v1_floatReg:
+		      LVX_PRINT_REG (LVX_V1_REGFILE_DEC_RV_FPR, value)
+		      break;
+		    case Immediate_lvx_v1_brknumber:
+		    case Immediate_lvx_v1_sysnumber:
+		    case Immediate_lvx_v1_signed10:
+		    case Immediate_lvx_v1_signed12:
+		    case Immediate_lvx_v1_signed16:
+		    case Immediate_lvx_v1_signed20:
+		    case Immediate_lvx_v1_signed27:
+		    case Immediate_lvx_v1_wrapped32:
+		    case Immediate_lvx_v1_signed37:
+		    case Immediate_lvx_v1_signed43:
+		    case Immediate_lvx_v1_signed54:
+		    case Immediate_lvx_v1_wrapped64:
+		    case Immediate_lvx_v1_unsigned6:
 		      res->operands[idx].val = value;
 		      res->operands[idx].sign = flags & LVX_OPERAND_SIGNED;
 		      res->operands[idx].width = width;
@@ -772,8 +618,14 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		      res->operands[idx].pcrel = 0;
 		      idx++;
 		      break;
-		    case Immediate_kv3_v1_pcrel17:
-		    case Immediate_kv3_v1_pcrel27:
+		    case Immediate_lvx_v1_pcrel12s1:
+		    case Immediate_lvx_v1_pcrel11s2:
+		    case Immediate_lvx_v1_pcrel17s2:
+		    case Immediate_lvx_v1_pcrel20s1:
+		    case Immediate_lvx_v1_pcrel27s2:
+		    case Immediate_lvx_v1_pcrel38s2:
+		    case Immediate_lvx_v1_pcrel44s2:
+		    case Immediate_lvx_v1_pcrel54s2:
 		      res->operands[idx].val = value + memaddr;
 		      res->operands[idx].sign = flags & LVX_OPERAND_SIGNED;
 		      res->operands[idx].width = width;
@@ -781,311 +633,40 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		      res->operands[idx].pcrel = 1;
 		      idx++;
 		      break;
-		    case Modifier_kv3_v1_column:
-		    case Modifier_kv3_v1_comparison:
-		    case Modifier_kv3_v1_doscale:
-		    case Modifier_kv3_v1_exunum:
-		    case Modifier_kv3_v1_floatcomp:
-		    case Modifier_kv3_v1_qindex:
-		    case Modifier_kv3_v1_rectify:
-		    case Modifier_kv3_v1_rounding:
-		    case Modifier_kv3_v1_roundint:
-		    case Modifier_kv3_v1_saturate:
-		    case Modifier_kv3_v1_scalarcond:
-		    case Modifier_kv3_v1_silent:
-		    case Modifier_kv3_v1_simdcond:
-		    case Modifier_kv3_v1_speculate:
-		    case Modifier_kv3_v1_splat32:
-		    case Modifier_kv3_v1_variant:
+		    case Modifier_lvx_v1_accesses:
+		    case Modifier_lvx_v1_boolcas:
+		    case Modifier_lvx_v1_cachelev:
+		    case Modifier_lvx_v1_channel:
+		    case Modifier_lvx_v1_coherency:
+		    case Modifier_lvx_v1_conjugate:
+		    case Modifier_lvx_v1_doscale:
+		    case Modifier_lvx_v1_exunum:
+		    case Modifier_lvx_v1_floatcomp:
+		    case Modifier_lvx_v1_hindex:
+		    case Modifier_lvx_v1_qindex:
+		    case Modifier_lvx_v1_floatmode:
+		    case Modifier_lvx_v1_ccbcomp:
+		    case Modifier_lvx_v1_intcomp:
+		    case Modifier_lvx_v1_bcucond:
+		    case Modifier_lvx_v1_shuffleV:
+		    case Modifier_lvx_v1_shuffleX:
+		    case Modifier_lvx_v1_lanecond:
+		    case Modifier_lvx_v1_speculate:
+		    case Modifier_lvx_v1_splat32:
+		    case Modifier_lvx_v1_variant:
+		    case Modifier_lvx_v1_lanetodo:
+		    case Modifier_lvx_v1_lanesize:
+		    case Modifier_lvx_v1_signextw:
+		    case Modifier_lvx_v1_highmult:
+		    case Modifier_lvx_v1_widemult:
+		    case Modifier_lvx_v1_oddlanes:
+		    case Modifier_lvx_v1_ziplanes:
+		    case Modifier_lvx_v1_imultiply:
+		    case Modifier_lvx_v1_fnegate:
+		    case Modifier_lvx_v1_mostsig:
 		      {
 			int sz = 0;
-			int mod_idx = type - Modifier_kv3_v1_column;
-			for (sz = 0; env.lvx_modifiers[mod_idx][sz]; ++sz);
-			const char *mod = value < (unsigned) sz
-			  ? env.lvx_modifiers[mod_idx][value] : NULL;
-			if (!mod) goto retry;
-			res->operands[idx].val = value;
-			res->operands[idx].type = CAT_MODIFIER;
-			res->operands[idx].mod_idx = mod_idx;
-			idx++;
-		      }
-		      break;
-		    default:
-		      fprintf (stderr, "error: unexpected operand type (%s)\n",
-			       type_name);
-		      exit (-1);
-		    };
-		}
-	      else if (env.opc_table == kv3_v2_optab)
-		{
-		  switch (type)
-		    {
-		    case RegClass_kv3_v2_singleReg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_GPR, value)
-		      break;
-		    case RegClass_kv3_v2_pairedReg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_PGR, value)
-		      break;
-		    case RegClass_kv3_v2_quadReg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_QGR, value)
-		      break;
-		    case RegClass_kv3_v2_systemReg:
-		    case RegClass_kv3_v2_aloneReg:
-		    case RegClass_kv3_v2_onlyraReg:
-		    case RegClass_kv3_v2_onlygetReg:
-		    case RegClass_kv3_v2_onlysetReg:
-		    case RegClass_kv3_v2_onlyfxReg:
-		    case RegClass_kv3_v2_onlyswapReg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_SFR, value)
-		      break;
-		    case RegClass_kv3_v2_xworddReg:
-		    case RegClass_kv3_v2_xworddReg0M4:
-		    case RegClass_kv3_v2_xworddReg1M4:
-		    case RegClass_kv3_v2_xworddReg2M4:
-		    case RegClass_kv3_v2_xworddReg3M4:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_XCR, value)
-		      break;
-		    case RegClass_kv3_v2_xwordqReg:
-		    case RegClass_kv3_v2_xwordqRegE:
-		    case RegClass_kv3_v2_xwordqRegO:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_XBR, value)
-		      break;
-		    case RegClass_kv3_v2_xwordoReg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_XVR, value)
-		      break;
-		    case RegClass_kv3_v2_xwordxReg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_XTR, value)
-		      break;
-		    case RegClass_kv3_v2_xwordvReg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_XMR, value)
-		      break;
-		    case RegClass_kv3_v2_buffer2Reg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_X2R, value)
-		      break;
-		    case RegClass_kv3_v2_buffer4Reg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_X4R, value)
-		      break;
-		    case RegClass_kv3_v2_buffer8Reg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_X8R, value)
-		      break;
-		    case RegClass_kv3_v2_buffer16Reg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_X16R, value)
-		      break;
-		    case RegClass_kv3_v2_buffer32Reg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_X32R, value)
-		      break;
-		    case RegClass_kv3_v2_buffer64Reg:
-		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_X64R, value)
-		      break;
-		    case Immediate_kv3_v2_brknumber:
-		    case Immediate_kv3_v2_sysnumber:
-		    case Immediate_kv3_v2_signed10:
-		    case Immediate_kv3_v2_signed16:
-		    case Immediate_kv3_v2_signed27:
-		    case Immediate_kv3_v2_wrapped32:
-		    case Immediate_kv3_v2_signed37:
-		    case Immediate_kv3_v2_signed43:
-		    case Immediate_kv3_v2_signed54:
-		    case Immediate_kv3_v2_wrapped64:
-		    case Immediate_kv3_v2_unsigned6:
-		      res->operands[idx].val = value;
-		      res->operands[idx].sign = flags & LVX_OPERAND_SIGNED;
-		      res->operands[idx].width = width;
-		      res->operands[idx].type = CAT_IMMEDIATE;
-		      res->operands[idx].pcrel = 0;
-		      idx++;
-		      break;
-		    case Immediate_kv3_v2_pcrel27:
-		    case Immediate_kv3_v2_pcrel17:
-		      res->operands[idx].val = value + memaddr;
-		      res->operands[idx].sign = flags & LVX_OPERAND_SIGNED;
-		      res->operands[idx].width = width;
-		      res->operands[idx].type = CAT_IMMEDIATE;
-		      res->operands[idx].pcrel = 1;
-		      idx++;
-		      break;
-		    case Modifier_kv3_v2_accesses:
-		    case Modifier_kv3_v2_boolcas:
-		    case Modifier_kv3_v2_cachelev:
-		    case Modifier_kv3_v2_channel:
-		    case Modifier_kv3_v2_coherency:
-		    case Modifier_kv3_v2_comparison:
-		    case Modifier_kv3_v2_conjugate:
-		    case Modifier_kv3_v2_doscale:
-		    case Modifier_kv3_v2_exunum:
-		    case Modifier_kv3_v2_floatcomp:
-		    case Modifier_kv3_v2_hindex:
-		    case Modifier_kv3_v2_lsomask:
-		    case Modifier_kv3_v2_lsumask:
-		    case Modifier_kv3_v2_qindex:
-		    case Modifier_kv3_v2_rounding:
-		    case Modifier_kv3_v2_scalarcond:
-		    case Modifier_kv3_v2_shuffleV:
-		    case Modifier_kv3_v2_shuffleX:
-		    case Modifier_kv3_v2_silent:
-		    case Modifier_kv3_v2_simdcond:
-		    case Modifier_kv3_v2_speculate:
-		    case Modifier_kv3_v2_splat32:
-		    case Modifier_kv3_v2_transpose:
-		    case Modifier_kv3_v2_variant:
-		      {
-			int sz = 0;
-			int mod_idx = type - Modifier_kv3_v2_accesses;
-			for (sz = 0; env.lvx_modifiers[mod_idx][sz];
-			     ++sz);
-			const char *mod = value < (unsigned) sz
-			  ? env.lvx_modifiers[mod_idx][value] : NULL;
-			if (!mod) goto retry;
-			res->operands[idx].val = value;
-			res->operands[idx].type = CAT_MODIFIER;
-			res->operands[idx].mod_idx = mod_idx;
-			idx++;
-		      };
-		      break;
-		    default:
-		      fprintf (stderr, "error: unexpected operand type (%s)\n",
-			       type_name);
-		      exit (-1);
-		    };
-		}
-	      else if (env.opc_table == kv4_v1_optab)
-		{
-		  switch (type)
-		    {
-		    case RegClass_kv4_v1_singleReg:
-		    case RegClass_kv4_v1_worddRegE:
-		    case RegClass_kv4_v1_worddRegO:
-		      LVX_PRINT_REG (LVX_REGFILE_DEC_GPR, value)
-		      break;
-		    case RegClass_kv4_v1_pairedReg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_PGR, value)
-		      break;
-		    case RegClass_kv4_v1_quadReg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_QGR, value)
-		      break;
-		    case RegClass_kv4_v1_systemReg:
-		    case RegClass_kv4_v1_aloneReg:
-		    case RegClass_kv4_v1_onlyraReg:
-		    case RegClass_kv4_v1_onlygetReg:
-		    case RegClass_kv4_v1_onlysetReg:
-		    case RegClass_kv4_v1_onlyfxReg:
-		    case RegClass_kv4_v1_onlyswapReg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_SFR, value)
-		      break;
-		    case RegClass_kv4_v1_xworddReg:
-		    case RegClass_kv4_v1_xworddReg0M4:
-		    case RegClass_kv4_v1_xworddReg1M4:
-		    case RegClass_kv4_v1_xworddReg2M4:
-		    case RegClass_kv4_v1_xworddReg3M4:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_XCR, value)
-		      break;
-		    case RegClass_kv4_v1_xwordqReg:
-		    case RegClass_kv4_v1_xwordqRegE:
-		    case RegClass_kv4_v1_xwordqRegO:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_XBR, value)
-		      break;
-		    case RegClass_kv4_v1_xwordoReg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_XVR, value)
-		      break;
-		    case RegClass_kv4_v1_xwordxReg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_XTR, value)
-		      break;
-		    case RegClass_kv4_v1_xwordvReg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_XMR, value)
-		      break;
-		    case RegClass_kv4_v1_buffer2Reg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_X2R, value)
-		      break;
-		    case RegClass_kv4_v1_buffer4Reg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_X4R, value)
-		      break;
-		    case RegClass_kv4_v1_buffer8Reg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_X8R, value)
-		      break;
-		    case RegClass_kv4_v1_buffer16Reg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_X16R, value)
-		      break;
-		    case RegClass_kv4_v1_buffer32Reg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_X32R, value)
-		      break;
-		    case RegClass_kv4_v1_buffer64Reg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_X64R, value)
-		      break;
-		    case RegClass_kv4_v1_mainReg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_FIRST_RV_BIR, value)
-		      break;
-		    case RegClass_kv4_v1_floatReg:
-		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_RV_FPR, value)
-		      break;
-		    case Immediate_kv4_v1_brknumber:
-		    case Immediate_kv4_v1_sysnumber:
-		    case Immediate_kv4_v1_signed10:
-		    case Immediate_kv4_v1_signed12:
-		    case Immediate_kv4_v1_signed16:
-		    case Immediate_kv4_v1_signed20:
-		    case Immediate_kv4_v1_signed27:
-		    case Immediate_kv4_v1_wrapped32:
-		    case Immediate_kv4_v1_signed37:
-		    case Immediate_kv4_v1_signed43:
-		    case Immediate_kv4_v1_signed54:
-		    case Immediate_kv4_v1_wrapped64:
-		    case Immediate_kv4_v1_unsigned6:
-		      res->operands[idx].val = value;
-		      res->operands[idx].sign = flags & LVX_OPERAND_SIGNED;
-		      res->operands[idx].width = width;
-		      res->operands[idx].type = CAT_IMMEDIATE;
-		      res->operands[idx].pcrel = 0;
-		      idx++;
-		      break;
-		    case Immediate_kv4_v1_pcrel12s1:
-		    case Immediate_kv4_v1_pcrel11s2:
-		    case Immediate_kv4_v1_pcrel17s2:
-		    case Immediate_kv4_v1_pcrel20s1:
-		    case Immediate_kv4_v1_pcrel27s2:
-		    case Immediate_kv4_v1_pcrel38s2:
-		    case Immediate_kv4_v1_pcrel44s2:
-		    case Immediate_kv4_v1_pcrel54s2:
-		      res->operands[idx].val = value + memaddr;
-		      res->operands[idx].sign = flags & LVX_OPERAND_SIGNED;
-		      res->operands[idx].width = width;
-		      res->operands[idx].type = CAT_IMMEDIATE;
-		      res->operands[idx].pcrel = 1;
-		      idx++;
-		      break;
-		    case Modifier_kv4_v1_accesses:
-		    case Modifier_kv4_v1_boolcas:
-		    case Modifier_kv4_v1_cachelev:
-		    case Modifier_kv4_v1_channel:
-		    case Modifier_kv4_v1_coherency:
-		    case Modifier_kv4_v1_conjugate:
-		    case Modifier_kv4_v1_doscale:
-		    case Modifier_kv4_v1_exunum:
-		    case Modifier_kv4_v1_floatcomp:
-		    case Modifier_kv4_v1_hindex:
-		    case Modifier_kv4_v1_qindex:
-		    case Modifier_kv4_v1_floatmode:
-		    case Modifier_kv4_v1_ccbcomp:
-		    case Modifier_kv4_v1_intcomp:
-		    case Modifier_kv4_v1_bcucond:
-		    case Modifier_kv4_v1_shuffleV:
-		    case Modifier_kv4_v1_shuffleX:
-		    case Modifier_kv4_v1_lanecond:
-		    case Modifier_kv4_v1_speculate:
-		    case Modifier_kv4_v1_splat32:
-		    case Modifier_kv4_v1_variant:
-		    case Modifier_kv4_v1_lanetodo:
-		    case Modifier_kv4_v1_lanesize:
-		    case Modifier_kv4_v1_signextw:
-		    case Modifier_kv4_v1_highmult:
-		    case Modifier_kv4_v1_widemult:
-		    case Modifier_kv4_v1_oddlanes:
-		    case Modifier_kv4_v1_ziplanes:
-		    case Modifier_kv4_v1_imultiply:
-		    case Modifier_kv4_v1_fnegate:
-		    case Modifier_kv4_v1_mostsig:
-		      {
-			int sz = 0;
-			int mod_idx = type - Modifier_kv4_v1_accesses;
+			int mod_idx = type - Modifier_lvx_v1_accesses;
 			for (sz = 0; env.lvx_modifiers[mod_idx][sz]; ++sz);
 			const char *mod = value < (unsigned) sz
 			  ? env.lvx_modifiers[mod_idx][value] : NULL;
@@ -1445,11 +1026,9 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 #define chk_type(core_, val_) \
       (env.opc_table == core_ ##_optab && type == (val_))
 
-	  if (   chk_type (kv3_v1, RegClass_kv3_v1_singleReg)
-	      || chk_type (kv3_v2, RegClass_kv3_v2_singleReg)
-	      || chk_type (kv4_v1, RegClass_kv4_v1_singleReg))
+	  if (   chk_type (lvx_v1, RegClass_lvx_v1_singleReg))
 	    {
-	      if (env.lvx_regfiles[LVX_REGFILE_DEC_GPR] + value
+	      if (env.lvx_regfiles[LVX_V1_REGFILE_DEC_GPR] + value
 		  >= env.lvx_max_dec_registers)
 		return -1;
 	      if (is_add && i < 2)
@@ -1514,178 +1093,85 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 	      else
 		crt_peb_insn->gpr_reg[crt_peb_insn->nb_gprs++] = value;
 	    }
-	  else if (   chk_type (kv3_v1, RegClass_kv3_v1_pairedReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_pairedReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_pairedReg))
+	  else if (   chk_type (lvx_v1, RegClass_lvx_v1_pairedReg))
 	    crt_peb_insn->gpr_reg[crt_peb_insn->nb_gprs++] = value * 2;
-	  else if (   chk_type (kv3_v1, RegClass_kv3_v1_quadReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_quadReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_quadReg))
+	  else if (   chk_type (lvx_v1, RegClass_lvx_v1_quadReg))
 	    crt_peb_insn->gpr_reg[crt_peb_insn->nb_gprs++] = value * 4;
-	  else if (   chk_type (kv3_v1, RegClass_kv3_v1_systemReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_systemReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_systemReg)
-		   || chk_type (kv3_v1, RegClass_kv3_v1_aloneReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_aloneReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_aloneReg)
-		   || chk_type (kv3_v1, RegClass_kv3_v1_onlyraReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_onlyraReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_onlygetReg)
-		   || chk_type (kv3_v1, RegClass_kv3_v1_onlygetReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_onlygetReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_onlygetReg)
-		   || chk_type (kv3_v1, RegClass_kv3_v1_onlysetReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_onlysetReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_onlysetReg)
-		   || chk_type (kv3_v1, RegClass_kv3_v1_onlyfxReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_onlyfxReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_onlyfxReg))
+	  else if (   chk_type (lvx_v1, RegClass_lvx_v1_systemReg)
+		   || chk_type (lvx_v1, RegClass_lvx_v1_aloneReg)
+		   || chk_type (lvx_v1, RegClass_lvx_v1_onlygetReg)
+		   || chk_type (lvx_v1, RegClass_lvx_v1_onlysetReg)
+		   || chk_type (lvx_v1, RegClass_lvx_v1_onlyfxReg))
 	    {
-	      if (env.lvx_regfiles[LVX_REGFILE_DEC_GPR] + value
+	      if (env.lvx_regfiles[LVX_V1_REGFILE_DEC_GPR] + value
 		  >= env.lvx_max_dec_registers)
 		return -1;
-	      if (is_get && !strcmp (env.lvx_registers[env.lvx_dec_registers[env.lvx_regfiles[LVX_REGFILE_DEC_SFR] + value]].name, "$ra"))
+	      if (is_get && !strcmp (env.lvx_registers[env.lvx_dec_registers[env.lvx_regfiles[LVX_V1_REGFILE_DEC_SFR] + value]].name, "$ra"))
 		{
 		  crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_GET_RA;
 		  is_a_peb_insn = 1;
 		}
 	    }
-	  else if (   chk_type (kv3_v1, RegClass_kv3_v1_xworddReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_xworddReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_xworddReg)
-		   || chk_type (kv3_v1, RegClass_kv3_v1_xwordqReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_xwordqReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_xwordqReg)
-		   || chk_type (kv3_v1, RegClass_kv3_v1_xwordoReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_xwordoReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_xwordoReg)
-		   || chk_type (kv3_v1, RegClass_kv3_v1_xwordxReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_xwordxReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_xwordxReg)
-		   || chk_type (kv3_v1, RegClass_kv3_v1_xwordvReg)
-		   || chk_type (kv3_v2, RegClass_kv3_v2_xwordvReg)
-		   || chk_type (kv4_v1, RegClass_kv4_v1_xwordvReg)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_scalarcond)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_column)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_comparison)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_doscale)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_exunum)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_floatcomp)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_qindex)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_rectify)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_rounding)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_roundint)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_saturate)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_scalarcond)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_silent)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_simdcond)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_speculate)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_splat32)
-		   || chk_type (kv3_v1, Modifier_kv3_v1_variant)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_accesses)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_boolcas)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_cachelev)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_channel)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_coherency)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_comparison)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_conjugate)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_doscale)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_exunum)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_floatcomp)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_hindex)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_lsomask)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_lsumask)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_qindex)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_rounding)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_scalarcond)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_shuffleV)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_shuffleX)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_silent)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_simdcond)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_speculate)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_splat32)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_transpose)
-		   || chk_type (kv3_v2, Modifier_kv3_v2_variant)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_accesses)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_boolcas)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_cachelev)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_channel)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_coherency)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_doscale)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_exunum)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_floatcomp)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_hindex)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_qindex)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_floatmode)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_ccbcomp)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_intcomp)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_bcucond)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_shuffleV)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_shuffleX)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_lanecond)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_speculate)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_splat32)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_variant)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_lanetodo)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_lanesize)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_signextw)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_highmult)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_widemult)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_oddlanes)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_ziplanes)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_imultiply)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_fnegate)
-		   || chk_type (kv4_v1, Modifier_kv4_v1_mostsig))
+	  else if (   chk_type (lvx_v1, RegClass_lvx_v1_xworddReg)
+		   || chk_type (lvx_v1, RegClass_lvx_v1_xwordqReg)
+		   || chk_type (lvx_v1, RegClass_lvx_v1_xwordoReg)
+		   || chk_type (lvx_v1, RegClass_lvx_v1_xwordxReg)
+		   || chk_type (lvx_v1, RegClass_lvx_v1_xwordvReg)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_accesses)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_boolcas)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_cachelev)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_channel)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_coherency)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_doscale)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_exunum)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_floatcomp)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_hindex)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_qindex)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_floatmode)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_ccbcomp)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_intcomp)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_bcucond)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_shuffleV)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_shuffleX)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_lanecond)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_speculate)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_splat32)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_variant)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_lanetodo)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_lanesize)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_signextw)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_highmult)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_widemult)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_oddlanes)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_ziplanes)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_imultiply)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_fnegate)
+		   || chk_type (lvx_v1, Modifier_lvx_v1_mostsig))
 	    {
 	      /* Do nothing.  */
 	    }
-	  else if (   chk_type (kv3_v1, Immediate_kv3_v1_sysnumber)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_sysnumber)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_sysnumber)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_wrapped8)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_wrapped8)
-		   || chk_type (kv3_v1, Immediate_kv3_v1_signed10)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_signed10)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_signed10)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_signed12)
-		   || chk_type (kv3_v1, Immediate_kv3_v1_signed16)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_signed16)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_signed16)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_signed20)
-		   || chk_type (kv3_v1, Immediate_kv3_v1_signed27)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_signed27)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_signed27)
-		   || chk_type (kv3_v1, Immediate_kv3_v1_wrapped32)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_wrapped32)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_wrapped32)
-		   || chk_type (kv3_v1, Immediate_kv3_v1_signed37)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_signed37)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_signed37)
-		   || chk_type (kv3_v1, Immediate_kv3_v1_signed43)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_signed43)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_signed43)
-		   || chk_type (kv3_v1, Immediate_kv3_v1_signed54)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_signed54)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_signed54)
-		   || chk_type (kv3_v1, Immediate_kv3_v1_wrapped64)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_wrapped64)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_wrapped64)
-		   || chk_type (kv3_v1, Immediate_kv3_v1_unsigned6)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_unsigned6)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_unsigned6))
+	  else if (   chk_type (lvx_v1, Immediate_lvx_v1_sysnumber)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_wrapped8)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_signed10)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_signed12)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_signed16)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_signed20)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_signed27)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_wrapped32)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_signed37)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_signed43)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_signed54)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_wrapped64)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_unsigned6))
 	    crt_peb_insn->immediate = value;
-	  else if (   chk_type (kv3_v1, Immediate_kv3_v1_pcrel17)
-		   || chk_type (kv3_v1, Immediate_kv3_v1_pcrel27)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_pcrel17)
-		   || chk_type (kv3_v2, Immediate_kv3_v2_pcrel27)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_pcrel11s2)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_pcrel12s1)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_pcrel17s2)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_pcrel20s1)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_pcrel27s2)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_pcrel38s2)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_pcrel44s2)
-		   || chk_type (kv4_v1, Immediate_kv4_v1_pcrel54s2))
+	  else if (   chk_type (lvx_v1, Immediate_lvx_v1_pcrel11s2)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel12s1)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel17s2)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel20s1)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel27s2)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel38s2)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel44s2)
+		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel54s2))
 	    crt_peb_insn->immediate = value + memaddr;
 	  else
 	    return -1;

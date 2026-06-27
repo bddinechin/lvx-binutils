@@ -18,8 +18,8 @@
    along with this program; see the file COPYING3. If not,
    see <http://www.gnu.org/licenses/>.  */
 
-#ifndef _KV3_DIS_H_
-#define _KV3_DIS_H_
+#ifndef _LVX_DIS_H_
+#define _LVX_DIS_H_
 
 #include "dis-asm.h"
 

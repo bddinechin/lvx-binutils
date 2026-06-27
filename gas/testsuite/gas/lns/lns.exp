@@ -46,7 +46,7 @@ if { ![istarget s390*-*-*] } {
     } elseif { [istarget or1k*-*-*] } {
       run_dump_test "lns-common-1" { { source "lns-common-1-or1k.s" } }
     } elseif { [istarget kvx*-*-*] } {
-      run_dump_test "lns-common-1" { { source "lns-common-1-kvx.s" } }
+      run_dump_test "lns-common-1" { { source "lns-common-1-lvx.s" } }
     } else {
       run_dump_test "lns-common-1"
     }

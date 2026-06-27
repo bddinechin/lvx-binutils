@@ -9284,29 +9284,9 @@ msgstr ""
 msgid "Private flags = 0x%lx : "
 msgstr ""
 
-#: elfnn-kvx.c:3028
-#, c-format
-msgid "Coolidge (kv3) V1 64 bits"
-msgstr ""
-
-#: elfnn-kvx.c:3030
-#, c-format
-msgid "Coolidge (kv3) V2 64 bits"
-msgstr ""
-
 #: elfnn-kvx.c:3032
 #, c-format
 msgid "Coolidge (kv4) V1 64 bits"
-msgstr ""
-
-#: elfnn-kvx.c:3037
-#, c-format
-msgid "Coolidge (kv3) V1 32 bits"
-msgstr ""
-
-#: elfnn-kvx.c:3039
-#, c-format
-msgid "Coolidge (kv3) V2 32 bits"
 msgstr ""
 
 #: elfnn-kvx.c:3041

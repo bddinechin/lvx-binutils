@@ -18,10 +18,10 @@
    along with this program; see the file COPYING3. If not,
    see <http://www.gnu.org/licenses/>.  */
 
-#ifdef LVX_KV3_V1_KV3_V2_KV4_V1
+#ifdef LVX_V1_LVX_V2
 static reloc_howto_type elf_lvx_howto_table[] =
 {
-  HOWTO (R_KVX_NONE,			/* type */
+  HOWTO (R_LVX_NONE,			/* type */
 	 0,				/* rightshift */
 	 0,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 32,				/* bitsize */
@@ -29,12 +29,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_bitfield,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_NONE",			/* name */
+	 "R_LVX_NONE",			/* name */
 	 false,				/* partial_inplace */
 	 0,				/* src_mask */
 	 0,				/* dst_mask */
 	 false),			/* pcrel_offset */
-  HOWTO (R_KVX_16,			/* type */
+  HOWTO (R_LVX_16,			/* type */
 	 0,				/* rightshift */
 	 2,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 16,				/* bitsize */
@@ -42,12 +42,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_unsigned,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_16",			/* name */
+	 "R_LVX_16",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_32,			/* type */
+  HOWTO (R_LVX_32,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 32,				/* bitsize */
@@ -55,12 +55,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_unsigned,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_32",			/* name */
+	 "R_LVX_32",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_64,			/* type */
+  HOWTO (R_LVX_64,			/* type */
 	 0,				/* rightshift */
 	 8,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 64,				/* bitsize */
@@ -68,12 +68,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_unsigned,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_64",			/* name */
+	 "R_LVX_64",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffffffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S16_PCREL,			/* type */
+  HOWTO (R_LVX_S16_PCREL,			/* type */
 	 0,				/* rightshift */
 	 2,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 16,				/* bitsize */
@@ -81,12 +81,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_signed,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S16_PCREL",			/* name */
+	 "R_LVX_S16_PCREL",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_PCREL17,			/* type */
+  HOWTO (R_LVX_PCREL17,			/* type */
 	 2,				/* rightshift */
 	 3,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 17,				/* bitsize */
@@ -94,12 +94,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_signed,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_PCREL17",			/* name */
+	 "R_LVX_PCREL17",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7fffc0,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_PCREL27,			/* type */
+  HOWTO (R_LVX_PCREL27,			/* type */
 	 2,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -107,12 +107,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_signed,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_PCREL27",			/* name */
+	 "R_LVX_PCREL27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_32_PCREL,			/* type */
+  HOWTO (R_LVX_32_PCREL,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 32,				/* bitsize */
@@ -120,12 +120,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_signed,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_32_PCREL",			/* name */
+	 "R_LVX_32_PCREL",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S37_PCREL_LO10,			/* type */
+  HOWTO (R_LVX_S37_PCREL_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -133,12 +133,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_PCREL_LO10",			/* name */
+	 "R_LVX_S37_PCREL_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S37_PCREL_UP27,			/* type */
+  HOWTO (R_LVX_S37_PCREL_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -146,12 +146,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_PCREL_UP27",			/* name */
+	 "R_LVX_S37_PCREL_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S43_PCREL_LO10,			/* type */
+  HOWTO (R_LVX_S43_PCREL_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -159,12 +159,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_PCREL_LO10",			/* name */
+	 "R_LVX_S43_PCREL_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S43_PCREL_UP27,			/* type */
+  HOWTO (R_LVX_S43_PCREL_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -172,12 +172,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_PCREL_UP27",			/* name */
+	 "R_LVX_S43_PCREL_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S43_PCREL_EX6,			/* type */
+  HOWTO (R_LVX_S43_PCREL_EX6,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 6,				/* bitsize */
@@ -185,12 +185,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_PCREL_EX6",			/* name */
+	 "R_LVX_S43_PCREL_EX6",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x3f,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S64_PCREL_LO10,			/* type */
+  HOWTO (R_LVX_S64_PCREL_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -198,12 +198,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S64_PCREL_LO10",			/* name */
+	 "R_LVX_S64_PCREL_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S64_PCREL_UP27,			/* type */
+  HOWTO (R_LVX_S64_PCREL_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -211,12 +211,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S64_PCREL_UP27",			/* name */
+	 "R_LVX_S64_PCREL_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S64_PCREL_EX27,			/* type */
+  HOWTO (R_LVX_S64_PCREL_EX27,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -224,12 +224,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S64_PCREL_EX27",			/* name */
+	 "R_LVX_S64_PCREL_EX27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_64_PCREL,			/* type */
+  HOWTO (R_LVX_64_PCREL,			/* type */
 	 0,				/* rightshift */
 	 8,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 64,				/* bitsize */
@@ -237,12 +237,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_signed,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_64_PCREL",			/* name */
+	 "R_LVX_64_PCREL",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffffffffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S16,			/* type */
+  HOWTO (R_LVX_S16,			/* type */
 	 0,				/* rightshift */
 	 2,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 16,				/* bitsize */
@@ -250,12 +250,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_signed,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S16",			/* name */
+	 "R_LVX_S16",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S32_LO5,			/* type */
+  HOWTO (R_LVX_S32_LO5,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 5,				/* bitsize */
@@ -263,12 +263,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S32_LO5",			/* name */
+	 "R_LVX_S32_LO5",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7c0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S32_UP27,			/* type */
+  HOWTO (R_LVX_S32_UP27,			/* type */
 	 5,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -276,12 +276,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S32_UP27",			/* name */
+	 "R_LVX_S32_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_LO10,			/* type */
+  HOWTO (R_LVX_S37_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -289,12 +289,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_LO10",			/* name */
+	 "R_LVX_S37_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_UP27,			/* type */
+  HOWTO (R_LVX_S37_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -302,12 +302,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_UP27",			/* name */
+	 "R_LVX_S37_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_GOTOFF_LO10,			/* type */
+  HOWTO (R_LVX_S37_GOTOFF_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -315,12 +315,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_GOTOFF_LO10",			/* name */
+	 "R_LVX_S37_GOTOFF_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_GOTOFF_UP27,			/* type */
+  HOWTO (R_LVX_S37_GOTOFF_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -328,12 +328,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_GOTOFF_UP27",			/* name */
+	 "R_LVX_S37_GOTOFF_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_GOTOFF_LO10,			/* type */
+  HOWTO (R_LVX_S43_GOTOFF_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -341,12 +341,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_GOTOFF_LO10",			/* name */
+	 "R_LVX_S43_GOTOFF_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_GOTOFF_UP27,			/* type */
+  HOWTO (R_LVX_S43_GOTOFF_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -354,12 +354,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_GOTOFF_UP27",			/* name */
+	 "R_LVX_S43_GOTOFF_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_GOTOFF_EX6,			/* type */
+  HOWTO (R_LVX_S43_GOTOFF_EX6,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 6,				/* bitsize */
@@ -367,12 +367,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_GOTOFF_EX6",			/* name */
+	 "R_LVX_S43_GOTOFF_EX6",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x3f,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_32_GOTOFF,			/* type */
+  HOWTO (R_LVX_32_GOTOFF,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 32,				/* bitsize */
@@ -380,12 +380,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_32_GOTOFF",			/* name */
+	 "R_LVX_32_GOTOFF",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_64_GOTOFF,			/* type */
+  HOWTO (R_LVX_64_GOTOFF,			/* type */
 	 0,				/* rightshift */
 	 8,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 64,				/* bitsize */
@@ -393,12 +393,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_64_GOTOFF",			/* name */
+	 "R_LVX_64_GOTOFF",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffffffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_32_GOT,			/* type */
+  HOWTO (R_LVX_32_GOT,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 32,				/* bitsize */
@@ -406,12 +406,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_unsigned,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_32_GOT",			/* name */
+	 "R_LVX_32_GOT",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_GOT_LO10,			/* type */
+  HOWTO (R_LVX_S37_GOT_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -419,12 +419,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_GOT_LO10",			/* name */
+	 "R_LVX_S37_GOT_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_GOT_UP27,			/* type */
+  HOWTO (R_LVX_S37_GOT_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -432,12 +432,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_GOT_UP27",			/* name */
+	 "R_LVX_S37_GOT_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_GOT_LO10,			/* type */
+  HOWTO (R_LVX_S43_GOT_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -445,12 +445,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_GOT_LO10",			/* name */
+	 "R_LVX_S43_GOT_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_GOT_UP27,			/* type */
+  HOWTO (R_LVX_S43_GOT_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -458,12 +458,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_GOT_UP27",			/* name */
+	 "R_LVX_S43_GOT_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_GOT_EX6,			/* type */
+  HOWTO (R_LVX_S43_GOT_EX6,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 6,				/* bitsize */
@@ -471,12 +471,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_GOT_EX6",			/* name */
+	 "R_LVX_S43_GOT_EX6",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x3f,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_64_GOT,			/* type */
+  HOWTO (R_LVX_64_GOT,			/* type */
 	 0,				/* rightshift */
 	 8,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 64,				/* bitsize */
@@ -484,12 +484,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_64_GOT",			/* name */
+	 "R_LVX_64_GOT",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffffffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_GLOB_DAT,			/* type */
+  HOWTO (R_LVX_GLOB_DAT,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 32,				/* bitsize */
@@ -497,12 +497,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_GLOB_DAT",			/* name */
+	 "R_LVX_GLOB_DAT",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_COPY,			/* type */
+  HOWTO (R_LVX_COPY,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 32,				/* bitsize */
@@ -510,12 +510,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_COPY",			/* name */
+	 "R_LVX_COPY",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_JMP_SLOT,			/* type */
+  HOWTO (R_LVX_JMP_SLOT,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 32,				/* bitsize */
@@ -523,12 +523,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_JMP_SLOT",			/* name */
+	 "R_LVX_JMP_SLOT",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_RELATIVE,			/* type */
+  HOWTO (R_LVX_RELATIVE,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 32,				/* bitsize */
@@ -536,12 +536,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_RELATIVE",			/* name */
+	 "R_LVX_RELATIVE",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_LO10,			/* type */
+  HOWTO (R_LVX_S43_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -549,12 +549,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_LO10",			/* name */
+	 "R_LVX_S43_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_UP27,			/* type */
+  HOWTO (R_LVX_S43_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -562,12 +562,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_UP27",			/* name */
+	 "R_LVX_S43_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_EX6,			/* type */
+  HOWTO (R_LVX_S43_EX6,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 6,				/* bitsize */
@@ -575,12 +575,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_EX6",			/* name */
+	 "R_LVX_S43_EX6",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x3f,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S64_LO10,			/* type */
+  HOWTO (R_LVX_S64_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -588,12 +588,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S64_LO10",			/* name */
+	 "R_LVX_S64_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S64_UP27,			/* type */
+  HOWTO (R_LVX_S64_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -601,12 +601,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S64_UP27",			/* name */
+	 "R_LVX_S64_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S64_EX27,			/* type */
+  HOWTO (R_LVX_S64_EX27,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -614,12 +614,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S64_EX27",			/* name */
+	 "R_LVX_S64_EX27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_GOTADDR_LO10,			/* type */
+  HOWTO (R_LVX_S37_GOTADDR_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -627,12 +627,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_GOTADDR_LO10",			/* name */
+	 "R_LVX_S37_GOTADDR_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S37_GOTADDR_UP27,			/* type */
+  HOWTO (R_LVX_S37_GOTADDR_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -640,12 +640,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_GOTADDR_UP27",			/* name */
+	 "R_LVX_S37_GOTADDR_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S43_GOTADDR_LO10,			/* type */
+  HOWTO (R_LVX_S43_GOTADDR_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -653,12 +653,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_GOTADDR_LO10",			/* name */
+	 "R_LVX_S43_GOTADDR_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S43_GOTADDR_UP27,			/* type */
+  HOWTO (R_LVX_S43_GOTADDR_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -666,12 +666,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_GOTADDR_UP27",			/* name */
+	 "R_LVX_S43_GOTADDR_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S43_GOTADDR_EX6,			/* type */
+  HOWTO (R_LVX_S43_GOTADDR_EX6,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 6,				/* bitsize */
@@ -679,12 +679,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_GOTADDR_EX6",			/* name */
+	 "R_LVX_S43_GOTADDR_EX6",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x3f,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S64_GOTADDR_LO10,			/* type */
+  HOWTO (R_LVX_S64_GOTADDR_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -692,12 +692,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S64_GOTADDR_LO10",			/* name */
+	 "R_LVX_S64_GOTADDR_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S64_GOTADDR_UP27,			/* type */
+  HOWTO (R_LVX_S64_GOTADDR_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -705,12 +705,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S64_GOTADDR_UP27",			/* name */
+	 "R_LVX_S64_GOTADDR_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S64_GOTADDR_EX27,			/* type */
+  HOWTO (R_LVX_S64_GOTADDR_EX27,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -718,12 +718,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S64_GOTADDR_EX27",			/* name */
+	 "R_LVX_S64_GOTADDR_EX27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_64_DTPMOD,			/* type */
+  HOWTO (R_LVX_64_DTPMOD,			/* type */
 	 0,				/* rightshift */
 	 8,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 64,				/* bitsize */
@@ -731,12 +731,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_64_DTPMOD",			/* name */
+	 "R_LVX_64_DTPMOD",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffffffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_64_DTPOFF,			/* type */
+  HOWTO (R_LVX_64_DTPOFF,			/* type */
 	 0,				/* rightshift */
 	 8,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 64,				/* bitsize */
@@ -744,12 +744,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_64_DTPOFF",			/* name */
+	 "R_LVX_64_DTPOFF",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffffffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_TLS_DTPOFF_LO10,			/* type */
+  HOWTO (R_LVX_S37_TLS_DTPOFF_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -757,12 +757,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_TLS_DTPOFF_LO10",			/* name */
+	 "R_LVX_S37_TLS_DTPOFF_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_TLS_DTPOFF_UP27,			/* type */
+  HOWTO (R_LVX_S37_TLS_DTPOFF_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -770,12 +770,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_TLS_DTPOFF_UP27",			/* name */
+	 "R_LVX_S37_TLS_DTPOFF_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_DTPOFF_LO10,			/* type */
+  HOWTO (R_LVX_S43_TLS_DTPOFF_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -783,12 +783,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_DTPOFF_LO10",			/* name */
+	 "R_LVX_S43_TLS_DTPOFF_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_DTPOFF_UP27,			/* type */
+  HOWTO (R_LVX_S43_TLS_DTPOFF_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -796,12 +796,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_DTPOFF_UP27",			/* name */
+	 "R_LVX_S43_TLS_DTPOFF_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_DTPOFF_EX6,			/* type */
+  HOWTO (R_LVX_S43_TLS_DTPOFF_EX6,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 6,				/* bitsize */
@@ -809,12 +809,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_DTPOFF_EX6",			/* name */
+	 "R_LVX_S43_TLS_DTPOFF_EX6",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x3f,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_TLS_GD_LO10,			/* type */
+  HOWTO (R_LVX_S37_TLS_GD_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -822,12 +822,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_TLS_GD_LO10",			/* name */
+	 "R_LVX_S37_TLS_GD_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_TLS_GD_UP27,			/* type */
+  HOWTO (R_LVX_S37_TLS_GD_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -835,12 +835,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_TLS_GD_UP27",			/* name */
+	 "R_LVX_S37_TLS_GD_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_GD_LO10,			/* type */
+  HOWTO (R_LVX_S43_TLS_GD_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -848,12 +848,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_GD_LO10",			/* name */
+	 "R_LVX_S43_TLS_GD_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_GD_UP27,			/* type */
+  HOWTO (R_LVX_S43_TLS_GD_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -861,12 +861,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_GD_UP27",			/* name */
+	 "R_LVX_S43_TLS_GD_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_GD_EX6,			/* type */
+  HOWTO (R_LVX_S43_TLS_GD_EX6,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 6,				/* bitsize */
@@ -874,12 +874,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_GD_EX6",			/* name */
+	 "R_LVX_S43_TLS_GD_EX6",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x3f,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_TLS_LD_LO10,			/* type */
+  HOWTO (R_LVX_S37_TLS_LD_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -887,12 +887,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_TLS_LD_LO10",			/* name */
+	 "R_LVX_S37_TLS_LD_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_TLS_LD_UP27,			/* type */
+  HOWTO (R_LVX_S37_TLS_LD_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -900,12 +900,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_TLS_LD_UP27",			/* name */
+	 "R_LVX_S37_TLS_LD_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_LD_LO10,			/* type */
+  HOWTO (R_LVX_S43_TLS_LD_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -913,12 +913,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_LD_LO10",			/* name */
+	 "R_LVX_S43_TLS_LD_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_LD_UP27,			/* type */
+  HOWTO (R_LVX_S43_TLS_LD_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -926,12 +926,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_LD_UP27",			/* name */
+	 "R_LVX_S43_TLS_LD_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_LD_EX6,			/* type */
+  HOWTO (R_LVX_S43_TLS_LD_EX6,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 6,				/* bitsize */
@@ -939,12 +939,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_LD_EX6",			/* name */
+	 "R_LVX_S43_TLS_LD_EX6",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x3f,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_64_TPOFF,			/* type */
+  HOWTO (R_LVX_64_TPOFF,			/* type */
 	 0,				/* rightshift */
 	 8,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 64,				/* bitsize */
@@ -952,12 +952,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_64_TPOFF",			/* name */
+	 "R_LVX_64_TPOFF",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffffffffffffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_TLS_IE_LO10,			/* type */
+  HOWTO (R_LVX_S37_TLS_IE_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -965,12 +965,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_TLS_IE_LO10",			/* name */
+	 "R_LVX_S37_TLS_IE_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_TLS_IE_UP27,			/* type */
+  HOWTO (R_LVX_S37_TLS_IE_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -978,12 +978,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_TLS_IE_UP27",			/* name */
+	 "R_LVX_S37_TLS_IE_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_IE_LO10,			/* type */
+  HOWTO (R_LVX_S43_TLS_IE_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -991,12 +991,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_IE_LO10",			/* name */
+	 "R_LVX_S43_TLS_IE_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_IE_UP27,			/* type */
+  HOWTO (R_LVX_S43_TLS_IE_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -1004,12 +1004,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_IE_UP27",			/* name */
+	 "R_LVX_S43_TLS_IE_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_IE_EX6,			/* type */
+  HOWTO (R_LVX_S43_TLS_IE_EX6,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 6,				/* bitsize */
@@ -1017,12 +1017,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_IE_EX6",			/* name */
+	 "R_LVX_S43_TLS_IE_EX6",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x3f,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_TLS_LE_LO10,			/* type */
+  HOWTO (R_LVX_S37_TLS_LE_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -1030,12 +1030,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_TLS_LE_LO10",			/* name */
+	 "R_LVX_S37_TLS_LE_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S37_TLS_LE_UP27,			/* type */
+  HOWTO (R_LVX_S37_TLS_LE_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -1043,12 +1043,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S37_TLS_LE_UP27",			/* name */
+	 "R_LVX_S37_TLS_LE_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_LE_LO10,			/* type */
+  HOWTO (R_LVX_S43_TLS_LE_LO10,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 10,				/* bitsize */
@@ -1056,12 +1056,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_LE_LO10",			/* name */
+	 "R_LVX_S43_TLS_LE_LO10",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xffc0,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_LE_UP27,			/* type */
+  HOWTO (R_LVX_S43_TLS_LE_UP27,			/* type */
 	 10,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -1069,12 +1069,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_LE_UP27",			/* name */
+	 "R_LVX_S43_TLS_LE_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S43_TLS_LE_EX6,			/* type */
+  HOWTO (R_LVX_S43_TLS_LE_EX6,			/* type */
 	 37,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 6,				/* bitsize */
@@ -1082,12 +1082,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S43_TLS_LE_EX6",			/* name */
+	 "R_LVX_S43_TLS_LE_EX6",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x3f,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_8,			/* type */
+  HOWTO (R_LVX_8,			/* type */
 	 0,				/* rightshift */
 	 1,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 8,				/* bitsize */
@@ -1095,12 +1095,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_unsigned,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_8",			/* name */
+	 "R_LVX_8",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0xff,			/* dst_mask */
 	 false),			/* pc_offset */
-  HOWTO (R_KVX_S11S2_PCREL,			/* type */
+  HOWTO (R_LVX_S11S2_PCREL,			/* type */
 	 2,				/* rightshift */
 	 3,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 11,				/* bitsize */
@@ -1108,12 +1108,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 12,				/* bitpos (bit field offset) */
 	 complain_overflow_signed,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S11S2_PCREL",			/* name */
+	 "R_LVX_S11S2_PCREL",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ff000,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S17S2_PCREL,			/* type */
+  HOWTO (R_LVX_S17S2_PCREL,			/* type */
 	 2,				/* rightshift */
 	 3,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 17,				/* bitsize */
@@ -1121,12 +1121,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_signed,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S17S2_PCREL",			/* name */
+	 "R_LVX_S17S2_PCREL",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7fffc0,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S27S2_PCREL,			/* type */
+  HOWTO (R_LVX_S27S2_PCREL,			/* type */
 	 2,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -1134,12 +1134,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_signed,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S27S2_PCREL",			/* name */
+	 "R_LVX_S27S2_PCREL",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S38S2_PCREL_LO11,			/* type */
+  HOWTO (R_LVX_S38S2_PCREL_LO11,			/* type */
 	 2,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 11,				/* bitsize */
@@ -1147,12 +1147,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 12,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S38S2_PCREL_LO11",			/* name */
+	 "R_LVX_S38S2_PCREL_LO11",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ff000,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S38S2_PCREL_UP27,			/* type */
+  HOWTO (R_LVX_S38S2_PCREL_UP27,			/* type */
 	 13,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -1160,12 +1160,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_signed,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S38S2_PCREL_UP27",			/* name */
+	 "R_LVX_S38S2_PCREL_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S44S2_PCREL_LO17,			/* type */
+  HOWTO (R_LVX_S44S2_PCREL_LO17,			/* type */
 	 2,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 17,				/* bitsize */
@@ -1173,12 +1173,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 6,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S44S2_PCREL_LO17",			/* name */
+	 "R_LVX_S44S2_PCREL_LO17",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7fffc0,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S44S2_PCREL_UP27,			/* type */
+  HOWTO (R_LVX_S44S2_PCREL_UP27,			/* type */
 	 19,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -1186,12 +1186,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_signed,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S44S2_PCREL_UP27",			/* name */
+	 "R_LVX_S44S2_PCREL_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S54S2_PCREL_LO27,			/* type */
+  HOWTO (R_LVX_S54S2_PCREL_LO27,			/* type */
 	 2,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -1199,12 +1199,12 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_dont,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S54S2_PCREL_LO27",			/* name */
+	 "R_LVX_S54S2_PCREL_LO27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_KVX_S54S2_PCREL_UP27,			/* type */
+  HOWTO (R_LVX_S54S2_PCREL_UP27,			/* type */
 	 29,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
 	 27,				/* bitsize */
@@ -1212,11 +1212,11 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0,				/* bitpos (bit field offset) */
 	 complain_overflow_signed,	/* complain_on_overflow */
 	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_KVX_S54S2_PCREL_UP27",			/* name */
+	 "R_LVX_S54S2_PCREL_UP27",			/* name */
 	 false,				/* partial_inplace */
 	 0x0,				/* src_mask */
 	 0x7ffffff,			/* dst_mask */
 	 true),			/* pc_offset */
 };
 
-#endif /* LVX_KV3_V1_KV3_V2_KV4_V1 */
+#endif /* LVX_V1_LVX_V2 */

@@ -8892,30 +8892,10 @@ msgstr "%s: el tamaño del objeto no coincide con el tamaño del objetivo %s"
 msgid "Private flags = 0x%lx : "
 msgstr "Marcas privadas = 0x%lx: "
 
-#: elfnn-kvx.c:3005
-#, c-format
-msgid "Coolidge (kv3) V1 64 bits"
-msgstr "Coolidge (kv3) V1 64 bits"
-
-#: elfnn-kvx.c:3007
-#, c-format
-msgid "Coolidge (kv3) V2 64 bits"
-msgstr "Coolidge (kv3) V2 64 bits"
-
 #: elfnn-kvx.c:3009
 #, c-format
 msgid "Coolidge (kv4) V1 64 bits"
 msgstr "Coolidge (kv4) V1 64 bits"
-
-#: elfnn-kvx.c:3014
-#, c-format
-msgid "Coolidge (kv3) V1 32 bits"
-msgstr "Coolidge (kv3) V1 32 bits"
-
-#: elfnn-kvx.c:3016
-#, c-format
-msgid "Coolidge (kv3) V2 32 bits"
-msgstr "Coolidge (kv3) V2 32 bits"
 
 #: elfnn-kvx.c:3018
 #, c-format

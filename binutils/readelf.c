@@ -121,7 +121,7 @@
 #include "elf/i960.h"
 #include "elf/ia64.h"
 #include "elf/ip2k.h"
-#include "elf/kvx.h"
+#include "elf/lvx.h"
 #include "elf/lm32.h"
 #include "elf/iq2000.h"
 #include "elf/m32c.h"
@@ -5172,9 +5172,7 @@ get_machine_flags (Filedata * filedata, unsigned e_flags, unsigned e_machine)
 	  break;
 
 	case EM_KVX:
-	  if ((e_flags & ELF_LVX_CORE_MASK) == ELF_LVX_CORE_KV4_1)
-	    strcat (buf, ", LVX kv4-1 (compat)");
-	  else if ((e_flags & ELF_LVX_CORE_MASK) == ELF_LVX_CORE_LVX_1)
+	  if ((e_flags & ELF_LVX_CORE_MASK) == ELF_LVX_CORE_LVX_1)
 	    strcat (buf, ", LVX lvx-1");
 	  else if ((e_flags & ELF_LVX_CORE_MASK) == ELF_LVX_CORE_LVX_2)
 	    strcat (buf, ", LVX lvx-2");

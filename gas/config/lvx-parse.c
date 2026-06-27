@@ -1177,10 +1177,9 @@ setup (int core)
 {
   switch (core)
   {
-  case ELF_LVX_CORE_KV4_1:
   case ELF_LVX_CORE_LVX_1:
   case ELF_LVX_CORE_LVX_2:
-    setup_kv4_v1 ();
+    setup_lvx_v1 ();
     break;
   default:
     as_bad ("Unknown architecture");

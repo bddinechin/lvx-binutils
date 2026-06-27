@@ -8888,30 +8888,10 @@ msgstr "%s: величина објекта не одговара величин
 msgid "Private flags = 0x%lx : "
 msgstr "Приватне заставице = 0x%lx: "
 
-#: elfnn-kvx.c:3005
-#, c-format
-msgid "Coolidge (kv3) V1 64 bits"
-msgstr "Coolidge (kv3) V1 64 бита"
-
-#: elfnn-kvx.c:3007
-#, c-format
-msgid "Coolidge (kv3) V2 64 bits"
-msgstr "Coolidge (kv3) V2 64 бита"
-
 #: elfnn-kvx.c:3009
 #, c-format
 msgid "Coolidge (kv4) V1 64 bits"
 msgstr "Coolidge (kv4) V1 64 бита"
-
-#: elfnn-kvx.c:3014
-#, c-format
-msgid "Coolidge (kv3) V1 32 bits"
-msgstr "Coolidge (kv3) V1 32 бита"
-
-#: elfnn-kvx.c:3016
-#, c-format
-msgid "Coolidge (kv3) V2 32 bits"
-msgstr "Coolidge (kv3) V2 32 бита"
 
 #: elfnn-kvx.c:3018
 #, c-format

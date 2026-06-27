@@ -1,5 +1,5 @@
 /* Script for ld testsuite */
-OUTPUT_ARCH(kv3-1:64)
+OUTPUT_ARCH(lvx-1:64)
 ENTRY(_start)
 SECTIONS
 {

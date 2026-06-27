@@ -48,14 +48,10 @@ static void supported_cores (char buf[], size_t buflen);
 #define LVX_PARALLEL_BIT (1u << 31)
 
 /* Enumeration of LVX execution units */
-enum KV4_EXU
-  { KV4_EXU_BCU0, KV4_EXU_BCU1, KV4_EXU_ALU0, KV4_EXU_ALU1, KV4_EXU_LSU0, KV4_EXU_LSU1,
-    KV4_EXU_EXT0, KV4_EXU_EXT1, KV4_EXU_EXT2, KV4_EXU_EXT3, KV4_EXU__ };
+enum LVX_EXU
+  { LVX_EXU_BCU0, LVX_EXU_BCU1, LVX_EXU_ALU0, LVX_EXU_ALU1, LVX_EXU_LSU0, LVX_EXU_LSU1,
+    LVX_EXU_EXT0, LVX_EXU_EXT1, LVX_EXU_EXT2, LVX_EXU_EXT3, LVX_EXU__ };
 
-enum KV3_EXU
-  { KV3_EXU_BCU, KV3_EXU_EXT, KV3_EXU_ALU0, KV3_EXU_ALU1, KV3_EXU_MAU, KV3_EXU_LSU, KV3_EXU__ };
-
-#define LVX_EXU__ ((int)KV4_EXU__ > (int)KV3_EXU__ ? KV4_EXU__ : KV3_EXU__)
 
 int size_type_function = 1;
 
@@ -683,58 +679,58 @@ insert_operand (struct lvx_insn *insn, struct lvx_operand *opnd,
 		if (insn->nfixups != 0)
 		  as_fatal ("[insert_operand] no room for fixup ");
 
-		if (ELF_LVX_IS_LVX (env.params.core) || env.params.core == ELF_LVX_CORE_KV4_1)
+		if (ELF_LVX_IS_LVX (env.params.core))
 		  switch (opnd->type)
 		    {
-		      case Immediate_kv4_v1_signed10:
-			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S37_LO10, exp);
+		      case Immediate_lvx_v1_signed10:
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S37_LO10, exp);
 			break;
-		      case Immediate_kv4_v1_signed37:
-			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S37_LO10, exp);
+		      case Immediate_lvx_v1_signed37:
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S37_LO10, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S37_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S37_UP27, exp);
 			break;
-		      case Immediate_kv4_v1_signed43:
-			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S43_LO10, exp);
-			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S43_EX6, exp);
+		      case Immediate_lvx_v1_signed43:
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S43_LO10, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S43_EX6, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S43_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S43_UP27, exp);
 			break;
-		      case Immediate_kv4_v1_wrapped32:
-			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S32_LO5, exp);
+		      case Immediate_lvx_v1_wrapped32:
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S32_LO5, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S32_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S32_UP27, exp);
 			break;
-		      case Immediate_kv4_v1_wrapped64:
-			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S64_LO10, exp);
+		      case Immediate_lvx_v1_wrapped64:
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S64_LO10, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S64_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S64_UP27, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S64_EX27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S64_EX27, exp);
 			break;
-		      case Immediate_kv4_v1_pcrel11s2:
-			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S11S2_PCREL, exp);
+		      case Immediate_lvx_v1_pcrel11s2:
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S11S2_PCREL, exp);
 			break;
-		      case Immediate_kv4_v1_pcrel17s2:
-			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S17S2_PCREL, exp);
+		      case Immediate_lvx_v1_pcrel17s2:
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S17S2_PCREL, exp);
 			break;
-		      case Immediate_kv4_v1_pcrel27s2:
-			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S27S2_PCREL, exp);
+		      case Immediate_lvx_v1_pcrel27s2:
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S27S2_PCREL, exp);
 			break;
-		      case Immediate_kv4_v1_pcrel38s2:
-			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S38S2_PCREL_LO11, exp);
+		      case Immediate_lvx_v1_pcrel38s2:
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S38S2_PCREL_LO11, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S38S2_PCREL_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S38S2_PCREL_UP27, exp);
 			break;
-		      case Immediate_kv4_v1_pcrel44s2:
-			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S44S2_PCREL_LO17, exp);
+		      case Immediate_lvx_v1_pcrel44s2:
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S44S2_PCREL_LO17, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S44S2_PCREL_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S44S2_PCREL_UP27, exp);
 			break;
-		      case Immediate_kv4_v1_pcrel54s2:
-			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S54S2_PCREL_LO27, exp);
+		      case Immediate_lvx_v1_pcrel54s2:
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S54S2_PCREL_LO27, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S54S2_PCREL_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S54S2_PCREL_UP27, exp);
 			break;
 		      default:
 		      as_fatal ("[insert_operand] don't know how to generate a fixup record");
@@ -819,8 +815,8 @@ lvx_emit_insn (struct lvx_insn *insn, int fixup_pos, int stopflag)
       pcrel = reloc_howto->pc_relative;
 
       /* In case the PCREL relocation is not for the first insn in the
-	 bundle, we have to offset it.  The KV3 architecture relies on
-	 the bundle PC.  The KV4 architecture relies on the insn PC.
+	 bundle, we have to offset it.  LVX relies on the insn PC (not
+	 the bundle PC as in older architectures).
 	 This difference is taken care of when setting the FIXUP_POS.  */
       if (pcrel && fixup_pos > 0)
 	insn->fixups[i].exp.X_add_number += fixup_pos * 4;
@@ -1060,77 +1056,9 @@ insn_syntax (struct lvx_opc * op, char *buf, int buf_size)
 
 #define ASM_CHARS_MAX (71)
 
-static void
-kv3_dump_opc (struct lvx_opc * op ATTRIBUTE_UNUSED)
-{
-  char asm_str[ASM_CHARS_MAX];
-  int chars = insn_syntax (op, asm_str, ASM_CHARS_MAX);
-  const char *insn_type = "UNKNOWN";
-  const char *insn_mode = "";
-
-  for (int i = chars - 1; i < ASM_CHARS_MAX - 1; i++)
-    asm_str[i] = '-';
-
-  /* This works because the Bundling is the same for the KV3 v1 and v2.  */
-  switch ((int) op->bundling)
-    {
-    case Bundling_kv3_v1_ALL:
-      insn_type = "ALL  ";
-      break;
-    case Bundling_kv3_v1_BCU:
-      insn_type = "BCU  ";
-      break;
-    case Bundling_kv3_v1_EXT:
-      insn_type = "EXT  ";
-      break;
-    case Bundling_kv3_v1_FULL:
-    case Bundling_kv3_v1_FULL_X:
-    case Bundling_kv3_v1_FULL_Y:
-      insn_type = "FULL ";
-      break;
-    case Bundling_kv3_v1_LITE:
-    case Bundling_kv3_v1_LITE_X:
-    case Bundling_kv3_v1_LITE_Y:
-      insn_type = "LITE ";
-      break;
-    case Bundling_kv3_v1_TINY:
-    case Bundling_kv3_v1_TINY_X:
-    case Bundling_kv3_v1_TINY_Y:
-      insn_type = "TINY ";
-      break;
-    case Bundling_kv3_v1_MAU:
-    case Bundling_kv3_v1_MAU_X:
-    case Bundling_kv3_v1_MAU_Y:
-      insn_type = "MAU  ";
-      break;
-    case Bundling_kv3_v1_LSU:
-    case Bundling_kv3_v1_LSU_X:
-    case Bundling_kv3_v1_LSU_Y:
-      insn_type = "LSU  ";
-      break;
-    case Bundling_kv3_v1_NOP:
-      insn_type = "NOP  ";
-      break;
-    default:
-      as_fatal ("[kv3_dump_opc] unhandled Bundling class %d", op->bundling);
-    }
-
-  if (op->codewords[0].flags & LVX_OPCODE_FLAG_MODE64
-      && op->codewords[0].flags & LVX_OPCODE_FLAG_MODE32)
-    insn_mode = "32 and 64";
-  else if (op->codewords[0].flags & LVX_OPCODE_FLAG_MODE64)
-    insn_mode = "64";
-  else if (op->codewords[0].flags & LVX_OPCODE_FLAG_MODE32)
-    insn_mode = "32";
-  else
-    as_fatal ("[kv3_dump_opc] unknown instruction mode.");
-
-  printf ("%s | syllables: %d | type: %s | mode: %s bits\n",
-	  asm_str, op->wordcount, insn_type, insn_mode);
-}
 
 static void
-kv4_dump_opc (struct lvx_opc * op ATTRIBUTE_UNUSED)
+lvx_v1_dump_opc (struct lvx_opc * op ATTRIBUTE_UNUSED)
 {
   char asm_str[ASM_CHARS_MAX];
   int chars = insn_syntax (op, asm_str, ASM_CHARS_MAX);
@@ -1142,46 +1070,46 @@ kv4_dump_opc (struct lvx_opc * op ATTRIBUTE_UNUSED)
 
   switch ((int) op->bundling)
     {
-    case Bundling_kv4_v1_ALL:
+    case Bundling_lvx_v1_ALL:
       insn_type = "ALL  ";
       break;
-    case Bundling_kv4_v1_BCU2_X:
-    case Bundling_kv4_v1_BCU2:
-    case Bundling_kv4_v1_BCU0:
-    case Bundling_kv4_v1_BCU:
+    case Bundling_lvx_v1_BCU2_X:
+    case Bundling_lvx_v1_BCU2:
+    case Bundling_lvx_v1_BCU0:
+    case Bundling_lvx_v1_BCU:
       insn_type = "BCU  ";
       break;
-    case Bundling_kv4_v1_FULL:
-    case Bundling_kv4_v1_FULL_X:
-    case Bundling_kv4_v1_FULL_Y:
+    case Bundling_lvx_v1_FULL:
+    case Bundling_lvx_v1_FULL_X:
+    case Bundling_lvx_v1_FULL_Y:
       insn_type = "FULL ";
       break;
-    case Bundling_kv4_v1_LITE:
-    case Bundling_kv4_v1_LITE_X:
-    case Bundling_kv4_v1_LITE_Y:
+    case Bundling_lvx_v1_LITE:
+    case Bundling_lvx_v1_LITE_X:
+    case Bundling_lvx_v1_LITE_Y:
       insn_type = "LITE ";
       break;
-    case Bundling_kv4_v1_TINY:
-    case Bundling_kv4_v1_TINY_X:
-    case Bundling_kv4_v1_TINY_Y:
+    case Bundling_lvx_v1_TINY:
+    case Bundling_lvx_v1_TINY_X:
+    case Bundling_lvx_v1_TINY_Y:
       insn_type = "TINY ";
       break;
-    case Bundling_kv4_v1_LSU0:
-    case Bundling_kv4_v1_LSU0_X:
-    case Bundling_kv4_v1_LSU0_Y:
-    case Bundling_kv4_v1_LSU:
-    case Bundling_kv4_v1_LSU_X:
-    case Bundling_kv4_v1_LSU_Y:
+    case Bundling_lvx_v1_LSU0:
+    case Bundling_lvx_v1_LSU0_X:
+    case Bundling_lvx_v1_LSU0_Y:
+    case Bundling_lvx_v1_LSU:
+    case Bundling_lvx_v1_LSU_X:
+    case Bundling_lvx_v1_LSU_Y:
       insn_type = "LSU  ";
       break;
-    case Bundling_kv4_v1_EXT:
+    case Bundling_lvx_v1_EXT:
       insn_type = "EXT  ";
       break;
-    case Bundling_kv4_v1_NOP:
+    case Bundling_lvx_v1_NOP:
       insn_type = "NOP  ";
       break;
     default:
-      as_fatal ("[kv4_dump_opc] unhandled bundling class %d", op->bundling);
+      as_fatal ("[lvx_dump_opc] unhandled bundling class %d", op->bundling);
     }
 
   if (op->codewords[0].flags & LVX_OPCODE_FLAG_MODE64
@@ -1192,176 +1120,28 @@ kv4_dump_opc (struct lvx_opc * op ATTRIBUTE_UNUSED)
   else if (op->codewords[0].flags & LVX_OPCODE_FLAG_MODE32)
     insn_mode = "32";
   else
-    as_fatal ("[kv4_dump_opc] unknown instruction mode.");
+    as_fatal ("[lvx_dump_opc] unknown instruction mode.");
 
   printf ("%s | syllables: %d | type: %s | mode: %s bits\n",
 	  asm_str, op->wordcount, insn_type, insn_mode);
 }
 
-/*
- * Fill the ISSUED_INSNS array indexed by EXU with the BUNDLE_INSNS.
- * Reorder the BUNDLE_INSNS array and update the LVX_IMMX_BUFFER entries.
- */
-static void
-kv3_reorder_bundle (struct lvx_insn *bundle_insns[], struct lvx_insn *issued_insns[])
-{
-  unsigned bundle_flags = 0;
-  for (int i = 0; i < lvx_insn_cnt; i++)
-    {
-      struct lvx_insn *insn = bundle_insns[i];
-      const struct lvx_opc *opdef = insn->opdef;
-      bundle_flags |= opdef->codewords[0].flags;
-
-      int tag = -1, exu = -1;
-      /* Hack! It works because all the kv3 Bundling(s) are the same.  */
-      switch (opdef->bundling)
-	{
-	case Bundling_kv3_v1_ALL:
-	  if (lvx_insn_cnt > 1)
-	    as_fatal ("too many instructions in a singleton bundle");
-	  issued_insns[exu = 0] = insn;
-	  break;
-	case Bundling_kv3_v1_BCU:
-	  if (!issued_insns[KV3_EXU_BCU])
-	    {
-	      issued_insns[exu = KV3_EXU_BCU] = insn;
-	    }
-	  else
-	    as_fatal ("more than one BCU instruction in bundle");
-	  break;
-	case Bundling_kv3_v1_EXT:
-	  if (!issued_insns[KV3_EXU_EXT])
-	    issued_insns[exu = KV3_EXU_EXT] = insn;
-	  else
-	    as_fatal ("more than one MAU instruction in bundle");
-	  break;
-	case Bundling_kv3_v1_FULL:
-	case Bundling_kv3_v1_FULL_X:
-	case Bundling_kv3_v1_FULL_Y:
-	  if (!issued_insns[KV3_EXU_ALU0])
-	    {
-	      issued_insns[exu = KV3_EXU_ALU0] = insn;
-	      tag = Modifier_kv3_v1_exunum_ALU0;
-	    }
-	  else
-	    as_fatal ("more than one ALU FULL instruction in bundle");
-	  break;
-	case Bundling_kv3_v1_LITE:
-	case Bundling_kv3_v1_LITE_X:
-	case Bundling_kv3_v1_LITE_Y:
-	  if (!issued_insns[KV3_EXU_ALU0])
-	    {
-	      issued_insns[exu = KV3_EXU_ALU0] = insn;
-	      tag = Modifier_kv3_v1_exunum_ALU0;
-	    }
-	  else if (!issued_insns[KV3_EXU_ALU1])
-	    {
-	      issued_insns[exu = KV3_EXU_ALU1] = insn;
-	      tag = Modifier_kv3_v1_exunum_ALU1;
-	    }
-	  else
-	    as_fatal ("too many ALU FULL or LITE instructions in bundle");
-	  break;
-	case Bundling_kv3_v1_MAU:
-	case Bundling_kv3_v1_MAU_X:
-	case Bundling_kv3_v1_MAU_Y:
-	  if (!issued_insns[KV3_EXU_MAU])
-	    {
-	      issued_insns[exu = KV3_EXU_MAU] = insn;
-	      tag = Modifier_kv3_v1_exunum_MAU;
-	    }
-	  else
-	    as_fatal ("more than one MAU instruction in bundle");
-	  break;
-	case Bundling_kv3_v1_LSU:
-	case Bundling_kv3_v1_LSU_X:
-	case Bundling_kv3_v1_LSU_Y:
-	  if (!issued_insns[KV3_EXU_LSU])
-	    {
-	      issued_insns[exu = KV3_EXU_LSU] = insn;
-	      tag = Modifier_kv3_v1_exunum_LSU;
-	    }
-	  else
-	    as_fatal ("more than one LSU instruction in bundle");
-	  break;
-	case Bundling_kv3_v1_TINY:
-	case Bundling_kv3_v1_TINY_X:
-	case Bundling_kv3_v1_TINY_Y:
-	case Bundling_kv3_v1_NOP:
-	  if (!issued_insns[KV3_EXU_ALU0])
-	    {
-	      issued_insns[exu = KV3_EXU_ALU0] = insn;
-	      tag = Modifier_kv3_v1_exunum_ALU0;
-	    }
-	  else if (!issued_insns[KV3_EXU_ALU1])
-	    {
-	      issued_insns[exu = KV3_EXU_ALU1] = insn;
-	      tag = Modifier_kv3_v1_exunum_ALU1;
-	    }
-	  else if (!issued_insns[KV3_EXU_MAU])
-	    {
-	      issued_insns[exu = KV3_EXU_MAU] = insn;
-	      tag = Modifier_kv3_v1_exunum_MAU;
-	    }
-	  else if (!issued_insns[KV3_EXU_LSU])
-	    {
-	      issued_insns[exu = KV3_EXU_LSU] = insn;
-	      tag = Modifier_kv3_v1_exunum_LSU;
-	    }
-	  else
-	    as_fatal ("too many ALU instructions in bundle");
-	  break;
-	default:
-	  as_fatal ("unhandled Bundling class %d", opdef->bundling);
-	}
-      insn->lvx_exu = exu;
-      assert (exu >= 0);
-
-      if (tag >= 0)
-	{
-	  if (issued_insns[exu]->immx0_idx >= 0)
-	    {
-	      int immx_idx = issued_insns[exu]->immx0_idx;
-	      lvx_immx_buffer[immx_idx].words[0] |= (tag << 27);
-	      lvx_immx_buffer[immx_idx].lvx_exu = exu;
-	    }
-	  if (issued_insns[exu]->immx1_idx >= 0)
-	    {
-	      int immx_idx = issued_insns[exu]->immx1_idx;
-	      lvx_immx_buffer[immx_idx].words[0] |= (tag << 27);
-	      lvx_immx_buffer[immx_idx].lvx_exu = exu;
-	    }
-	}
-    }
-
-  /* Fill BUNDLE_INSNS with valid instructions in enum KV3_EXU order.  */
-  int insn_cnt = 0;
-  for (int exu = KV3_EXU_BCU; exu < KV3_EXU__; exu++)
-    if (issued_insns[exu])
-      bundle_insns[insn_cnt++] = issued_insns[exu];
-
-  if (insn_cnt != lvx_insn_cnt)
-    as_fatal ("mismatch between bundled and issued instructions");
-
-  env.stcall_info.found = (bundle_flags & LVX_OPCODE_FLAG_STORE)
-			  && (bundle_flags & LVX_OPCODE_FLAG_CALL);
-}
 
 /* Record CCB with IMMX, which will be first in LVX_IMMX_BUFFER.  */
-static struct lvx_insn *kv4_bcux_insn;
+static struct lvx_insn *lvx_bcux_insn;
 
 /* Record the BCU opcode words to commonalize GUARD and BLEND instructions.  */
-static unsigned kv4_bcu0_word, kv4_bcu1_word;
+static unsigned lvx_bcu0_word, lvx_bcu1_word;
 
 /*
  * Fill the ISSUED_INSNS array indexed by EXU with the BUNDLE_INSNS.
  * Reorder the BUNDLE_INSNS array and update the LVX_IMMX_BUFFER entries.
  */
 static void
-kv4_reorder_bundle (struct lvx_insn *bundle_insns[], struct lvx_insn *issued_insns[])
+lvx_v1_reorder_bundle (struct lvx_insn *bundle_insns[], struct lvx_insn *issued_insns[])
 {
-  kv4_bcux_insn = 0;
-  kv4_bcu0_word = kv4_bcu1_word = 0;
+  lvx_bcux_insn = 0;
+  lvx_bcu0_word = lvx_bcu1_word = 0;
   unsigned bundle_flags = 0;
   for (int i = 0; i < lvx_insn_cnt; i++)
     {
@@ -1372,137 +1152,137 @@ kv4_reorder_bundle (struct lvx_insn *bundle_insns[], struct lvx_insn *issued_ins
       int tag = -1, exu = -1;
       switch (opdef->bundling)
 	{
-	case Bundling_kv4_v1_ALL:
+	case Bundling_lvx_v1_ALL:
 	  if (lvx_insn_cnt > 1)
 	    as_fatal ("too many instructions in a singleton bundle");
 	  issued_insns[exu = 0] = insn;
 	  break;
-	case Bundling_kv4_v1_BCU2_X:
+	case Bundling_lvx_v1_BCU2_X:
 	  assert (lvx_immx_cnt > 0);
-	  kv4_bcux_insn = insn;
+	  lvx_bcux_insn = insn;
 	  // Fall-through.
-	case Bundling_kv4_v1_BCU2:
-	  if (!issued_insns[KV4_EXU_BCU0] && !issued_insns[KV4_EXU_BCU1])
+	case Bundling_lvx_v1_BCU2:
+	  if (!issued_insns[LVX_EXU_BCU0] && !issued_insns[LVX_EXU_BCU1])
 	    {
-	      issued_insns[exu = KV4_EXU_BCU0] = issued_insns[KV4_EXU_BCU1] = insn;
-	      kv4_bcu0_word = kv4_bcu1_word = insn->words[0];
+	      issued_insns[exu = LVX_EXU_BCU0] = issued_insns[LVX_EXU_BCU1] = insn;
+	      lvx_bcu0_word = lvx_bcu1_word = insn->words[0];
 	    }
 	  else
 	    as_fatal ("more than two BCU2 instructions in bundle");
 	  break;
-	case Bundling_kv4_v1_BCU0:
-	  if (!issued_insns[KV4_EXU_BCU0])
+	case Bundling_lvx_v1_BCU0:
+	  if (!issued_insns[LVX_EXU_BCU0])
 	    {
-	      issued_insns[exu = KV4_EXU_BCU0] = insn;
-	      kv4_bcu0_word = insn->words[0];
+	      issued_insns[exu = LVX_EXU_BCU0] = insn;
+	      lvx_bcu0_word = insn->words[0];
 	    }
 	  else
 	    as_fatal ("more than one BCU0 instruction in bundle");
 	  break;
-	case Bundling_kv4_v1_BCU:
-	  if (!issued_insns[KV4_EXU_BCU0])
+	case Bundling_lvx_v1_BCU:
+	  if (!issued_insns[LVX_EXU_BCU0])
 	    {
-	      issued_insns[exu = KV4_EXU_BCU0] = insn;
-	      kv4_bcu0_word = insn->words[0];
+	      issued_insns[exu = LVX_EXU_BCU0] = insn;
+	      lvx_bcu0_word = insn->words[0];
 	    }
-	  else if (!issued_insns[KV4_EXU_BCU1])
+	  else if (!issued_insns[LVX_EXU_BCU1])
 	    {
-	      issued_insns[exu = KV4_EXU_BCU1] = insn;
-	      kv4_bcu1_word = insn->words[0];
+	      issued_insns[exu = LVX_EXU_BCU1] = insn;
+	      lvx_bcu1_word = insn->words[0];
 	    }
 	  else
 	    as_fatal ("more than two BCU instructions in bundle");
 	  break;
-	case Bundling_kv4_v1_FULL:
-	case Bundling_kv4_v1_FULL_X:
-	case Bundling_kv4_v1_FULL_Y:
-	  if (!issued_insns[KV4_EXU_ALU0])
+	case Bundling_lvx_v1_FULL:
+	case Bundling_lvx_v1_FULL_X:
+	case Bundling_lvx_v1_FULL_Y:
+	  if (!issued_insns[LVX_EXU_ALU0])
 	    {
-	      issued_insns[exu = KV4_EXU_ALU0] = insn;
-	      tag = Modifier_kv4_v1_exunum_ALU0;
+	      issued_insns[exu = LVX_EXU_ALU0] = insn;
+	      tag = Modifier_lvx_v1_exunum_ALU0;
 	    }
 	  else
 	    as_fatal ("more than one ALU FULL instruction in bundle");
 	  break;
-	case Bundling_kv4_v1_LITE:
-	case Bundling_kv4_v1_LITE_X:
-	case Bundling_kv4_v1_LITE_Y:
-	  if (!issued_insns[KV4_EXU_ALU0])
+	case Bundling_lvx_v1_LITE:
+	case Bundling_lvx_v1_LITE_X:
+	case Bundling_lvx_v1_LITE_Y:
+	  if (!issued_insns[LVX_EXU_ALU0])
 	    {
-	      issued_insns[exu = KV4_EXU_ALU0] = insn;
-	      tag = Modifier_kv4_v1_exunum_ALU0;
+	      issued_insns[exu = LVX_EXU_ALU0] = insn;
+	      tag = Modifier_lvx_v1_exunum_ALU0;
 	    }
-	  else if (!issued_insns[KV4_EXU_ALU1])
+	  else if (!issued_insns[LVX_EXU_ALU1])
 	    {
-	      issued_insns[exu = KV4_EXU_ALU1] = insn;
-	      tag = Modifier_kv4_v1_exunum_ALU1;
+	      issued_insns[exu = LVX_EXU_ALU1] = insn;
+	      tag = Modifier_lvx_v1_exunum_ALU1;
 	    }
 	  else
 	    as_fatal ("too many ALU FULL or LITE instructions in bundle");
 	  break;
-	case Bundling_kv4_v1_LSU0:
-	case Bundling_kv4_v1_LSU0_X:
-	case Bundling_kv4_v1_LSU0_Y:
-	  if (!issued_insns[KV4_EXU_LSU0])
+	case Bundling_lvx_v1_LSU0:
+	case Bundling_lvx_v1_LSU0_X:
+	case Bundling_lvx_v1_LSU0_Y:
+	  if (!issued_insns[LVX_EXU_LSU0])
 	    {
-	      issued_insns[exu = KV4_EXU_LSU0] = insn;
-	      tag = Modifier_kv4_v1_exunum_LSU0;
+	      issued_insns[exu = LVX_EXU_LSU0] = insn;
+	      tag = Modifier_lvx_v1_exunum_LSU0;
 	    }
 	  else
 	    as_fatal ("more than one LSU0 instruction in bundle");
 	  break;
-	case Bundling_kv4_v1_LSU:
-	case Bundling_kv4_v1_LSU_X:
-	case Bundling_kv4_v1_LSU_Y:
-	  if (!issued_insns[KV4_EXU_LSU0])
+	case Bundling_lvx_v1_LSU:
+	case Bundling_lvx_v1_LSU_X:
+	case Bundling_lvx_v1_LSU_Y:
+	  if (!issued_insns[LVX_EXU_LSU0])
 	    {
-	      issued_insns[exu = KV4_EXU_LSU0] = insn;
-	      tag = Modifier_kv4_v1_exunum_LSU0;
+	      issued_insns[exu = LVX_EXU_LSU0] = insn;
+	      tag = Modifier_lvx_v1_exunum_LSU0;
 	    }
-	  else if (!issued_insns[KV4_EXU_LSU1])
+	  else if (!issued_insns[LVX_EXU_LSU1])
 	    {
-	      issued_insns[exu = KV4_EXU_LSU1] = insn;
-	      tag = Modifier_kv4_v1_exunum_LSU1;
+	      issued_insns[exu = LVX_EXU_LSU1] = insn;
+	      tag = Modifier_lvx_v1_exunum_LSU1;
 	    }
 	  else
 	    as_fatal ("more than two LSU instructions in bundle");
 	  break;
-	case Bundling_kv4_v1_TINY:
-	case Bundling_kv4_v1_TINY_X:
-	case Bundling_kv4_v1_TINY_Y:
-	case Bundling_kv4_v1_NOP:
-	  if (!issued_insns[KV4_EXU_ALU0])
+	case Bundling_lvx_v1_TINY:
+	case Bundling_lvx_v1_TINY_X:
+	case Bundling_lvx_v1_TINY_Y:
+	case Bundling_lvx_v1_NOP:
+	  if (!issued_insns[LVX_EXU_ALU0])
 	    {
-	      issued_insns[exu = KV4_EXU_ALU0] = insn;
-	      tag = Modifier_kv4_v1_exunum_ALU0;
+	      issued_insns[exu = LVX_EXU_ALU0] = insn;
+	      tag = Modifier_lvx_v1_exunum_ALU0;
 	    }
-	  else if (!issued_insns[KV4_EXU_ALU1])
+	  else if (!issued_insns[LVX_EXU_ALU1])
 	    {
-	      issued_insns[exu = KV4_EXU_ALU1] = insn;
-	      tag = Modifier_kv4_v1_exunum_ALU1;
+	      issued_insns[exu = LVX_EXU_ALU1] = insn;
+	      tag = Modifier_lvx_v1_exunum_ALU1;
 	    }
-	  else if (!issued_insns[KV4_EXU_LSU0])
+	  else if (!issued_insns[LVX_EXU_LSU0])
 	    {
-	      issued_insns[exu = KV4_EXU_LSU0] = insn;
-	      tag = Modifier_kv4_v1_exunum_LSU0;
+	      issued_insns[exu = LVX_EXU_LSU0] = insn;
+	      tag = Modifier_lvx_v1_exunum_LSU0;
 	    }
-	  else if (!issued_insns[KV4_EXU_LSU1])
+	  else if (!issued_insns[LVX_EXU_LSU1])
 	    {
-	      issued_insns[exu = KV4_EXU_LSU1] = insn;
-	      tag = Modifier_kv4_v1_exunum_LSU1;
+	      issued_insns[exu = LVX_EXU_LSU1] = insn;
+	      tag = Modifier_lvx_v1_exunum_LSU1;
 	    }
 	  else
 	    as_fatal ("too many ALU instructions in bundle");
 	  break;
-	case Bundling_kv4_v1_EXT:
-	  if (!issued_insns[KV4_EXU_EXT0])
-	    issued_insns[exu = KV4_EXU_EXT0] = insn;
-	  else if (!issued_insns[KV4_EXU_EXT1])
-	    issued_insns[exu = KV4_EXU_EXT1] = insn;
-	  else if (!issued_insns[KV4_EXU_EXT2])
-	    issued_insns[exu = KV4_EXU_EXT2] = insn;
-	  else if (!issued_insns[KV4_EXU_EXT3])
-	    issued_insns[exu = KV4_EXU_EXT3] = insn;
+	case Bundling_lvx_v1_EXT:
+	  if (!issued_insns[LVX_EXU_EXT0])
+	    issued_insns[exu = LVX_EXU_EXT0] = insn;
+	  else if (!issued_insns[LVX_EXU_EXT1])
+	    issued_insns[exu = LVX_EXU_EXT1] = insn;
+	  else if (!issued_insns[LVX_EXU_EXT2])
+	    issued_insns[exu = LVX_EXU_EXT2] = insn;
+	  else if (!issued_insns[LVX_EXU_EXT3])
+	    issued_insns[exu = LVX_EXU_EXT3] = insn;
 	  else
 	    as_fatal ("more than four EXT instructions in bundle");
 	  break;
@@ -1529,18 +1309,18 @@ kv4_reorder_bundle (struct lvx_insn *bundle_insns[], struct lvx_insn *issued_ins
 	}
     }
 
-  /* Fill BUNDLE_INSNS with valid instructions in enum KV4_EXU order.  */
+  /* Fill BUNDLE_INSNS with valid instructions in enum LVX_EXU order.  */
   int insn_cnt = 0;
-  if (issued_insns[KV4_EXU_BCU0])
-    bundle_insns[insn_cnt++] = issued_insns[KV4_EXU_BCU0];
+  if (issued_insns[LVX_EXU_BCU0])
+    bundle_insns[insn_cnt++] = issued_insns[LVX_EXU_BCU0];
 
-  if (issued_insns[KV4_EXU_BCU1] == issued_insns[KV4_EXU_BCU0])
+  if (issued_insns[LVX_EXU_BCU1] == issued_insns[LVX_EXU_BCU0])
     /* Case of BCU0 with its immediate extension in BCU1.  */
     ;
-  else if (issued_insns[KV4_EXU_BCU1])
-    bundle_insns[insn_cnt++] = issued_insns[KV4_EXU_BCU1];
+  else if (issued_insns[LVX_EXU_BCU1])
+    bundle_insns[insn_cnt++] = issued_insns[LVX_EXU_BCU1];
 
-  for (int exu = KV4_EXU_ALU0; exu < KV4_EXU__; exu++)
+  for (int exu = LVX_EXU_ALU0; exu < LVX_EXU__; exu++)
     if (issued_insns[exu])
       bundle_insns[insn_cnt++] = issued_insns[exu];
 
@@ -1552,7 +1332,7 @@ kv4_reorder_bundle (struct lvx_insn *bundle_insns[], struct lvx_insn *issued_ins
 }
 
 /* BCU part of a conditional instruction.  */
-struct kv4_cond {
+struct lvx_cond {
   /* A pointer to the target insn within lvx_insn_buffer.  */
   struct lvx_insn *target_insn;
   /* The conditional instruction as text.  */
@@ -1560,7 +1340,7 @@ struct kv4_cond {
 };
 
 static bool
-kv4_cond_insn_merge (int target_exu,
+lvx_cond_insn_merge (int target_exu,
 		     struct lvx_insn *bundle_insns[],
 		     struct lvx_insn *issued_insns[])
 {
@@ -1568,41 +1348,41 @@ kv4_cond_insn_merge (int target_exu,
   const struct lvx_opc *opdef = insn->opdef;
 
   if (!(opdef->codewords[0].flags & LVX_OPCODE_FLAG_COND))
-    as_fatal ("[kv4_cond_insn_merge] unrecognized conditional instruction prefix.");
+    as_fatal ("[lvx_cond_insn_merge] unrecognized conditional instruction prefix.");
 
   /* Try merging with an already issued BCU instruction.  */
   unsigned insn_word = insn->words[0];
   unsigned insn_activate =
-      1 << (target_exu - KV4_EXU_ALU0 + KV4_ACTIVATE_OFFSET);
-  if (!((insn_word ^ kv4_bcu0_word) & ~KV4_ACTIVATE_MASK))
+      1 << (target_exu - LVX_EXU_ALU0 + LVX_ACTIVATE_OFFSET);
+  if (!((insn_word ^ lvx_bcu0_word) & ~LVX_ACTIVATE_MASK))
     {
-      issued_insns[KV4_EXU_BCU0]->words[0] |= insn_activate;
-      kv4_bcu0_word |= insn_activate;
+      issued_insns[LVX_EXU_BCU0]->words[0] |= insn_activate;
+      lvx_bcu0_word |= insn_activate;
       return true;
     }
-  if (!((insn_word ^ kv4_bcu1_word) & ~KV4_ACTIVATE_MASK))
+  if (!((insn_word ^ lvx_bcu1_word) & ~LVX_ACTIVATE_MASK))
     {
-      issued_insns[KV4_EXU_BCU1]->words[0] |= insn_activate;
-      kv4_bcu1_word |= insn_activate;
+      issued_insns[LVX_EXU_BCU1]->words[0] |= insn_activate;
+      lvx_bcu1_word |= insn_activate;
       return true;
     }
 
   /* No merging, insert the new BCU instruction into ISSUED_INSNS[].  */
   int insn_idx = -1;
-  if (!issued_insns[KV4_EXU_BCU0])
+  if (!issued_insns[LVX_EXU_BCU0])
     {
-      issued_insns[KV4_EXU_BCU0] = insn;
-      kv4_bcu0_word = insn_word;
+      issued_insns[LVX_EXU_BCU0] = insn;
+      lvx_bcu0_word = insn_word;
       insn_idx = 0;
     }
-  else if (!issued_insns[KV4_EXU_BCU1])
+  else if (!issued_insns[LVX_EXU_BCU1])
     {
-      issued_insns[KV4_EXU_BCU1] = insn;
-      kv4_bcu1_word = insn_word;
+      issued_insns[LVX_EXU_BCU1] = insn;
+      lvx_bcu1_word = insn_word;
       insn_idx = 1;
     }
   else
-    as_fatal ("[kv4_cond_insn_merge] no BCU available to merge conditional.");
+    as_fatal ("[lvx_cond_insn_merge] no BCU available to merge conditional.");
 
   /* Insert the new BCU instruction into BUNDLE_INSNS[].  */
   for (int i = lvx_insn_cnt - 2 ; i >= insn_idx; i--)
@@ -1614,35 +1394,35 @@ kv4_cond_insn_merge (int target_exu,
 
 /* Stack of BCU insns for conditional execution.  */
 static struct {
-  struct kv4_cond cells[LVX_EXU__];
+  struct lvx_cond cells[LVX_EXU__];
   int count;
-} kv4_cond_stack[1];
+} lvx_cond_stack[1];
 
 static inline void
-kv4_cond_stack_reset (void)
+lvx_cond_stack_reset (void)
 {
-  memset (kv4_cond_stack, 0, sizeof (kv4_cond_stack));
+  memset (lvx_cond_stack, 0, sizeof (lvx_cond_stack));
 }
 
 static inline int
-kv4_cond_stack_count (void)
+lvx_cond_stack_count (void)
 {
-  return kv4_cond_stack->count;
+  return lvx_cond_stack->count;
 }
 
-static inline struct kv4_cond *
-kv4_cond_stack_access (int index)
+static inline struct lvx_cond *
+lvx_cond_stack_access (int index)
 {
-  return kv4_cond_stack->cells + index;
+  return lvx_cond_stack->cells + index;
 }
 
-static struct kv4_cond *
-kv4_cond_stack_push (void)
+static struct lvx_cond *
+lvx_cond_stack_push (void)
 {
-  if (kv4_cond_stack->count >= LVX_EXU__)
-    as_fatal ("[kv4_cond_stack_push] kv4_cond_stack overflow.");
+  if (lvx_cond_stack->count >= LVX_EXU__)
+    as_fatal ("[lvx_cond_stack_push] lvx_cond_stack overflow.");
 
-  return kv4_cond_stack->cells + kv4_cond_stack->count++;
+  return lvx_cond_stack->cells + lvx_cond_stack->count++;
 }
 
 static void
@@ -1726,16 +1506,16 @@ md_assemble (char *line)
       qsort (bundle_insns, lvx_insn_cnt, sizeof (struct lvx_insn *), lvx_insn_compare);
       (*lvx_reorder_bundle) (bundle_insns, issued_insns);
 
-      if (kv4_cond_stack_count ())
+      if (lvx_cond_stack_count ())
 	/* Assemble the guard or blend line_prefix of conditional insns.  */
 	{
 	  inside_bundle = 1;
-	  for (int i = 0; i < kv4_cond_stack_count (); i++)
+	  for (int i = 0; i < lvx_cond_stack_count (); i++)
 	    {
-	      struct kv4_cond *cond = kv4_cond_stack_access (i);
+	      struct lvx_cond *cond = lvx_cond_stack_access (i);
 	      int len = strlen (cond->line_prefix);
 	      int target_exu = cond->target_insn->lvx_exu;
-	      unsigned exu_mask = 1 << (target_exu - KV4_EXU_ALU0);
+	      unsigned exu_mask = 1 << (target_exu - LVX_EXU_ALU0);
 	      sprintf (cond->line_prefix + len, " %d", exu_mask);
 
 	      struct token_s gob_tok = TOK_FROM_STR (cond->line_prefix);
@@ -1744,10 +1524,10 @@ md_assemble (char *line)
 	      free_token_list (gob_tok_lst);
 
 	      bundle_insns[lvx_insn_cnt - 1] = &lvx_insn_buffer[lvx_insn_cnt - 1];
-	      lvx_insn_cnt -= kv4_cond_insn_merge (target_exu, bundle_insns, issued_insns);
+	      lvx_insn_cnt -= lvx_cond_insn_merge (target_exu, bundle_insns, issued_insns);
 	    }
 
-	    kv4_cond_stack_reset ();
+	    lvx_cond_stack_reset ();
 	    inside_bundle = 0;
 	}
 
@@ -1772,7 +1552,7 @@ md_assemble (char *line)
 	  lvx_emit_insn (insn, fixup_pos, !--emit_cnt);
 	  assert ((unsigned)insn->lvx_exu < LVX_EXU__);
 	  exu2pos[insn->lvx_exu] = insn_pos + bcux_seen;
-	  if (insn == kv4_bcux_insn)
+	  if (insn == lvx_bcux_insn)
 	    {
 	      bcux_immx_idx = insn->immx0_idx;
 	      lvx_emit_insn (&lvx_immx_buffer[bcux_immx_idx],
@@ -1824,16 +1604,6 @@ md_assemble (char *line)
       return;
     }
 
-  int cond_len = 0;
-  if (env.params.core == ELF_LVX_CORE_KV4_1
-      && (cond_len = insn_cond_len (line)))
-    {
-      struct kv4_cond *cond = kv4_cond_stack_push ();
-      cond->target_insn = lvx_insn_buffer + lvx_insn_cnt;
-      strncpy (cond->line_prefix, line, cond_len);
-      line_cursor += cond_len;
-    }
-
   char *buf = NULL;
   sscanf (line_cursor, "%m[^\n]", &buf);
   struct token_s my_tok = TOK_FROM_STR (buf);
@@ -1860,15 +1630,15 @@ lvx_set_cpu (void)
     lvx_core_info = &lvx_1_core_info;
 
   if (!lvx_registers)
-    lvx_registers = kv4_v1_registers;
+    lvx_registers = lvx_v1_registers;
 
   if (!lvx_regfiles) {
-    lvx_regfiles = kv4_v1_regfiles;
-    lvx_regfiles_size = KV4_V1_REGFILE_REGISTERS;
+    lvx_regfiles = lvx_v1_regfiles;
+    lvx_regfiles_size = LVX_V1_REGFILE_REGISTERS;
   }
 
   if (!lvx_modifiers)
-    lvx_modifiers = kv4_v1_modifiers;
+    lvx_modifiers = lvx_v1_modifiers;
 
   if (env.params.core == -1)
       env.params.core = lvx_core_info->elf_core;
@@ -1877,20 +1647,19 @@ lvx_set_cpu (void)
 
   switch (lvx_core_info->elf_core)
     {
-    case ELF_LVX_CORE_KV4_1:
     case ELF_LVX_CORE_LVX_1:
       lvx_bfd_mach = bfd_mach_lvx_1_64;
-      lvx_base_bundling = kv4_v1_base_bundling;
-      lvx_reorder_bundle = kv4_reorder_bundle;
-      lvx_dump_opc = kv4_dump_opc;
+      lvx_base_bundling = lvx_v1_base_bundling;
+      lvx_reorder_bundle = lvx_v1_reorder_bundle;
+      lvx_dump_opc = lvx_v1_dump_opc;
       lvx_insn_pcrel = true;
       setup (ELF_LVX_CORE_LVX_1);
       break;
     case ELF_LVX_CORE_LVX_2:
       lvx_bfd_mach = bfd_mach_lvx_2_64;
-      lvx_base_bundling = kv4_v1_base_bundling;
-      lvx_reorder_bundle = kv4_reorder_bundle;
-      lvx_dump_opc = kv4_dump_opc;
+      lvx_base_bundling = lvx_v1_base_bundling;
+      lvx_reorder_bundle = lvx_v1_reorder_bundle;
+      lvx_dump_opc = lvx_v1_dump_opc;
       lvx_insn_pcrel = true;
       setup (ELF_LVX_CORE_LVX_2);
       break;
@@ -2138,33 +1907,33 @@ md_apply_fix (fixS * fixP, valueT * valueP, segT segmentP ATTRIBUTE_UNUSED)
     {
       switch (fixP->fx_r_type)
 	{
-	case BFD_RELOC_KVX_S37_TLS_LE_UP27:
-	case BFD_RELOC_KVX_S37_TLS_LE_LO10:
+	case BFD_RELOC_LVX_S37_TLS_LE_UP27:
+	case BFD_RELOC_LVX_S37_TLS_LE_LO10:
 
-	case BFD_RELOC_KVX_S43_TLS_LE_EX6:
-	case BFD_RELOC_KVX_S43_TLS_LE_UP27:
-	case BFD_RELOC_KVX_S43_TLS_LE_LO10:
+	case BFD_RELOC_LVX_S43_TLS_LE_EX6:
+	case BFD_RELOC_LVX_S43_TLS_LE_UP27:
+	case BFD_RELOC_LVX_S43_TLS_LE_LO10:
 
-	case BFD_RELOC_KVX_S37_TLS_GD_LO10:
-	case BFD_RELOC_KVX_S37_TLS_GD_UP27:
+	case BFD_RELOC_LVX_S37_TLS_GD_LO10:
+	case BFD_RELOC_LVX_S37_TLS_GD_UP27:
 
-	case BFD_RELOC_KVX_S43_TLS_GD_LO10:
-	case BFD_RELOC_KVX_S43_TLS_GD_UP27:
-	case BFD_RELOC_KVX_S43_TLS_GD_EX6:
+	case BFD_RELOC_LVX_S43_TLS_GD_LO10:
+	case BFD_RELOC_LVX_S43_TLS_GD_UP27:
+	case BFD_RELOC_LVX_S43_TLS_GD_EX6:
 
-	case BFD_RELOC_KVX_S37_TLS_IE_LO10:
-	case BFD_RELOC_KVX_S37_TLS_IE_UP27:
+	case BFD_RELOC_LVX_S37_TLS_IE_LO10:
+	case BFD_RELOC_LVX_S37_TLS_IE_UP27:
 
-	case BFD_RELOC_KVX_S43_TLS_IE_LO10:
-	case BFD_RELOC_KVX_S43_TLS_IE_UP27:
-	case BFD_RELOC_KVX_S43_TLS_IE_EX6:
+	case BFD_RELOC_LVX_S43_TLS_IE_LO10:
+	case BFD_RELOC_LVX_S43_TLS_IE_UP27:
+	case BFD_RELOC_LVX_S43_TLS_IE_EX6:
 
-	case BFD_RELOC_KVX_S37_TLS_LD_LO10:
-	case BFD_RELOC_KVX_S37_TLS_LD_UP27:
+	case BFD_RELOC_LVX_S37_TLS_LD_LO10:
+	case BFD_RELOC_LVX_S37_TLS_LD_UP27:
 
-	case BFD_RELOC_KVX_S43_TLS_LD_LO10:
-	case BFD_RELOC_KVX_S43_TLS_LD_UP27:
-	case BFD_RELOC_KVX_S43_TLS_LD_EX6:
+	case BFD_RELOC_LVX_S43_TLS_LD_LO10:
+	case BFD_RELOC_LVX_S43_TLS_LD_UP27:
+	case BFD_RELOC_LVX_S43_TLS_LD_EX6:
 
 	  S_SET_THREAD_LOCAL (fixP->fx_addsy);
 	  break;
@@ -2183,80 +1952,80 @@ md_apply_fix (fixS * fixP, valueT * valueP, segT segmentP ATTRIBUTE_UNUSED)
 	case BFD_RELOC_32:
 	case BFD_RELOC_64:
 
-	case BFD_RELOC_KVX_GLOB_DAT:
-	case BFD_RELOC_KVX_32_GOT:
-	case BFD_RELOC_KVX_64_GOT:
-	case BFD_RELOC_KVX_64_GOTOFF:
-	case BFD_RELOC_KVX_32_GOTOFF:
+	case BFD_RELOC_LVX_GLOB_DAT:
+	case BFD_RELOC_LVX_32_GOT:
+	case BFD_RELOC_LVX_64_GOT:
+	case BFD_RELOC_LVX_64_GOTOFF:
+	case BFD_RELOC_LVX_32_GOTOFF:
 	  image = value;
 	  md_number_to_chars (fixpos, image, fixP->fx_size);
 	  break;
 
-	case BFD_RELOC_KVX_S11S2_PCREL:
+	case BFD_RELOC_LVX_S11S2_PCREL:
 	  if (signed_overflow (value, 11 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("branch out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_PCREL17:
-	case BFD_RELOC_KVX_S17S2_PCREL:
+	case BFD_RELOC_LVX_PCREL17:
+	case BFD_RELOC_LVX_S17S2_PCREL:
 	  if (signed_overflow (value, 17 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("branch out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_PCREL27:
-	case BFD_RELOC_KVX_S27S2_PCREL:
+	case BFD_RELOC_LVX_PCREL27:
+	case BFD_RELOC_LVX_S27S2_PCREL:
 	  if (signed_overflow (value, 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("branch out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S38S2_PCREL_LO11:
-	case BFD_RELOC_KVX_S38S2_PCREL_UP27:
+	case BFD_RELOC_LVX_S38S2_PCREL_LO11:
+	case BFD_RELOC_LVX_S38S2_PCREL_UP27:
 	  if (signed_overflow (value, 11 + 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed38 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S44S2_PCREL_LO17:
-	case BFD_RELOC_KVX_S44S2_PCREL_UP27:
+	case BFD_RELOC_LVX_S44S2_PCREL_LO17:
+	case BFD_RELOC_LVX_S44S2_PCREL_UP27:
 	  if (signed_overflow (value, 17 + 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed44 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S54S2_PCREL_LO27:
-	case BFD_RELOC_KVX_S54S2_PCREL_UP27:
+	case BFD_RELOC_LVX_S54S2_PCREL_LO27:
+	case BFD_RELOC_LVX_S54S2_PCREL_UP27:
 	  if (signed_overflow (value, 27 + 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed54 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S16_PCREL:
+	case BFD_RELOC_LVX_S16_PCREL:
 	  if (signed_overflow (value, 16))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed16 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S43_PCREL_LO10:
-	case BFD_RELOC_KVX_S43_PCREL_UP27:
-	case BFD_RELOC_KVX_S43_PCREL_EX6:
+	case BFD_RELOC_LVX_S43_PCREL_LO10:
+	case BFD_RELOC_LVX_S43_PCREL_UP27:
+	case BFD_RELOC_LVX_S43_PCREL_EX6:
 	  if (signed_overflow (value, 10 + 27 + 6))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed43 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S37_PCREL_LO10:
-	case BFD_RELOC_KVX_S37_PCREL_UP27:
+	case BFD_RELOC_LVX_S37_PCREL_LO10:
+	case BFD_RELOC_LVX_S37_PCREL_UP27:
 	  if (signed_overflow (value, 10 + 27))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed37 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S64_PCREL_LO10:
-	case BFD_RELOC_KVX_S64_PCREL_UP27:
-	case BFD_RELOC_KVX_S64_PCREL_EX27:
+	case BFD_RELOC_LVX_S64_PCREL_LO10:
+	case BFD_RELOC_LVX_S64_PCREL_UP27:
+	case BFD_RELOC_LVX_S64_PCREL_EX27:
 
 	pcrel_common:
 	  if (fixP->fx_pcrel || fixP->fx_addsy)
@@ -2268,58 +2037,58 @@ md_apply_fix (fixS * fixP, valueT * valueP, segT segmentP ATTRIBUTE_UNUSED)
 	  md_number_to_chars (fixpos, image, fixP->fx_size);
 	  break;
 
-	case BFD_RELOC_KVX_S64_GOTADDR_LO10:
-	case BFD_RELOC_KVX_S64_GOTADDR_UP27:
-	case BFD_RELOC_KVX_S64_GOTADDR_EX27:
+	case BFD_RELOC_LVX_S64_GOTADDR_LO10:
+	case BFD_RELOC_LVX_S64_GOTADDR_UP27:
+	case BFD_RELOC_LVX_S64_GOTADDR_EX27:
 
-	case BFD_RELOC_KVX_S43_GOTADDR_LO10:
-	case BFD_RELOC_KVX_S43_GOTADDR_UP27:
-	case BFD_RELOC_KVX_S43_GOTADDR_EX6:
+	case BFD_RELOC_LVX_S43_GOTADDR_LO10:
+	case BFD_RELOC_LVX_S43_GOTADDR_UP27:
+	case BFD_RELOC_LVX_S43_GOTADDR_EX6:
 
-	case BFD_RELOC_KVX_S37_GOTADDR_LO10:
-	case BFD_RELOC_KVX_S37_GOTADDR_UP27:
+	case BFD_RELOC_LVX_S37_GOTADDR_LO10:
+	case BFD_RELOC_LVX_S37_GOTADDR_UP27:
 	  value = 0;
 	  /* Fallthrough.  */
 
-	case BFD_RELOC_KVX_S32_UP27:
+	case BFD_RELOC_LVX_S32_UP27:
 
-	case BFD_RELOC_KVX_S37_UP27:
+	case BFD_RELOC_LVX_S37_UP27:
 
-	case BFD_RELOC_KVX_S43_UP27:
+	case BFD_RELOC_LVX_S43_UP27:
 
-	case BFD_RELOC_KVX_S64_UP27:
-	case BFD_RELOC_KVX_S64_EX27:
-	case BFD_RELOC_KVX_S64_LO10:
+	case BFD_RELOC_LVX_S64_UP27:
+	case BFD_RELOC_LVX_S64_EX27:
+	case BFD_RELOC_LVX_S64_LO10:
 
-	case BFD_RELOC_KVX_S43_TLS_LE_UP27:
-	case BFD_RELOC_KVX_S43_TLS_LE_EX6:
+	case BFD_RELOC_LVX_S43_TLS_LE_UP27:
+	case BFD_RELOC_LVX_S43_TLS_LE_EX6:
 
-	case BFD_RELOC_KVX_S37_TLS_LE_UP27:
+	case BFD_RELOC_LVX_S37_TLS_LE_UP27:
 
-	case BFD_RELOC_KVX_S37_GOTOFF_UP27:
+	case BFD_RELOC_LVX_S37_GOTOFF_UP27:
 
-	case BFD_RELOC_KVX_S43_GOTOFF_UP27:
-	case BFD_RELOC_KVX_S43_GOTOFF_EX6:
+	case BFD_RELOC_LVX_S43_GOTOFF_UP27:
+	case BFD_RELOC_LVX_S43_GOTOFF_EX6:
 
-	case BFD_RELOC_KVX_S43_GOT_UP27:
-	case BFD_RELOC_KVX_S43_GOT_EX6:
+	case BFD_RELOC_LVX_S43_GOT_UP27:
+	case BFD_RELOC_LVX_S43_GOT_EX6:
 
-	case BFD_RELOC_KVX_S37_GOT_UP27:
+	case BFD_RELOC_LVX_S37_GOT_UP27:
 
-	case BFD_RELOC_KVX_S32_LO5:
-	case BFD_RELOC_KVX_S37_LO10:
+	case BFD_RELOC_LVX_S32_LO5:
+	case BFD_RELOC_LVX_S37_LO10:
 
-	case BFD_RELOC_KVX_S43_LO10:
-	case BFD_RELOC_KVX_S43_EX6:
+	case BFD_RELOC_LVX_S43_LO10:
+	case BFD_RELOC_LVX_S43_EX6:
 
-	case BFD_RELOC_KVX_S43_TLS_LE_LO10:
-	case BFD_RELOC_KVX_S37_TLS_LE_LO10:
+	case BFD_RELOC_LVX_S43_TLS_LE_LO10:
+	case BFD_RELOC_LVX_S37_TLS_LE_LO10:
 
-	case BFD_RELOC_KVX_S37_GOTOFF_LO10:
-	case BFD_RELOC_KVX_S43_GOTOFF_LO10:
+	case BFD_RELOC_LVX_S37_GOTOFF_LO10:
+	case BFD_RELOC_LVX_S43_GOTOFF_LO10:
 
-	case BFD_RELOC_KVX_S43_GOT_LO10:
-	case BFD_RELOC_KVX_S37_GOT_LO10:
+	case BFD_RELOC_LVX_S43_GOT_LO10:
+	case BFD_RELOC_LVX_S37_GOT_LO10:
 
 	default:
 	  as_fatal ("[md_apply_fix]:"
@@ -2482,7 +2251,7 @@ tc_gen_reloc (asection * sec ATTRIBUTE_UNUSED, fixS * fixp)
    *       are not marked as partial_inplace, so for them,
    *       bfd_elf_generic_reloc returns bfd_reloc_ok, and the addend
    *       is not modified by bfd_install_relocation.   The relocations
-   *       R_KVX_16 and R_KVX_32 are marked partial_inplace, and so for
+   *       R_LVX_16 and R_LVX_32 are marked partial_inplace, and so for
    *       these we need to correct the addend.
    * In the code below, the condition in the emit_all_relocs branch
    * (now moved to write.c) is the inverse of the condition that
@@ -2941,21 +2710,21 @@ lvx_force_reloc (fixS * fixP)
 
   switch (fixP->fx_r_type)
     {
-    case BFD_RELOC_KVX_32_GOTOFF:
-    case BFD_RELOC_KVX_S37_GOTOFF_UP27:
-    case BFD_RELOC_KVX_S37_GOTOFF_LO10:
+    case BFD_RELOC_LVX_32_GOTOFF:
+    case BFD_RELOC_LVX_S37_GOTOFF_UP27:
+    case BFD_RELOC_LVX_S37_GOTOFF_LO10:
 
-    case BFD_RELOC_KVX_64_GOTOFF:
-    case BFD_RELOC_KVX_S43_GOTOFF_UP27:
-    case BFD_RELOC_KVX_S43_GOTOFF_LO10:
-    case BFD_RELOC_KVX_S43_GOTOFF_EX6:
+    case BFD_RELOC_LVX_64_GOTOFF:
+    case BFD_RELOC_LVX_S43_GOTOFF_UP27:
+    case BFD_RELOC_LVX_S43_GOTOFF_LO10:
+    case BFD_RELOC_LVX_S43_GOTOFF_EX6:
 
-    case BFD_RELOC_KVX_32_GOT:
-    case BFD_RELOC_KVX_64_GOT:
-    case BFD_RELOC_KVX_S37_GOT_UP27:
-    case BFD_RELOC_KVX_S37_GOT_LO10:
+    case BFD_RELOC_LVX_32_GOT:
+    case BFD_RELOC_LVX_64_GOT:
+    case BFD_RELOC_LVX_S37_GOT_UP27:
+    case BFD_RELOC_LVX_S37_GOT_LO10:
 
-    case BFD_RELOC_KVX_GLOB_DAT:
+    case BFD_RELOC_LVX_GLOB_DAT:
       return 1;
     default:
       return 0;
@@ -2984,24 +2753,24 @@ lvx_force_reloc_sub_same (fixS * fixP, segT sec)
 
   switch (fixP->fx_r_type)
     {
-    case BFD_RELOC_KVX_32_GOTOFF:
-    case BFD_RELOC_KVX_S37_GOTOFF_UP27:
-    case BFD_RELOC_KVX_S37_GOTOFF_LO10:
+    case BFD_RELOC_LVX_32_GOTOFF:
+    case BFD_RELOC_LVX_S37_GOTOFF_UP27:
+    case BFD_RELOC_LVX_S37_GOTOFF_LO10:
 
-    case BFD_RELOC_KVX_64_GOTOFF:
-    case BFD_RELOC_KVX_S43_GOTOFF_UP27:
-    case BFD_RELOC_KVX_S43_GOTOFF_LO10:
-    case BFD_RELOC_KVX_S43_GOTOFF_EX6:
+    case BFD_RELOC_LVX_64_GOTOFF:
+    case BFD_RELOC_LVX_S43_GOTOFF_UP27:
+    case BFD_RELOC_LVX_S43_GOTOFF_LO10:
+    case BFD_RELOC_LVX_S43_GOTOFF_EX6:
 
-    case BFD_RELOC_KVX_32_GOT:
-    case BFD_RELOC_KVX_64_GOT:
-    case BFD_RELOC_KVX_S37_GOT_UP27:
-    case BFD_RELOC_KVX_S37_GOT_LO10:
+    case BFD_RELOC_LVX_32_GOT:
+    case BFD_RELOC_LVX_64_GOT:
+    case BFD_RELOC_LVX_S37_GOT_UP27:
+    case BFD_RELOC_LVX_S37_GOT_LO10:
 
-    case BFD_RELOC_KVX_S37_LO10:
-    case BFD_RELOC_KVX_S37_UP27:
+    case BFD_RELOC_LVX_S37_LO10:
+    case BFD_RELOC_LVX_S37_UP27:
 
-    case BFD_RELOC_KVX_GLOB_DAT:
+    case BFD_RELOC_LVX_GLOB_DAT:
       return 1;
 
     default:

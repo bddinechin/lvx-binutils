@@ -83,7 +83,7 @@ abdd $r26 = $r51, 4294967295
 The default modifier (@code{.}) of an instruction is automatically selected and
 can be omitted.
 
-@heading Common to kv3-1 and to kv3-2
+@heading Common to lvx-1 and to lvx-2
 
 @table @dfn
 
@@ -156,7 +156,7 @@ into a 64-bit operand by replicating it twice.
 
 @end table
 
-@heading Only available on kv3-1
+@heading Only available on lvx-1
 
 @table @dfn
 
@@ -184,7 +184,7 @@ addresses.
 
 @end table
 
-@heading Only available on kv3-2
+@heading Only available on lvx-2
 
 @table @dfn
 
@@ -291,7 +291,7 @@ Dump the full list of instructions.
 
 @cindex @samp{-march} option, LVX
 @item -march=
-The assembler supports the following architectures: kv3-1, kv3-2.
+The assembler supports the following architectures: lvx-1, lvx-2.
 
 @cindex @samp{--check-resources} option, LVX
 @item --check-resources

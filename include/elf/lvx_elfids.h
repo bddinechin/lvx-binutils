@@ -57,10 +57,6 @@
 #define ELF_LVX_CORE_MAJOR_SHIFT (0 + ELF_LVX_CORE_BIT_SHIFT)
 #define ELF_LVX_CORE_MINOR_SHIFT (4 + ELF_LVX_CORE_BIT_SHIFT)
 
-/* KV4 core IDs (kept for ELF compatibility with KVX toolchain) */
-#define ELF_LVX_CORE_KV4         (0x04 << ELF_LVX_CORE_BIT_SHIFT)
-#define ELF_LVX_CORE_KV4_1      (ELF_LVX_CORE_KV4 | (1 << (ELF_LVX_CORE_MINOR_SHIFT)))
-#define ELF_LVX_IS_KV4(flags)   (((flags) & ELF_LVX_CORE_MAJOR_MASK) == (ELF_LVX_CORE_KV4))
 
 /* LVX core IDs */
 #define ELF_LVX_CORE_LVX         (0x05 << ELF_LVX_CORE_BIT_SHIFT)
