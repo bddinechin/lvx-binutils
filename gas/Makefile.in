@@ -665,7 +665,7 @@ TARGET_CPU_CFILES = \
 	config/tc-i386.c \
 	config/tc-ip2k.c \
 	config/tc-iq2000.c \
-	config/tc-kvx.c \
+	config/tc-lvx.c \
 	config/tc-lm32.c \
 	config/tc-loongarch.c \
 	config/tc-m32c.c \
@@ -741,7 +741,7 @@ TARGET_CPU_HFILES = \
 	config/tc-i386.h \
 	config/tc-ip2k.h \
 	config/tc-iq2000.h \
-	config/tc-kvx.h \
+	config/tc-lvx.h \
 	config/tc-lm32.h \
 	config/tc-m32c.h \
 	config/tc-m32r.h \
@@ -983,7 +983,7 @@ CPU_DOCS = \
 	doc/c-hppa.texi \
 	doc/c-i386.texi \
 	doc/c-ip2k.texi \
-	doc/c-kvx.texi \
+	doc/c-lvx.texi \
 	doc/c-lm32.texi \
 	doc/c-m32c.texi \
 	doc/c-m32r.texi \
@@ -1150,7 +1150,7 @@ config/tc-ip2k.$(OBJEXT): config/$(am__dirstamp) \
 	config/$(DEPDIR)/$(am__dirstamp)
 config/tc-iq2000.$(OBJEXT): config/$(am__dirstamp) \
 	config/$(DEPDIR)/$(am__dirstamp)
-config/tc-kvx.$(OBJEXT): config/$(am__dirstamp) \
+config/tc-lvx.$(OBJEXT): config/$(am__dirstamp) \
 	config/$(DEPDIR)/$(am__dirstamp)
 config/tc-lm32.$(OBJEXT): config/$(am__dirstamp) \
 	config/$(DEPDIR)/$(am__dirstamp)
@@ -1412,7 +1412,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@config/$(DEPDIR)/tc-ia64.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@config/$(DEPDIR)/tc-ip2k.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@config/$(DEPDIR)/tc-iq2000.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@config/$(DEPDIR)/tc-kvx.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@config/$(DEPDIR)/tc-lvx.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@config/$(DEPDIR)/tc-lm32.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@config/$(DEPDIR)/tc-loongarch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@config/$(DEPDIR)/tc-m32c.Po@am__quote@

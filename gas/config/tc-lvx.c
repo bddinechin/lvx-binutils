@@ -687,54 +687,54 @@ insert_operand (struct lvx_insn *insn, struct lvx_operand *opnd,
 		  switch (opnd->type)
 		    {
 		      case Immediate_kv4_v1_signed10:
-			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S37_LO10, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S37_LO10, exp);
 			break;
 		      case Immediate_kv4_v1_signed37:
-			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S37_LO10, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S37_LO10, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S37_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S37_UP27, exp);
 			break;
 		      case Immediate_kv4_v1_signed43:
-			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S43_LO10, exp);
-			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S43_EX6, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S43_LO10, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S43_EX6, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S43_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S43_UP27, exp);
 			break;
 		      case Immediate_kv4_v1_wrapped32:
-			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S32_LO5, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S32_LO5, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S32_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S32_UP27, exp);
 			break;
 		      case Immediate_kv4_v1_wrapped64:
-			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S64_LO10, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S64_LO10, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S64_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S64_UP27, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S64_EX27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S64_EX27, exp);
 			break;
 		      case Immediate_kv4_v1_pcrel11s2:
-			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S11S2_PCREL, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S11S2_PCREL, exp);
 			break;
 		      case Immediate_kv4_v1_pcrel17s2:
-			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S17S2_PCREL, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S17S2_PCREL, exp);
 			break;
 		      case Immediate_kv4_v1_pcrel27s2:
-			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S27S2_PCREL, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S27S2_PCREL, exp);
 			break;
 		      case Immediate_kv4_v1_pcrel38s2:
-			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S38S2_PCREL_LO11, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S38S2_PCREL_LO11, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S38S2_PCREL_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S38S2_PCREL_UP27, exp);
 			break;
 		      case Immediate_kv4_v1_pcrel44s2:
-			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S44S2_PCREL_LO17, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S44S2_PCREL_LO17, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S44S2_PCREL_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S44S2_PCREL_UP27, exp);
 			break;
 		      case Immediate_kv4_v1_pcrel54s2:
-			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S54S2_PCREL_LO27, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_KVX_S54S2_PCREL_LO27, exp);
 			insn_immx = lvx_insn_add_immx (insn);
-			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S54S2_PCREL_UP27, exp);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S54S2_PCREL_UP27, exp);
 			break;
 		      default:
 		      as_fatal ("[insert_operand] don't know how to generate a fixup record");
@@ -1857,18 +1857,18 @@ static void
 lvx_set_cpu (void)
 {
   if (!lvx_core_info)
-    lvx_core_info = &kv3_v1_core_info;
+    lvx_core_info = &lvx_1_core_info;
 
   if (!lvx_registers)
-    lvx_registers = kv3_v1_registers;
+    lvx_registers = kv4_v1_registers;
 
   if (!lvx_regfiles) {
-    lvx_regfiles = kv3_v1_regfiles;
-    lvx_regfiles_size = KV3_V1_REGFILE_REGISTERS;
+    lvx_regfiles = kv4_v1_regfiles;
+    lvx_regfiles_size = KV4_V1_REGFILE_REGISTERS;
   }
 
   if (!lvx_modifiers)
-    lvx_modifiers = kv3_v1_modifiers;
+    lvx_modifiers = kv4_v1_modifiers;
 
   if (env.params.core == -1)
       env.params.core = lvx_core_info->elf_core;
@@ -1877,29 +1877,22 @@ lvx_set_cpu (void)
 
   switch (lvx_core_info->elf_core)
     {
-    case ELF_LVX_CORE_KV3_1:
-      lvx_bfd_mach = env.params.arch_size == 32 ? bfd_mach_kv3_1 : bfd_mach_kv3_1_64;
-      lvx_base_bundling = kv3_v1_base_bundling;
-      lvx_reorder_bundle = kv3_reorder_bundle;
-      lvx_dump_opc = kv3_dump_opc;
-      lvx_insn_pcrel = false;
-      setup (ELF_LVX_CORE_KV3_1);
-      break;
-    case ELF_LVX_CORE_KV3_2:
-      lvx_bfd_mach = env.params.arch_size == 32 ? bfd_mach_kv3_2 : bfd_mach_kv3_2_64;
-      lvx_base_bundling = kv3_v2_base_bundling;
-      lvx_reorder_bundle = kv3_reorder_bundle;
-      lvx_dump_opc = kv3_dump_opc;
-      lvx_insn_pcrel = false;
-      setup (ELF_LVX_CORE_KV3_2);
-      break;
     case ELF_LVX_CORE_KV4_1:
-      lvx_bfd_mach = env.params.arch_size == 32 ? bfd_mach_kv4_1 : bfd_mach_kv4_1_64;
+    case ELF_LVX_CORE_LVX_1:
+      lvx_bfd_mach = bfd_mach_lvx_1_64;
       lvx_base_bundling = kv4_v1_base_bundling;
       lvx_reorder_bundle = kv4_reorder_bundle;
       lvx_dump_opc = kv4_dump_opc;
       lvx_insn_pcrel = true;
-      setup (ELF_LVX_CORE_KV4_1);
+      setup (ELF_LVX_CORE_LVX_1);
+      break;
+    case ELF_LVX_CORE_LVX_2:
+      lvx_bfd_mach = bfd_mach_lvx_2_64;
+      lvx_base_bundling = kv4_v1_base_bundling;
+      lvx_reorder_bundle = kv4_reorder_bundle;
+      lvx_dump_opc = kv4_dump_opc;
+      lvx_insn_pcrel = true;
+      setup (ELF_LVX_CORE_LVX_2);
       break;
     default:
       as_fatal ("unknown elf core: 0x%x", lvx_core_info->elf_core);
@@ -2145,33 +2138,33 @@ md_apply_fix (fixS * fixP, valueT * valueP, segT segmentP ATTRIBUTE_UNUSED)
     {
       switch (fixP->fx_r_type)
 	{
-	case BFD_RELOC_LVX_S37_TLS_LE_UP27:
-	case BFD_RELOC_LVX_S37_TLS_LE_LO10:
+	case BFD_RELOC_KVX_S37_TLS_LE_UP27:
+	case BFD_RELOC_KVX_S37_TLS_LE_LO10:
 
-	case BFD_RELOC_LVX_S43_TLS_LE_EX6:
-	case BFD_RELOC_LVX_S43_TLS_LE_UP27:
-	case BFD_RELOC_LVX_S43_TLS_LE_LO10:
+	case BFD_RELOC_KVX_S43_TLS_LE_EX6:
+	case BFD_RELOC_KVX_S43_TLS_LE_UP27:
+	case BFD_RELOC_KVX_S43_TLS_LE_LO10:
 
-	case BFD_RELOC_LVX_S37_TLS_GD_LO10:
-	case BFD_RELOC_LVX_S37_TLS_GD_UP27:
+	case BFD_RELOC_KVX_S37_TLS_GD_LO10:
+	case BFD_RELOC_KVX_S37_TLS_GD_UP27:
 
-	case BFD_RELOC_LVX_S43_TLS_GD_LO10:
-	case BFD_RELOC_LVX_S43_TLS_GD_UP27:
-	case BFD_RELOC_LVX_S43_TLS_GD_EX6:
+	case BFD_RELOC_KVX_S43_TLS_GD_LO10:
+	case BFD_RELOC_KVX_S43_TLS_GD_UP27:
+	case BFD_RELOC_KVX_S43_TLS_GD_EX6:
 
-	case BFD_RELOC_LVX_S37_TLS_IE_LO10:
-	case BFD_RELOC_LVX_S37_TLS_IE_UP27:
+	case BFD_RELOC_KVX_S37_TLS_IE_LO10:
+	case BFD_RELOC_KVX_S37_TLS_IE_UP27:
 
-	case BFD_RELOC_LVX_S43_TLS_IE_LO10:
-	case BFD_RELOC_LVX_S43_TLS_IE_UP27:
-	case BFD_RELOC_LVX_S43_TLS_IE_EX6:
+	case BFD_RELOC_KVX_S43_TLS_IE_LO10:
+	case BFD_RELOC_KVX_S43_TLS_IE_UP27:
+	case BFD_RELOC_KVX_S43_TLS_IE_EX6:
 
-	case BFD_RELOC_LVX_S37_TLS_LD_LO10:
-	case BFD_RELOC_LVX_S37_TLS_LD_UP27:
+	case BFD_RELOC_KVX_S37_TLS_LD_LO10:
+	case BFD_RELOC_KVX_S37_TLS_LD_UP27:
 
-	case BFD_RELOC_LVX_S43_TLS_LD_LO10:
-	case BFD_RELOC_LVX_S43_TLS_LD_UP27:
-	case BFD_RELOC_LVX_S43_TLS_LD_EX6:
+	case BFD_RELOC_KVX_S43_TLS_LD_LO10:
+	case BFD_RELOC_KVX_S43_TLS_LD_UP27:
+	case BFD_RELOC_KVX_S43_TLS_LD_EX6:
 
 	  S_SET_THREAD_LOCAL (fixP->fx_addsy);
 	  break;
@@ -2190,80 +2183,80 @@ md_apply_fix (fixS * fixP, valueT * valueP, segT segmentP ATTRIBUTE_UNUSED)
 	case BFD_RELOC_32:
 	case BFD_RELOC_64:
 
-	case BFD_RELOC_LVX_GLOB_DAT:
-	case BFD_RELOC_LVX_32_GOT:
-	case BFD_RELOC_LVX_64_GOT:
-	case BFD_RELOC_LVX_64_GOTOFF:
-	case BFD_RELOC_LVX_32_GOTOFF:
+	case BFD_RELOC_KVX_GLOB_DAT:
+	case BFD_RELOC_KVX_32_GOT:
+	case BFD_RELOC_KVX_64_GOT:
+	case BFD_RELOC_KVX_64_GOTOFF:
+	case BFD_RELOC_KVX_32_GOTOFF:
 	  image = value;
 	  md_number_to_chars (fixpos, image, fixP->fx_size);
 	  break;
 
-	case BFD_RELOC_LVX_S11S2_PCREL:
+	case BFD_RELOC_KVX_S11S2_PCREL:
 	  if (signed_overflow (value, 11 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("branch out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_LVX_PCREL17:
-	case BFD_RELOC_LVX_S17S2_PCREL:
+	case BFD_RELOC_KVX_PCREL17:
+	case BFD_RELOC_KVX_S17S2_PCREL:
 	  if (signed_overflow (value, 17 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("branch out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_LVX_PCREL27:
-	case BFD_RELOC_LVX_S27S2_PCREL:
+	case BFD_RELOC_KVX_PCREL27:
+	case BFD_RELOC_KVX_S27S2_PCREL:
 	  if (signed_overflow (value, 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("branch out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_LVX_S38S2_PCREL_LO11:
-	case BFD_RELOC_LVX_S38S2_PCREL_UP27:
+	case BFD_RELOC_KVX_S38S2_PCREL_LO11:
+	case BFD_RELOC_KVX_S38S2_PCREL_UP27:
 	  if (signed_overflow (value, 11 + 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed38 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_LVX_S44S2_PCREL_LO17:
-	case BFD_RELOC_LVX_S44S2_PCREL_UP27:
+	case BFD_RELOC_KVX_S44S2_PCREL_LO17:
+	case BFD_RELOC_KVX_S44S2_PCREL_UP27:
 	  if (signed_overflow (value, 17 + 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed44 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_LVX_S54S2_PCREL_LO27:
-	case BFD_RELOC_LVX_S54S2_PCREL_UP27:
+	case BFD_RELOC_KVX_S54S2_PCREL_LO27:
+	case BFD_RELOC_KVX_S54S2_PCREL_UP27:
 	  if (signed_overflow (value, 27 + 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed54 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_LVX_S16_PCREL:
+	case BFD_RELOC_KVX_S16_PCREL:
 	  if (signed_overflow (value, 16))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed16 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_LVX_S43_PCREL_LO10:
-	case BFD_RELOC_LVX_S43_PCREL_UP27:
-	case BFD_RELOC_LVX_S43_PCREL_EX6:
+	case BFD_RELOC_KVX_S43_PCREL_LO10:
+	case BFD_RELOC_KVX_S43_PCREL_UP27:
+	case BFD_RELOC_KVX_S43_PCREL_EX6:
 	  if (signed_overflow (value, 10 + 27 + 6))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed43 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_LVX_S37_PCREL_LO10:
-	case BFD_RELOC_LVX_S37_PCREL_UP27:
+	case BFD_RELOC_KVX_S37_PCREL_LO10:
+	case BFD_RELOC_KVX_S37_PCREL_UP27:
 	  if (signed_overflow (value, 10 + 27))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed37 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_LVX_S64_PCREL_LO10:
-	case BFD_RELOC_LVX_S64_PCREL_UP27:
-	case BFD_RELOC_LVX_S64_PCREL_EX27:
+	case BFD_RELOC_KVX_S64_PCREL_LO10:
+	case BFD_RELOC_KVX_S64_PCREL_UP27:
+	case BFD_RELOC_KVX_S64_PCREL_EX27:
 
 	pcrel_common:
 	  if (fixP->fx_pcrel || fixP->fx_addsy)
@@ -2275,58 +2268,58 @@ md_apply_fix (fixS * fixP, valueT * valueP, segT segmentP ATTRIBUTE_UNUSED)
 	  md_number_to_chars (fixpos, image, fixP->fx_size);
 	  break;
 
-	case BFD_RELOC_LVX_S64_GOTADDR_LO10:
-	case BFD_RELOC_LVX_S64_GOTADDR_UP27:
-	case BFD_RELOC_LVX_S64_GOTADDR_EX27:
+	case BFD_RELOC_KVX_S64_GOTADDR_LO10:
+	case BFD_RELOC_KVX_S64_GOTADDR_UP27:
+	case BFD_RELOC_KVX_S64_GOTADDR_EX27:
 
-	case BFD_RELOC_LVX_S43_GOTADDR_LO10:
-	case BFD_RELOC_LVX_S43_GOTADDR_UP27:
-	case BFD_RELOC_LVX_S43_GOTADDR_EX6:
+	case BFD_RELOC_KVX_S43_GOTADDR_LO10:
+	case BFD_RELOC_KVX_S43_GOTADDR_UP27:
+	case BFD_RELOC_KVX_S43_GOTADDR_EX6:
 
-	case BFD_RELOC_LVX_S37_GOTADDR_LO10:
-	case BFD_RELOC_LVX_S37_GOTADDR_UP27:
+	case BFD_RELOC_KVX_S37_GOTADDR_LO10:
+	case BFD_RELOC_KVX_S37_GOTADDR_UP27:
 	  value = 0;
 	  /* Fallthrough.  */
 
-	case BFD_RELOC_LVX_S32_UP27:
+	case BFD_RELOC_KVX_S32_UP27:
 
-	case BFD_RELOC_LVX_S37_UP27:
+	case BFD_RELOC_KVX_S37_UP27:
 
-	case BFD_RELOC_LVX_S43_UP27:
+	case BFD_RELOC_KVX_S43_UP27:
 
-	case BFD_RELOC_LVX_S64_UP27:
-	case BFD_RELOC_LVX_S64_EX27:
-	case BFD_RELOC_LVX_S64_LO10:
+	case BFD_RELOC_KVX_S64_UP27:
+	case BFD_RELOC_KVX_S64_EX27:
+	case BFD_RELOC_KVX_S64_LO10:
 
-	case BFD_RELOC_LVX_S43_TLS_LE_UP27:
-	case BFD_RELOC_LVX_S43_TLS_LE_EX6:
+	case BFD_RELOC_KVX_S43_TLS_LE_UP27:
+	case BFD_RELOC_KVX_S43_TLS_LE_EX6:
 
-	case BFD_RELOC_LVX_S37_TLS_LE_UP27:
+	case BFD_RELOC_KVX_S37_TLS_LE_UP27:
 
-	case BFD_RELOC_LVX_S37_GOTOFF_UP27:
+	case BFD_RELOC_KVX_S37_GOTOFF_UP27:
 
-	case BFD_RELOC_LVX_S43_GOTOFF_UP27:
-	case BFD_RELOC_LVX_S43_GOTOFF_EX6:
+	case BFD_RELOC_KVX_S43_GOTOFF_UP27:
+	case BFD_RELOC_KVX_S43_GOTOFF_EX6:
 
-	case BFD_RELOC_LVX_S43_GOT_UP27:
-	case BFD_RELOC_LVX_S43_GOT_EX6:
+	case BFD_RELOC_KVX_S43_GOT_UP27:
+	case BFD_RELOC_KVX_S43_GOT_EX6:
 
-	case BFD_RELOC_LVX_S37_GOT_UP27:
+	case BFD_RELOC_KVX_S37_GOT_UP27:
 
-	case BFD_RELOC_LVX_S32_LO5:
-	case BFD_RELOC_LVX_S37_LO10:
+	case BFD_RELOC_KVX_S32_LO5:
+	case BFD_RELOC_KVX_S37_LO10:
 
-	case BFD_RELOC_LVX_S43_LO10:
-	case BFD_RELOC_LVX_S43_EX6:
+	case BFD_RELOC_KVX_S43_LO10:
+	case BFD_RELOC_KVX_S43_EX6:
 
-	case BFD_RELOC_LVX_S43_TLS_LE_LO10:
-	case BFD_RELOC_LVX_S37_TLS_LE_LO10:
+	case BFD_RELOC_KVX_S43_TLS_LE_LO10:
+	case BFD_RELOC_KVX_S37_TLS_LE_LO10:
 
-	case BFD_RELOC_LVX_S37_GOTOFF_LO10:
-	case BFD_RELOC_LVX_S43_GOTOFF_LO10:
+	case BFD_RELOC_KVX_S37_GOTOFF_LO10:
+	case BFD_RELOC_KVX_S43_GOTOFF_LO10:
 
-	case BFD_RELOC_LVX_S43_GOT_LO10:
-	case BFD_RELOC_LVX_S37_GOT_LO10:
+	case BFD_RELOC_KVX_S43_GOT_LO10:
+	case BFD_RELOC_KVX_S37_GOT_LO10:
 
 	default:
 	  as_fatal ("[md_apply_fix]:"
@@ -2948,21 +2941,21 @@ lvx_force_reloc (fixS * fixP)
 
   switch (fixP->fx_r_type)
     {
-    case BFD_RELOC_LVX_32_GOTOFF:
-    case BFD_RELOC_LVX_S37_GOTOFF_UP27:
-    case BFD_RELOC_LVX_S37_GOTOFF_LO10:
+    case BFD_RELOC_KVX_32_GOTOFF:
+    case BFD_RELOC_KVX_S37_GOTOFF_UP27:
+    case BFD_RELOC_KVX_S37_GOTOFF_LO10:
 
-    case BFD_RELOC_LVX_64_GOTOFF:
-    case BFD_RELOC_LVX_S43_GOTOFF_UP27:
-    case BFD_RELOC_LVX_S43_GOTOFF_LO10:
-    case BFD_RELOC_LVX_S43_GOTOFF_EX6:
+    case BFD_RELOC_KVX_64_GOTOFF:
+    case BFD_RELOC_KVX_S43_GOTOFF_UP27:
+    case BFD_RELOC_KVX_S43_GOTOFF_LO10:
+    case BFD_RELOC_KVX_S43_GOTOFF_EX6:
 
-    case BFD_RELOC_LVX_32_GOT:
-    case BFD_RELOC_LVX_64_GOT:
-    case BFD_RELOC_LVX_S37_GOT_UP27:
-    case BFD_RELOC_LVX_S37_GOT_LO10:
+    case BFD_RELOC_KVX_32_GOT:
+    case BFD_RELOC_KVX_64_GOT:
+    case BFD_RELOC_KVX_S37_GOT_UP27:
+    case BFD_RELOC_KVX_S37_GOT_LO10:
 
-    case BFD_RELOC_LVX_GLOB_DAT:
+    case BFD_RELOC_KVX_GLOB_DAT:
       return 1;
     default:
       return 0;
@@ -2991,24 +2984,24 @@ lvx_force_reloc_sub_same (fixS * fixP, segT sec)
 
   switch (fixP->fx_r_type)
     {
-    case BFD_RELOC_LVX_32_GOTOFF:
-    case BFD_RELOC_LVX_S37_GOTOFF_UP27:
-    case BFD_RELOC_LVX_S37_GOTOFF_LO10:
+    case BFD_RELOC_KVX_32_GOTOFF:
+    case BFD_RELOC_KVX_S37_GOTOFF_UP27:
+    case BFD_RELOC_KVX_S37_GOTOFF_LO10:
 
-    case BFD_RELOC_LVX_64_GOTOFF:
-    case BFD_RELOC_LVX_S43_GOTOFF_UP27:
-    case BFD_RELOC_LVX_S43_GOTOFF_LO10:
-    case BFD_RELOC_LVX_S43_GOTOFF_EX6:
+    case BFD_RELOC_KVX_64_GOTOFF:
+    case BFD_RELOC_KVX_S43_GOTOFF_UP27:
+    case BFD_RELOC_KVX_S43_GOTOFF_LO10:
+    case BFD_RELOC_KVX_S43_GOTOFF_EX6:
 
-    case BFD_RELOC_LVX_32_GOT:
-    case BFD_RELOC_LVX_64_GOT:
-    case BFD_RELOC_LVX_S37_GOT_UP27:
-    case BFD_RELOC_LVX_S37_GOT_LO10:
+    case BFD_RELOC_KVX_32_GOT:
+    case BFD_RELOC_KVX_64_GOT:
+    case BFD_RELOC_KVX_S37_GOT_UP27:
+    case BFD_RELOC_KVX_S37_GOT_LO10:
 
-    case BFD_RELOC_LVX_S37_LO10:
-    case BFD_RELOC_LVX_S37_UP27:
+    case BFD_RELOC_KVX_S37_LO10:
+    case BFD_RELOC_KVX_S37_UP27:
 
-    case BFD_RELOC_LVX_GLOB_DAT:
+    case BFD_RELOC_KVX_GLOB_DAT:
       return 1;
 
     default:

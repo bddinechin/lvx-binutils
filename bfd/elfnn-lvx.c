@@ -39,31 +39,31 @@
 #endif
 
 #define IS_LVX_TLS_RELOC(R_TYPE)			\
-  ((R_TYPE) == BFD_RELOC_LVX_S37_TLS_LE_LO10	\
-   || (R_TYPE) == BFD_RELOC_LVX_S37_TLS_LE_UP27	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_LE_LO10	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_LE_UP27	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_LE_EX6	\
-   || (R_TYPE) == BFD_RELOC_LVX_S37_TLS_DTPOFF_LO10	\
-   || (R_TYPE) == BFD_RELOC_LVX_S37_TLS_DTPOFF_UP27	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_DTPOFF_LO10	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_DTPOFF_UP27	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_DTPOFF_EX6	\
-   || (R_TYPE) == BFD_RELOC_LVX_S37_TLS_IE_LO10	\
-   || (R_TYPE) == BFD_RELOC_LVX_S37_TLS_IE_UP27	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_IE_LO10	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_IE_UP27	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_IE_EX6	\
-   || (R_TYPE) == BFD_RELOC_LVX_S37_TLS_GD_LO10	\
-   || (R_TYPE) == BFD_RELOC_LVX_S37_TLS_GD_UP27	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_GD_LO10	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_GD_UP27	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_GD_EX6	\
-   || (R_TYPE) == BFD_RELOC_LVX_S37_TLS_LD_LO10	\
-   || (R_TYPE) == BFD_RELOC_LVX_S37_TLS_LD_UP27	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_LD_LO10	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_LD_UP27	\
-   || (R_TYPE) == BFD_RELOC_LVX_S43_TLS_LD_EX6	\
+  ((R_TYPE) == BFD_RELOC_KVX_S37_TLS_LE_LO10	\
+   || (R_TYPE) == BFD_RELOC_KVX_S37_TLS_LE_UP27	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_LE_LO10	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_LE_UP27	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_LE_EX6	\
+   || (R_TYPE) == BFD_RELOC_KVX_S37_TLS_DTPOFF_LO10	\
+   || (R_TYPE) == BFD_RELOC_KVX_S37_TLS_DTPOFF_UP27	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_DTPOFF_LO10	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_DTPOFF_UP27	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_DTPOFF_EX6	\
+   || (R_TYPE) == BFD_RELOC_KVX_S37_TLS_IE_LO10	\
+   || (R_TYPE) == BFD_RELOC_KVX_S37_TLS_IE_UP27	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_IE_LO10	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_IE_UP27	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_IE_EX6	\
+   || (R_TYPE) == BFD_RELOC_KVX_S37_TLS_GD_LO10	\
+   || (R_TYPE) == BFD_RELOC_KVX_S37_TLS_GD_UP27	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_GD_LO10	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_GD_UP27	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_GD_EX6	\
+   || (R_TYPE) == BFD_RELOC_KVX_S37_TLS_LD_LO10	\
+   || (R_TYPE) == BFD_RELOC_KVX_S37_TLS_LD_UP27	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_LD_LO10	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_LD_UP27	\
+   || (R_TYPE) == BFD_RELOC_KVX_S43_TLS_LD_EX6	\
    )
 
 #define IS_LVX_TLS_RELAX_RELOC(R_TYPE) 0
@@ -137,7 +137,7 @@ static const uint32_t elfNN_lvx_long_branch_stub[] =
 #define ALL_ONES (~ (bfd_vma) 0)
 
 /* Indexed by the bfd interal reloc enumerators.
-   Therefore, the table needs to be synced with BFD_RELOC_LVX_*
+   Therefore, the table needs to be synced with BFD_RELOC_KVX_*
    in reloc.c.   */
 
 #define LVX_KV3_V1_KV3_V2_KV4_V1
@@ -153,9 +153,9 @@ elfNN_lvx_bfd_reloc_from_howto (reloc_howto_type *howto)
   const ptrdiff_t offset = howto - elf_lvx_howto_table;
 
   if (offset >= 0 && offset < size)
-    return BFD_RELOC_LVX_RELOC_START + offset + 1;
+    return BFD_RELOC_KVX_RELOC_START + offset + 1;
 
-  return BFD_RELOC_LVX_RELOC_START + 1;
+  return BFD_RELOC_KVX_RELOC_START + 1;
 }
 
 /* Given R_TYPE, return the bfd internal relocation enumerator.  */
@@ -181,10 +181,10 @@ elfNN_lvx_bfd_reloc_from_type (bfd *abfd ATTRIBUTE_UNUSED, unsigned int r_type)
   if (r_type >= R_KVX_end)
     {
       bfd_set_error (bfd_error_bad_value);
-      return BFD_RELOC_LVX_RELOC_END;
+      return BFD_RELOC_KVX_RELOC_END;
     }
 
-  return (BFD_RELOC_LVX_RELOC_START + 1) + offsets[r_type];
+  return (BFD_RELOC_KVX_RELOC_START + 1) + offsets[r_type];
 }
 
 struct elf_lvx_reloc_map
@@ -196,17 +196,17 @@ struct elf_lvx_reloc_map
 /* Map bfd generic reloc to LVX-specific reloc.  */
 static const struct elf_lvx_reloc_map elf_lvx_reloc_map[] =
 {
-  {BFD_RELOC_NONE, BFD_RELOC_LVX_NONE},
+  {BFD_RELOC_NONE, BFD_RELOC_KVX_NONE},
 
   /* Basic data relocations.  */
-  {BFD_RELOC_CTOR, BFD_RELOC_LVX_NN},
-  {BFD_RELOC_64, BFD_RELOC_LVX_64},
-  {BFD_RELOC_32, BFD_RELOC_LVX_32},
-  {BFD_RELOC_16, BFD_RELOC_LVX_16},
-  {BFD_RELOC_8,  BFD_RELOC_LVX_8},
+  {BFD_RELOC_CTOR, BFD_RELOC_KVX_NN},
+  {BFD_RELOC_64, BFD_RELOC_KVX_64},
+  {BFD_RELOC_32, BFD_RELOC_KVX_32},
+  {BFD_RELOC_16, BFD_RELOC_KVX_16},
+  {BFD_RELOC_8,  BFD_RELOC_KVX_8},
 
-  {BFD_RELOC_64_PCREL, BFD_RELOC_LVX_64_PCREL},
-  {BFD_RELOC_32_PCREL, BFD_RELOC_LVX_32_PCREL},
+  {BFD_RELOC_64_PCREL, BFD_RELOC_KVX_64_PCREL},
+  {BFD_RELOC_32_PCREL, BFD_RELOC_KVX_32_PCREL},
 };
 
 /* Given the bfd internal relocation enumerator in CODE, return the
@@ -218,7 +218,7 @@ elfNN_lvx_howto_from_bfd_reloc (bfd_reloc_code_real_type code)
   unsigned int i;
 
   /* Convert bfd generic reloc to LVX-specific reloc.  */
-  if (code < BFD_RELOC_LVX_RELOC_START || code > BFD_RELOC_LVX_RELOC_END)
+  if (code < BFD_RELOC_KVX_RELOC_START || code > BFD_RELOC_KVX_RELOC_END)
     for (i = 0; i < ARRAY_SIZE (elf_lvx_reloc_map) ; i++)
       if (elf_lvx_reloc_map[i].from == code)
 	{
@@ -226,8 +226,8 @@ elfNN_lvx_howto_from_bfd_reloc (bfd_reloc_code_real_type code)
 	  break;
 	}
 
-  if (code > BFD_RELOC_LVX_RELOC_START && code < BFD_RELOC_LVX_RELOC_END)
-      return &elf_lvx_howto_table[code - (BFD_RELOC_LVX_RELOC_START + 1)];
+  if (code > BFD_RELOC_KVX_RELOC_START && code < BFD_RELOC_KVX_RELOC_END)
+      return &elf_lvx_howto_table[code - (BFD_RELOC_KVX_RELOC_START + 1)];
 
   return NULL;
 }
@@ -976,9 +976,9 @@ lvx_build_one_stub (struct bfd_hash_entry *gen_entry,
     case lvx_stub_long_branch:
       /* The stub uses a make insn with 43bits immediate.
 	 We need to apply 3 relocations:
-	 BFD_RELOC_LVX_S43_LO10,
-	 BFD_RELOC_LVX_S43_UP27,
-	 BFD_RELOC_LVX_S43_EX6.  */
+	 BFD_RELOC_KVX_S43_LO10,
+	 BFD_RELOC_KVX_S43_UP27,
+	 BFD_RELOC_KVX_S43_EX6.  */
       if (lvx_relocate (R_KVX_S43_LO10, stub_bfd, stub_sec,
 			stub_entry->stub_offset, sym_value) != bfd_reloc_ok)
 	BFD_FAIL ();
@@ -1684,40 +1684,40 @@ lvx_reloc_got_type (bfd_reloc_code_real_type r_type)
       /* Extracted with:
 	 awk 'match ($0, /HOWTO.*R_(LVX.*_GOT(OFF)?(64)?_.*),/,ary) \
 	 {print "case BFD_RELOC_" ary[1] ":";}' elfxx-lvxc.def  */
-    case BFD_RELOC_LVX_S37_GOTOFF_LO10:
-    case BFD_RELOC_LVX_S37_GOTOFF_UP27:
+    case BFD_RELOC_KVX_S37_GOTOFF_LO10:
+    case BFD_RELOC_KVX_S37_GOTOFF_UP27:
 
-    case BFD_RELOC_LVX_S37_GOT_LO10:
-    case BFD_RELOC_LVX_S37_GOT_UP27:
+    case BFD_RELOC_KVX_S37_GOT_LO10:
+    case BFD_RELOC_KVX_S37_GOT_UP27:
 
-    case BFD_RELOC_LVX_S43_GOTOFF_LO10:
-    case BFD_RELOC_LVX_S43_GOTOFF_UP27:
-    case BFD_RELOC_LVX_S43_GOTOFF_EX6:
+    case BFD_RELOC_KVX_S43_GOTOFF_LO10:
+    case BFD_RELOC_KVX_S43_GOTOFF_UP27:
+    case BFD_RELOC_KVX_S43_GOTOFF_EX6:
 
-    case BFD_RELOC_LVX_S43_GOT_LO10:
-    case BFD_RELOC_LVX_S43_GOT_UP27:
-    case BFD_RELOC_LVX_S43_GOT_EX6:
+    case BFD_RELOC_KVX_S43_GOT_LO10:
+    case BFD_RELOC_KVX_S43_GOT_UP27:
+    case BFD_RELOC_KVX_S43_GOT_EX6:
       return GOT_NORMAL;
 
-    case BFD_RELOC_LVX_S37_TLS_GD_LO10:
-    case BFD_RELOC_LVX_S37_TLS_GD_UP27:
-    case BFD_RELOC_LVX_S43_TLS_GD_LO10:
-    case BFD_RELOC_LVX_S43_TLS_GD_UP27:
-    case BFD_RELOC_LVX_S43_TLS_GD_EX6:
+    case BFD_RELOC_KVX_S37_TLS_GD_LO10:
+    case BFD_RELOC_KVX_S37_TLS_GD_UP27:
+    case BFD_RELOC_KVX_S43_TLS_GD_LO10:
+    case BFD_RELOC_KVX_S43_TLS_GD_UP27:
+    case BFD_RELOC_KVX_S43_TLS_GD_EX6:
       return GOT_TLS_GD;
 
-    case BFD_RELOC_LVX_S37_TLS_LD_LO10:
-    case BFD_RELOC_LVX_S37_TLS_LD_UP27:
-    case BFD_RELOC_LVX_S43_TLS_LD_LO10:
-    case BFD_RELOC_LVX_S43_TLS_LD_UP27:
-    case BFD_RELOC_LVX_S43_TLS_LD_EX6:
+    case BFD_RELOC_KVX_S37_TLS_LD_LO10:
+    case BFD_RELOC_KVX_S37_TLS_LD_UP27:
+    case BFD_RELOC_KVX_S43_TLS_LD_LO10:
+    case BFD_RELOC_KVX_S43_TLS_LD_UP27:
+    case BFD_RELOC_KVX_S43_TLS_LD_EX6:
       return GOT_TLS_LD;
 
-    case BFD_RELOC_LVX_S37_TLS_IE_LO10:
-    case BFD_RELOC_LVX_S37_TLS_IE_UP27:
-    case BFD_RELOC_LVX_S43_TLS_IE_LO10:
-    case BFD_RELOC_LVX_S43_TLS_IE_UP27:
-    case BFD_RELOC_LVX_S43_TLS_IE_EX6:
+    case BFD_RELOC_KVX_S37_TLS_IE_LO10:
+    case BFD_RELOC_KVX_S37_TLS_IE_UP27:
+    case BFD_RELOC_KVX_S43_TLS_IE_LO10:
+    case BFD_RELOC_KVX_S43_TLS_IE_UP27:
+    case BFD_RELOC_KVX_S43_TLS_IE_EX6:
       return GOT_TLS_IE;
 
     default:
@@ -1865,25 +1865,25 @@ check_signed_overflow (enum complain_overflow complain_on_overflow,
      (ie. unchecked) for those. */
   switch (bfd_r_type)
     {
-    case BFD_RELOC_LVX_S37_LO10:
-    case BFD_RELOC_LVX_S37_UP27:
+    case BFD_RELOC_KVX_S37_LO10:
+    case BFD_RELOC_KVX_S37_UP27:
       bitsize = 37;
       break;
 
-    case BFD_RELOC_LVX_S32_LO5:
-    case BFD_RELOC_LVX_S32_UP27:
+    case BFD_RELOC_KVX_S32_LO5:
+    case BFD_RELOC_KVX_S32_UP27:
       bitsize = 32;
       break;
 
-    case BFD_RELOC_LVX_S43_LO10:
-    case BFD_RELOC_LVX_S43_UP27:
-    case BFD_RELOC_LVX_S43_EX6:
+    case BFD_RELOC_KVX_S43_LO10:
+    case BFD_RELOC_KVX_S43_UP27:
+    case BFD_RELOC_KVX_S43_EX6:
       bitsize = 43;
       break;
 
-    case BFD_RELOC_LVX_S64_LO10:
-    case BFD_RELOC_LVX_S64_UP27:
-    case BFD_RELOC_LVX_S64_EX27:
+    case BFD_RELOC_KVX_S64_LO10:
+    case BFD_RELOC_KVX_S64_UP27:
+    case BFD_RELOC_KVX_S64_EX27:
       bitsize = 64;
       break;
 
@@ -2044,23 +2044,23 @@ elfNN_lvx_final_link_relocate (reloc_howto_type *howto,
 
   switch (bfd_r_type)
     {
-    case BFD_RELOC_LVX_NN:
+    case BFD_RELOC_KVX_NN:
 #if ARCH_SIZE == 64
-    case BFD_RELOC_LVX_32:
+    case BFD_RELOC_KVX_32:
 #endif
-    case BFD_RELOC_LVX_S37_LO10:
-    case BFD_RELOC_LVX_S37_UP27:
+    case BFD_RELOC_KVX_S37_LO10:
+    case BFD_RELOC_KVX_S37_UP27:
 
-    case BFD_RELOC_LVX_S32_LO5:
-    case BFD_RELOC_LVX_S32_UP27:
+    case BFD_RELOC_KVX_S32_LO5:
+    case BFD_RELOC_KVX_S32_UP27:
 
-    case BFD_RELOC_LVX_S43_LO10:
-    case BFD_RELOC_LVX_S43_UP27:
-    case BFD_RELOC_LVX_S43_EX6:
+    case BFD_RELOC_KVX_S43_LO10:
+    case BFD_RELOC_KVX_S43_UP27:
+    case BFD_RELOC_KVX_S43_EX6:
 
-    case BFD_RELOC_LVX_S64_LO10:
-    case BFD_RELOC_LVX_S64_UP27:
-    case BFD_RELOC_LVX_S64_EX27:
+    case BFD_RELOC_KVX_S64_LO10:
+    case BFD_RELOC_KVX_S64_UP27:
+    case BFD_RELOC_KVX_S64_EX27:
       /* When generating a shared library or PIE, these relocations
 	 are copied into the output file to be resolved at run time.  */
       if (bfd_link_pic (info)
@@ -2102,8 +2102,8 @@ elfNN_lvx_final_link_relocate (reloc_howto_type *howto,
 		   && (!bfd_link_pic (info) || !info->symbolic
 		       || !h->def_regular))
 	    outrel.r_info = ELFNN_R_INFO (h->dynindx, r_type);
-	  else if (bfd_r_type == BFD_RELOC_LVX_32
-		   || bfd_r_type == BFD_RELOC_LVX_64)
+	  else if (bfd_r_type == BFD_RELOC_KVX_32
+		   || bfd_r_type == BFD_RELOC_KVX_64)
 	    {
 	      int symbol;
 
@@ -2182,17 +2182,17 @@ elfNN_lvx_final_link_relocate (reloc_howto_type *howto,
 				       addend);
       break;
 
-    case BFD_RELOC_LVX_PCREL17:
-    case BFD_RELOC_LVX_PCREL27:
-    case BFD_RELOC_LVX_S11S2_PCREL:
-    case BFD_RELOC_LVX_S17S2_PCREL:
-    case BFD_RELOC_LVX_S27S2_PCREL:
-    case BFD_RELOC_LVX_S38S2_PCREL_LO11:
-    case BFD_RELOC_LVX_S38S2_PCREL_UP27:
-    case BFD_RELOC_LVX_S44S2_PCREL_LO17:
-    case BFD_RELOC_LVX_S44S2_PCREL_UP27:
-    case BFD_RELOC_LVX_S54S2_PCREL_LO27:
-    case BFD_RELOC_LVX_S54S2_PCREL_UP27:
+    case BFD_RELOC_KVX_PCREL17:
+    case BFD_RELOC_KVX_PCREL27:
+    case BFD_RELOC_KVX_S11S2_PCREL:
+    case BFD_RELOC_KVX_S17S2_PCREL:
+    case BFD_RELOC_KVX_S27S2_PCREL:
+    case BFD_RELOC_KVX_S38S2_PCREL_LO11:
+    case BFD_RELOC_KVX_S38S2_PCREL_UP27:
+    case BFD_RELOC_KVX_S44S2_PCREL_LO17:
+    case BFD_RELOC_KVX_S44S2_PCREL_UP27:
+    case BFD_RELOC_KVX_S54S2_PCREL_LO27:
+    case BFD_RELOC_KVX_S54S2_PCREL_UP27:
 
       {
 	/* BCU insn are always first in a bundle, so there is no need
@@ -2251,61 +2251,61 @@ elfNN_lvx_final_link_relocate (reloc_howto_type *howto,
       /* FALLTHROUGH */
 
       /* PCREL 32 are used in dwarf2 table for exception handling */
-    case BFD_RELOC_LVX_32_PCREL:
-    case BFD_RELOC_LVX_S64_PCREL_LO10:
-    case BFD_RELOC_LVX_S64_PCREL_UP27:
-    case BFD_RELOC_LVX_S64_PCREL_EX27:
-    case BFD_RELOC_LVX_S37_PCREL_LO10:
-    case BFD_RELOC_LVX_S37_PCREL_UP27:
-    case BFD_RELOC_LVX_S43_PCREL_LO10:
-    case BFD_RELOC_LVX_S43_PCREL_UP27:
-    case BFD_RELOC_LVX_S43_PCREL_EX6:
+    case BFD_RELOC_KVX_32_PCREL:
+    case BFD_RELOC_KVX_S64_PCREL_LO10:
+    case BFD_RELOC_KVX_S64_PCREL_UP27:
+    case BFD_RELOC_KVX_S64_PCREL_EX27:
+    case BFD_RELOC_KVX_S37_PCREL_LO10:
+    case BFD_RELOC_KVX_S37_PCREL_UP27:
+    case BFD_RELOC_KVX_S43_PCREL_LO10:
+    case BFD_RELOC_KVX_S43_PCREL_UP27:
+    case BFD_RELOC_KVX_S43_PCREL_EX6:
       return _bfd_final_link_relocate (howto, input_bfd, input_section,
 				       contents, rel->r_offset, value,
 				       addend);
       break;
 
-    case BFD_RELOC_LVX_S37_TLS_LE_LO10:
-    case BFD_RELOC_LVX_S37_TLS_LE_UP27:
+    case BFD_RELOC_KVX_S37_TLS_LE_LO10:
+    case BFD_RELOC_KVX_S37_TLS_LE_UP27:
 
-    case BFD_RELOC_LVX_S43_TLS_LE_LO10:
-    case BFD_RELOC_LVX_S43_TLS_LE_UP27:
-    case BFD_RELOC_LVX_S43_TLS_LE_EX6:
+    case BFD_RELOC_KVX_S43_TLS_LE_LO10:
+    case BFD_RELOC_KVX_S43_TLS_LE_UP27:
+    case BFD_RELOC_KVX_S43_TLS_LE_EX6:
       return _bfd_final_link_relocate (howto, input_bfd, input_section,
 				       contents, rel->r_offset,
 				       value - tpoff_base (info), addend);
       break;
 
-    case BFD_RELOC_LVX_S37_TLS_DTPOFF_LO10:
-    case BFD_RELOC_LVX_S37_TLS_DTPOFF_UP27:
+    case BFD_RELOC_KVX_S37_TLS_DTPOFF_LO10:
+    case BFD_RELOC_KVX_S37_TLS_DTPOFF_UP27:
 
-    case BFD_RELOC_LVX_S43_TLS_DTPOFF_LO10:
-    case BFD_RELOC_LVX_S43_TLS_DTPOFF_UP27:
-    case BFD_RELOC_LVX_S43_TLS_DTPOFF_EX6:
+    case BFD_RELOC_KVX_S43_TLS_DTPOFF_LO10:
+    case BFD_RELOC_KVX_S43_TLS_DTPOFF_UP27:
+    case BFD_RELOC_KVX_S43_TLS_DTPOFF_EX6:
       return _bfd_final_link_relocate (howto, input_bfd, input_section,
 				       contents, rel->r_offset,
 				       value - dtpoff_base (info), addend);
 
-    case BFD_RELOC_LVX_S37_TLS_GD_UP27:
-    case BFD_RELOC_LVX_S37_TLS_GD_LO10:
+    case BFD_RELOC_KVX_S37_TLS_GD_UP27:
+    case BFD_RELOC_KVX_S37_TLS_GD_LO10:
 
-    case BFD_RELOC_LVX_S43_TLS_GD_UP27:
-    case BFD_RELOC_LVX_S43_TLS_GD_EX6:
-    case BFD_RELOC_LVX_S43_TLS_GD_LO10:
+    case BFD_RELOC_KVX_S43_TLS_GD_UP27:
+    case BFD_RELOC_KVX_S43_TLS_GD_EX6:
+    case BFD_RELOC_KVX_S43_TLS_GD_LO10:
 
-    case BFD_RELOC_LVX_S37_TLS_IE_UP27:
-    case BFD_RELOC_LVX_S37_TLS_IE_LO10:
+    case BFD_RELOC_KVX_S37_TLS_IE_UP27:
+    case BFD_RELOC_KVX_S37_TLS_IE_LO10:
 
-    case BFD_RELOC_LVX_S43_TLS_IE_UP27:
-    case BFD_RELOC_LVX_S43_TLS_IE_EX6:
-    case BFD_RELOC_LVX_S43_TLS_IE_LO10:
+    case BFD_RELOC_KVX_S43_TLS_IE_UP27:
+    case BFD_RELOC_KVX_S43_TLS_IE_EX6:
+    case BFD_RELOC_KVX_S43_TLS_IE_LO10:
 
-    case BFD_RELOC_LVX_S37_TLS_LD_UP27:
-    case BFD_RELOC_LVX_S37_TLS_LD_LO10:
+    case BFD_RELOC_KVX_S37_TLS_LD_UP27:
+    case BFD_RELOC_KVX_S37_TLS_LD_LO10:
 
-    case BFD_RELOC_LVX_S43_TLS_LD_UP27:
-    case BFD_RELOC_LVX_S43_TLS_LD_EX6:
-    case BFD_RELOC_LVX_S43_TLS_LD_LO10:
+    case BFD_RELOC_KVX_S43_TLS_LD_UP27:
+    case BFD_RELOC_KVX_S43_TLS_LD_EX6:
+    case BFD_RELOC_KVX_S43_TLS_LD_LO10:
 
       if (globals->root.sgot == NULL)
 	return bfd_reloc_notsupported;
@@ -2316,16 +2316,16 @@ elfNN_lvx_final_link_relocate (reloc_howto_type *howto,
       *unresolved_reloc_p = false;
       break;
 
-    case BFD_RELOC_LVX_S37_GOTADDR_UP27:
-    case BFD_RELOC_LVX_S37_GOTADDR_LO10:
+    case BFD_RELOC_KVX_S37_GOTADDR_UP27:
+    case BFD_RELOC_KVX_S37_GOTADDR_LO10:
 
-    case BFD_RELOC_LVX_S43_GOTADDR_UP27:
-    case BFD_RELOC_LVX_S43_GOTADDR_EX6:
-    case BFD_RELOC_LVX_S43_GOTADDR_LO10:
+    case BFD_RELOC_KVX_S43_GOTADDR_UP27:
+    case BFD_RELOC_KVX_S43_GOTADDR_EX6:
+    case BFD_RELOC_KVX_S43_GOTADDR_LO10:
 
-    case BFD_RELOC_LVX_S64_GOTADDR_UP27:
-    case BFD_RELOC_LVX_S64_GOTADDR_EX27:
-    case BFD_RELOC_LVX_S64_GOTADDR_LO10:
+    case BFD_RELOC_KVX_S64_GOTADDR_UP27:
+    case BFD_RELOC_KVX_S64_GOTADDR_EX27:
+    case BFD_RELOC_KVX_S64_GOTADDR_LO10:
       {
 	if (globals->root.sgot == NULL)
 	  BFD_ASSERT (h != NULL);
@@ -2339,15 +2339,15 @@ elfNN_lvx_final_link_relocate (reloc_howto_type *howto,
       }
       break;
 
-    case BFD_RELOC_LVX_S37_GOTOFF_LO10:
-    case BFD_RELOC_LVX_S37_GOTOFF_UP27:
+    case BFD_RELOC_KVX_S37_GOTOFF_LO10:
+    case BFD_RELOC_KVX_S37_GOTOFF_UP27:
 
-    case BFD_RELOC_LVX_32_GOTOFF:
-    case BFD_RELOC_LVX_64_GOTOFF:
+    case BFD_RELOC_KVX_32_GOTOFF:
+    case BFD_RELOC_KVX_64_GOTOFF:
 
-    case BFD_RELOC_LVX_S43_GOTOFF_LO10:
-    case BFD_RELOC_LVX_S43_GOTOFF_UP27:
-    case BFD_RELOC_LVX_S43_GOTOFF_EX6:
+    case BFD_RELOC_KVX_S43_GOTOFF_LO10:
+    case BFD_RELOC_KVX_S43_GOTOFF_UP27:
+    case BFD_RELOC_KVX_S43_GOTOFF_EX6:
 
       {
 	asection *basegot = globals->root.sgot;
@@ -2360,15 +2360,15 @@ elfNN_lvx_final_link_relocate (reloc_howto_type *howto,
       }
       break;
 
-    case BFD_RELOC_LVX_S37_GOT_LO10:
-    case BFD_RELOC_LVX_S37_GOT_UP27:
+    case BFD_RELOC_KVX_S37_GOT_LO10:
+    case BFD_RELOC_KVX_S37_GOT_UP27:
 
-    case BFD_RELOC_LVX_32_GOT:
-    case BFD_RELOC_LVX_64_GOT:
+    case BFD_RELOC_KVX_32_GOT:
+    case BFD_RELOC_KVX_64_GOT:
 
-    case BFD_RELOC_LVX_S43_GOT_LO10:
-    case BFD_RELOC_LVX_S43_GOT_UP27:
-    case BFD_RELOC_LVX_S43_GOT_EX6:
+    case BFD_RELOC_KVX_S43_GOT_LO10:
+    case BFD_RELOC_KVX_S43_GOT_UP27:
+    case BFD_RELOC_KVX_S43_GOT_EX6:
 
       if (globals->root.sgot == NULL)
 	BFD_ASSERT (h != NULL);
@@ -2395,7 +2395,7 @@ elfNN_lvx_final_link_relocate (reloc_howto_type *howto,
 
 	  if (locals == NULL)
 	    {
-	      int howto_index = bfd_r_type - BFD_RELOC_LVX_RELOC_START;
+	      int howto_index = bfd_r_type - BFD_RELOC_KVX_RELOC_START;
 	      _bfd_error_handler
 		/* xgettext:c-format */
 		(_("%pB: local symbol descriptor table be NULL when applying "
@@ -2615,19 +2615,19 @@ elfNN_lvx_relocate_section (bfd *output_bfd,
 
       switch (elfNN_lvx_bfd_reloc_from_type (input_bfd, r_type))
 	{
-	case BFD_RELOC_LVX_S37_TLS_GD_LO10:
-	case BFD_RELOC_LVX_S37_TLS_GD_UP27:
+	case BFD_RELOC_KVX_S37_TLS_GD_LO10:
+	case BFD_RELOC_KVX_S37_TLS_GD_UP27:
 
-	case BFD_RELOC_LVX_S43_TLS_GD_LO10:
-	case BFD_RELOC_LVX_S43_TLS_GD_UP27:
-	case BFD_RELOC_LVX_S43_TLS_GD_EX6:
+	case BFD_RELOC_KVX_S43_TLS_GD_LO10:
+	case BFD_RELOC_KVX_S43_TLS_GD_UP27:
+	case BFD_RELOC_KVX_S43_TLS_GD_EX6:
 
-	case BFD_RELOC_LVX_S37_TLS_LD_LO10:
-	case BFD_RELOC_LVX_S37_TLS_LD_UP27:
+	case BFD_RELOC_KVX_S37_TLS_LD_LO10:
+	case BFD_RELOC_KVX_S37_TLS_LD_UP27:
 
-	case BFD_RELOC_LVX_S43_TLS_LD_LO10:
-	case BFD_RELOC_LVX_S43_TLS_LD_UP27:
-	case BFD_RELOC_LVX_S43_TLS_LD_EX6:
+	case BFD_RELOC_KVX_S43_TLS_LD_LO10:
+	case BFD_RELOC_KVX_S43_TLS_LD_UP27:
+	case BFD_RELOC_KVX_S43_TLS_LD_EX6:
 
 	  if (! symbol_got_offset_mark_p (input_bfd, h, r_symndx))
 	    {
@@ -2663,11 +2663,11 @@ elfNN_lvx_relocate_section (bfd *output_bfd,
 		  bfd_reloc_code_real_type real_type =
 		    elfNN_lvx_bfd_reloc_from_type (input_bfd, r_type);
 
-		  if (real_type == BFD_RELOC_LVX_S37_TLS_LD_LO10
-		      || real_type == BFD_RELOC_LVX_S37_TLS_LD_UP27
-		      || real_type == BFD_RELOC_LVX_S43_TLS_LD_LO10
-		      || real_type == BFD_RELOC_LVX_S43_TLS_LD_UP27
-		      || real_type == BFD_RELOC_LVX_S43_TLS_LD_EX6)
+		  if (real_type == BFD_RELOC_KVX_S37_TLS_LD_LO10
+		      || real_type == BFD_RELOC_KVX_S37_TLS_LD_UP27
+		      || real_type == BFD_RELOC_KVX_S43_TLS_LD_LO10
+		      || real_type == BFD_RELOC_KVX_S43_TLS_LD_UP27
+		      || real_type == BFD_RELOC_KVX_S43_TLS_LD_EX6)
 		    {
 		      /* For local dynamic, don't generate DTPOFF in any case.
 			 Initialize the DTPOFF slot into zero, so we get module
@@ -2719,12 +2719,12 @@ elfNN_lvx_relocate_section (bfd *output_bfd,
 	    }
 	  break;
 
-	case BFD_RELOC_LVX_S37_TLS_IE_LO10:
-	case BFD_RELOC_LVX_S37_TLS_IE_UP27:
+	case BFD_RELOC_KVX_S37_TLS_IE_LO10:
+	case BFD_RELOC_KVX_S37_TLS_IE_UP27:
 
-	case BFD_RELOC_LVX_S43_TLS_IE_LO10:
-	case BFD_RELOC_LVX_S43_TLS_IE_UP27:
-	case BFD_RELOC_LVX_S43_TLS_IE_EX6:
+	case BFD_RELOC_KVX_S43_TLS_IE_LO10:
+	case BFD_RELOC_KVX_S43_TLS_IE_UP27:
+	case BFD_RELOC_KVX_S43_TLS_IE_EX6:
 	  if (! symbol_got_offset_mark_p (input_bfd, h, r_symndx))
 	    {
 	      bool need_relocs = false;
@@ -2873,15 +2873,9 @@ elfNN_lvx_object_p (bfd *abfd)
       int e_core = elf_elfheader (abfd)->e_flags & ELF_LVX_CORE_MASK;
       switch(e_core)
 	{
-#if ARCH_SIZE == 64
-	case ELF_LVX_CORE_KV3_1 : e_set = bfd_mach_kv3_1_64; break;
-	case ELF_LVX_CORE_KV3_2 : e_set = bfd_mach_kv3_2_64; break;
-	case ELF_LVX_CORE_KV4_1 : e_set = bfd_mach_kv4_1_64; break;
-#else
-	case ELF_LVX_CORE_KV3_1 : e_set = bfd_mach_kv3_1; break;
-	case ELF_LVX_CORE_KV3_2 : e_set = bfd_mach_kv3_2; break;
-	case ELF_LVX_CORE_KV4_1 : e_set = bfd_mach_kv4_1; break;
-#endif
+	case ELF_LVX_CORE_KV4_1 :
+	case ELF_LVX_CORE_LVX_1 : e_set = bfd_mach_lvx_1_64; break;
+	case ELF_LVX_CORE_LVX_2 : e_set = bfd_mach_lvx_2_64; break;
 	default:
 	  (*_bfd_error_handler)(_("%s: Bad ELF id: `%d'"),
 				abfd->filename, e_core);
@@ -3035,21 +3029,15 @@ elfNN_lvx_print_private_bfd_data (bfd *abfd, void *ptr)
   fprintf (file, _("Private flags = 0x%lx : "), elf_elfheader (abfd)->e_flags);
   if((flags & ELF_LVX_ABI_64B_ADDR_BIT) == ELF_LVX_ABI_64B_ADDR_BIT)
     {
-      if (ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_KV3_1))
-	fprintf (file, _("Coolidge (kv3) V1 64 bits"));
-      else if (ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_KV3_2))
-	fprintf (file, _("Coolidge (kv3) V2 64 bits"));
-      else if (ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_KV4_1))
-	fprintf (file, _("Coolidge (kv4) V1 64 bits"));
+      if (ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_KV4_1) ||
+	  ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_LVX_1))
+	fprintf (file, _("LVX-1 64 bits"));
+      else if (ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_LVX_2))
+	fprintf (file, _("LVX-2 64 bits"));
     }
   else
     {
-      if (ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_KV3_1))
-	fprintf (file, _("Coolidge (kv3) V1 32 bits"));
-      else if (ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_KV3_2))
-	fprintf (file, _("Coolidge (kv3) V2 32 bits"));
-      else if (ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_KV4_1))
-	fprintf (file, _("Coolidge (kv4) V1 32 bits"));
+      fprintf (file, _("LVX 32 bits (unsupported)"));
     }
 
   fputc ('\n', file);
@@ -3325,19 +3313,19 @@ elfNN_lvx_check_relocs (bfd *abfd, struct bfd_link_info *info,
       switch (bfd_r_type)
 	{
 
-	case BFD_RELOC_LVX_S43_LO10:
-	case BFD_RELOC_LVX_S43_UP27:
-	case BFD_RELOC_LVX_S43_EX6:
+	case BFD_RELOC_KVX_S43_LO10:
+	case BFD_RELOC_KVX_S43_UP27:
+	case BFD_RELOC_KVX_S43_EX6:
 
-	case BFD_RELOC_LVX_S37_LO10:
-	case BFD_RELOC_LVX_S37_UP27:
+	case BFD_RELOC_KVX_S37_LO10:
+	case BFD_RELOC_KVX_S37_UP27:
 
-	case BFD_RELOC_LVX_S64_LO10:
-	case BFD_RELOC_LVX_S64_UP27:
-	case BFD_RELOC_LVX_S64_EX27:
+	case BFD_RELOC_KVX_S64_LO10:
+	case BFD_RELOC_KVX_S64_UP27:
+	case BFD_RELOC_KVX_S64_EX27:
 
-	case BFD_RELOC_LVX_32:
-	case BFD_RELOC_LVX_64:
+	case BFD_RELOC_KVX_32:
+	case BFD_RELOC_KVX_64:
 
 	  /* We don't need to handle relocs into sections not going into
 	     the "real" output.  */
@@ -3425,40 +3413,40 @@ elfNN_lvx_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	  }
 	  break;
 
-	case BFD_RELOC_LVX_S37_GOT_LO10:
-	case BFD_RELOC_LVX_S37_GOT_UP27:
+	case BFD_RELOC_KVX_S37_GOT_LO10:
+	case BFD_RELOC_KVX_S37_GOT_UP27:
 
-	case BFD_RELOC_LVX_S37_GOTOFF_LO10:
-	case BFD_RELOC_LVX_S37_GOTOFF_UP27:
+	case BFD_RELOC_KVX_S37_GOTOFF_LO10:
+	case BFD_RELOC_KVX_S37_GOTOFF_UP27:
 
-	case BFD_RELOC_LVX_S43_GOT_LO10:
-	case BFD_RELOC_LVX_S43_GOT_UP27:
-	case BFD_RELOC_LVX_S43_GOT_EX6:
+	case BFD_RELOC_KVX_S43_GOT_LO10:
+	case BFD_RELOC_KVX_S43_GOT_UP27:
+	case BFD_RELOC_KVX_S43_GOT_EX6:
 
-	case BFD_RELOC_LVX_S43_GOTOFF_LO10:
-	case BFD_RELOC_LVX_S43_GOTOFF_UP27:
-	case BFD_RELOC_LVX_S43_GOTOFF_EX6:
+	case BFD_RELOC_KVX_S43_GOTOFF_LO10:
+	case BFD_RELOC_KVX_S43_GOTOFF_UP27:
+	case BFD_RELOC_KVX_S43_GOTOFF_EX6:
 
-	case BFD_RELOC_LVX_S37_TLS_GD_LO10:
-	case BFD_RELOC_LVX_S37_TLS_GD_UP27:
+	case BFD_RELOC_KVX_S37_TLS_GD_LO10:
+	case BFD_RELOC_KVX_S37_TLS_GD_UP27:
 
-	case BFD_RELOC_LVX_S43_TLS_GD_LO10:
-	case BFD_RELOC_LVX_S43_TLS_GD_UP27:
-	case BFD_RELOC_LVX_S43_TLS_GD_EX6:
+	case BFD_RELOC_KVX_S43_TLS_GD_LO10:
+	case BFD_RELOC_KVX_S43_TLS_GD_UP27:
+	case BFD_RELOC_KVX_S43_TLS_GD_EX6:
 
-	case BFD_RELOC_LVX_S37_TLS_IE_LO10:
-	case BFD_RELOC_LVX_S37_TLS_IE_UP27:
+	case BFD_RELOC_KVX_S37_TLS_IE_LO10:
+	case BFD_RELOC_KVX_S37_TLS_IE_UP27:
 
-	case BFD_RELOC_LVX_S43_TLS_IE_LO10:
-	case BFD_RELOC_LVX_S43_TLS_IE_UP27:
-	case BFD_RELOC_LVX_S43_TLS_IE_EX6:
+	case BFD_RELOC_KVX_S43_TLS_IE_LO10:
+	case BFD_RELOC_KVX_S43_TLS_IE_UP27:
+	case BFD_RELOC_KVX_S43_TLS_IE_EX6:
 
-	case BFD_RELOC_LVX_S37_TLS_LD_LO10:
-	case BFD_RELOC_LVX_S37_TLS_LD_UP27:
+	case BFD_RELOC_KVX_S37_TLS_LD_LO10:
+	case BFD_RELOC_KVX_S37_TLS_LD_UP27:
 
-	case BFD_RELOC_LVX_S43_TLS_LD_LO10:
-	case BFD_RELOC_LVX_S43_TLS_LD_UP27:
-	case BFD_RELOC_LVX_S43_TLS_LD_EX6:
+	case BFD_RELOC_KVX_S43_TLS_LD_LO10:
+	case BFD_RELOC_KVX_S43_TLS_LD_UP27:
+	case BFD_RELOC_KVX_S43_TLS_LD_EX6:
 	  {
 	    unsigned got_type;
 	    unsigned old_got_type;
@@ -3519,16 +3507,16 @@ elfNN_lvx_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	    break;
 	  }
 
-	case BFD_RELOC_LVX_S64_GOTADDR_LO10:
-	case BFD_RELOC_LVX_S64_GOTADDR_UP27:
-	case BFD_RELOC_LVX_S64_GOTADDR_EX27:
+	case BFD_RELOC_KVX_S64_GOTADDR_LO10:
+	case BFD_RELOC_KVX_S64_GOTADDR_UP27:
+	case BFD_RELOC_KVX_S64_GOTADDR_EX27:
 
-	case BFD_RELOC_LVX_S43_GOTADDR_LO10:
-	case BFD_RELOC_LVX_S43_GOTADDR_UP27:
-	case BFD_RELOC_LVX_S43_GOTADDR_EX6:
+	case BFD_RELOC_KVX_S43_GOTADDR_LO10:
+	case BFD_RELOC_KVX_S43_GOTADDR_UP27:
+	case BFD_RELOC_KVX_S43_GOTADDR_EX6:
 
-	case BFD_RELOC_LVX_S37_GOTADDR_LO10:
-	case BFD_RELOC_LVX_S37_GOTADDR_UP27:
+	case BFD_RELOC_KVX_S37_GOTADDR_LO10:
+	case BFD_RELOC_KVX_S37_GOTADDR_UP27:
 
 	  if (htab->root.dynobj == NULL)
 	    htab->root.dynobj = abfd;
@@ -3536,10 +3524,10 @@ elfNN_lvx_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	    return false;
 	  break;
 
-	case BFD_RELOC_LVX_PCREL27:
-	case BFD_RELOC_LVX_PCREL17:
-	case BFD_RELOC_LVX_S27S2_PCREL:
-	case BFD_RELOC_LVX_S17S2_PCREL:
+	case BFD_RELOC_KVX_PCREL27:
+	case BFD_RELOC_KVX_PCREL17:
+	case BFD_RELOC_KVX_S27S2_PCREL:
+	case BFD_RELOC_KVX_S17S2_PCREL:
 	  /* If this is a local symbol then we resolve it
 	     directly without creating a PLT entry.  */
 	  if (h == NULL)
@@ -4390,12 +4378,12 @@ elfNN_lvx_create_small_pltn_entry (struct elf_link_hash_entry *h,
 
   /* Use 37bits offset for both 32 and 64bits mode.
      Fill the LO10 of of lw $r9 = 0[$r14].  */
-  elf_lvx_update_plt_entry(output_bfd, BFD_RELOC_LVX_S37_LO10,
+  elf_lvx_update_plt_entry(output_bfd, BFD_RELOC_KVX_S37_LO10,
 			   plt_entry+4,
 			   gotplt_entry_address - plt_entry_address);
 
   /* Fill the UP27 of of lw $r9 = 0[$r14].  */
-  elf_lvx_update_plt_entry(output_bfd, BFD_RELOC_LVX_S37_UP27,
+  elf_lvx_update_plt_entry(output_bfd, BFD_RELOC_KVX_S37_UP27,
 			   plt_entry+8,
 			   gotplt_entry_address - plt_entry_address);
 

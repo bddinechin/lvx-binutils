@@ -1158,6 +1158,7 @@ SOURCE_CFILES = \
 BUILD_CFILES = \
 	elf32-aarch64.c elf64-aarch64.c \
 	elf32-kvx.c elf64-kvx.c \
+	elf64-lvx.c \
 	elf32-ia64.c elf64-ia64.c \
 	elf32-loongarch.c elf64-loongarch.c \
 	elf32-riscv.c elf64-riscv.c \
@@ -1650,6 +1651,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-ia64-vms.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-ia64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-kvx.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-lvx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-loongarch.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-mips.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/elf64-mmix.Plo@am__quote@
@@ -2377,6 +2379,10 @@ elf32-kvx.c : elfnn-kvx.c
 	$(AM_V_GEN)$(SED) -e s/NN/32/g < $< >> $@
 
 elf64-kvx.c : elfnn-kvx.c
+	$(AM_V_at)echo "#line 1 \"$<\"" > $@
+	$(AM_V_GEN)$(SED) -e s/NN/64/g < $< >> $@
+
+elf64-lvx.c : elfnn-lvx.c
 	$(AM_V_at)echo "#line 1 \"$<\"" > $@
 	$(AM_V_GEN)$(SED) -e s/NN/64/g < $< >> $@
 

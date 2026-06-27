@@ -769,6 +769,7 @@ extern const bfd_target iq2000_elf32_vec;
 extern const bfd_target kvx_elf32_vec;
 extern const bfd_target kvx_elf64_vec;
 extern const bfd_target kvx_elf64_linux_vec;
+extern const bfd_target lvx_elf64_vec;
 extern const bfd_target lm32_elf32_vec;
 extern const bfd_target lm32_elf32_fdpic_vec;
 extern const bfd_target loongarch_elf64_vec;
@@ -1133,6 +1134,7 @@ static const bfd_target * const _bfd_target_vector[] =
 	&kvx_elf32_vec,
 	&kvx_elf64_vec,
 	&kvx_elf64_linux_vec,
+	&lvx_elf64_vec,
 #endif
 
 	&lm32_elf32_vec,

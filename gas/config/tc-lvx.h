@@ -281,7 +281,7 @@ extern int lvx_force_reloc_sub_same (struct fix *, segT);
    symbol is not resolved by the assembler.  */
 
 #define TC_RELOC_RTSYM_LOC_FIXUP(FIX)                                          \
-  ((FIX)->fx_r_type != BFD_RELOC_LVX_23_PCREL                                  \
+  ((FIX)->fx_r_type != BFD_RELOC_KVX_23_PCREL                                  \
    || (FIX)->fx_addsy == NULL                                                  \
    || (! S_IS_EXTERNAL ((FIX)->fx_addsy)                                       \
        && ! S_IS_WEAK ((FIX)->fx_addsy)                                        \

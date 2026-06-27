@@ -2217,7 +2217,7 @@ dump_relocations (Filedata *          filedata,
 	  break;
 
 	case EM_KVX:
-	  rtype = elf_kvx_reloc_type (type);
+	  rtype = elf_lvx_reloc_type (type);
 	  break;
 
 	case EM_CRIS:
@@ -5172,14 +5172,14 @@ get_machine_flags (Filedata * filedata, unsigned e_flags, unsigned e_machine)
 	  break;
 
 	case EM_KVX:
-	  if ((e_flags & (ELF_KVX_CORE_MAJOR_MASK | ELF_KVX_CORE_MINOR_MASK)) == ELF_KVX_CORE_KV3_1)
-	    strcat (buf, ", Kalray VLIW kv3-1");
-	  else if ((e_flags & (ELF_KVX_CORE_MAJOR_MASK | ELF_KVX_CORE_MINOR_MASK)) == ELF_KVX_CORE_KV3_2)
-	    strcat (buf, ", Kalray VLIW kv3-2");
-	  else if ((e_flags & (ELF_KVX_CORE_MAJOR_MASK | ELF_KVX_CORE_MINOR_MASK)) == ELF_KVX_CORE_KV4_1)
-	    strcat (buf, ", Kalray VLIW kv4-1");
+	  if ((e_flags & ELF_LVX_CORE_MASK) == ELF_LVX_CORE_KV4_1)
+	    strcat (buf, ", LVX kv4-1 (compat)");
+	  else if ((e_flags & ELF_LVX_CORE_MASK) == ELF_LVX_CORE_LVX_1)
+	    strcat (buf, ", LVX lvx-1");
+	  else if ((e_flags & ELF_LVX_CORE_MASK) == ELF_LVX_CORE_LVX_2)
+	    strcat (buf, ", LVX lvx-2");
 	  else
-	    strcat (buf, ", unknown KVX MPPA");
+	    strcat (buf, ", unknown LVX core");
 	  break;
 
 	case EM_MSP430:

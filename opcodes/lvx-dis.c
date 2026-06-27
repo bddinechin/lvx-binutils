@@ -32,6 +32,10 @@
 #include "elf/lvx.h"
 #include "opcode/lvx.h"
 
+/* KV3 cores are not supported by LVX; stub out for dead-code branches. */
+#define kv3_v1_optab ((struct lvx_opc *)NULL)
+#define kv3_v2_optab ((struct lvx_opc *)NULL)
+
 #define FAIL(s) ((s) != NULL)
 
 /* Begin synchronize with processor/lvx-family/BE/LAO/lvx-Bundle.c  */
@@ -224,39 +228,14 @@ static struct lvx_dis_env env = {
 static void
 lvx_dis_init (struct disassemble_info *info)
 {
-  env.lvx_arch_size = 32;
+  env.lvx_arch_size = 64;
   switch (info->mach)
     {
-    case bfd_mach_kv3_1_64:
-      env.lvx_arch_size = 64;
-      /* fallthrough */
-    case bfd_mach_kv3_1_usr:
-    case bfd_mach_kv3_1:
+    case bfd_mach_lvx_2:
+    case bfd_mach_lvx_2_64:
+    case bfd_mach_lvx_1:
+    case bfd_mach_lvx_1_64:
     default:
-      env.opc_table = kv3_v1_optab;
-      env.lvx_regfiles = kv3_v1_regfiles;
-      env.lvx_registers = kv3_v1_registers;
-      env.lvx_modifiers = kv3_v1_modifiers;
-      env.lvx_dec_registers = kv3_v1_dec_registers;
-      env.lvx_max_dec_registers = kv3_v1_regfiles[KV3_V1_REGFILE_DEC_REGISTERS];
-      break;
-    case bfd_mach_kv3_2_64:
-      env.lvx_arch_size = 64;
-      /* fallthrough */
-    case bfd_mach_kv3_2_usr:
-    case bfd_mach_kv3_2:
-      env.opc_table = kv3_v2_optab;
-      env.lvx_regfiles = kv3_v2_regfiles;
-      env.lvx_registers = kv3_v2_registers;
-      env.lvx_modifiers = kv3_v2_modifiers;
-      env.lvx_dec_registers = kv3_v2_dec_registers;
-      env.lvx_max_dec_registers = kv3_v2_regfiles[KV3_V2_REGFILE_DEC_REGISTERS];
-      break;
-    case bfd_mach_kv4_1_64:
-      env.lvx_arch_size = 64;
-      /* fallthrough */
-    case bfd_mach_kv4_1_usr:
-    case bfd_mach_kv4_1:
       env.opc_table = kv4_v1_optab;
       env.lvx_regfiles = kv4_v1_regfiles;
       env.lvx_registers = kv4_v1_registers;
@@ -619,18 +598,11 @@ lvx_steer_bundle_insns (struct disassemble_info *info,
 {
   switch (info->mach)
     {
-    case bfd_mach_kv3_1_64:
-    case bfd_mach_kv3_1_usr:
-    case bfd_mach_kv3_1:
-    case bfd_mach_kv3_2_64:
-    case bfd_mach_kv3_2_usr:
-    case bfd_mach_kv3_2:
+    case bfd_mach_lvx_1:
+    case bfd_mach_lvx_1_64:
+    case bfd_mach_lvx_2:
+    case bfd_mach_lvx_2_64:
     default:
-      return kv3_steer_bundle_insns (word_cnt, _insn_cnt);
-      break;
-    case bfd_mach_kv4_1_64:
-    case bfd_mach_kv4_1_usr:
-    case bfd_mach_kv4_1:
       return kv4_steer_bundle_insns (word_cnt, _insn_cnt);
       break;
     }

@@ -134193,37 +134193,33 @@ const struct kvx_core_info lvx_2_core_info = {
   (char **) kv4_v1_resource_names
 };
 
-const struct kvx_core_info *kvx_core_info_table[] =
+const struct lvx_core_info *lvx_core_info_table[] =
 {
   &lvx_1_core_info,
   &lvx_2_core_info
 };
 
-const struct kvx_register *kvx_registers_table[] =
+const struct lvx_register *lvx_registers_table[] =
 {
-  kv3_v1_registers,
-  kv3_v2_registers,
+  kv4_v1_registers,
   kv4_v1_registers
 };
 
-const char ***kvx_modifiers_table[] =
+const char ***lvx_modifiers_table[] =
 {
-  kv3_v1_modifiers,
-  kv3_v2_modifiers,
+  kv4_v1_modifiers,
   kv4_v1_modifiers
 };
 
-const int *kvx_regfiles_table[] =
+const int *lvx_regfiles_table[] =
 {
-  kv3_v1_regfiles,
-  kv3_v2_regfiles,
+  kv4_v1_regfiles,
   kv4_v1_regfiles
 };
 
-const int kvx_regfiles_size_table[] =
+const int lvx_regfiles_size_table[] =
 {
-  KV3_V1_REGFILE_REGISTERS,
-  KV3_V2_REGFILE_REGISTERS,
+  KV4_V1_REGFILE_REGISTERS,
   KV4_V1_REGFILE_REGISTERS
 };
 
