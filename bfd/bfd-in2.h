@@ -1776,7 +1776,7 @@ enum bfd_architecture
   bfd_arch_lm32,      /* Lattice Mico32.  */
 #define bfd_mach_lm32          1
   bfd_arch_microblaze,/* Xilinx MicroBlaze.  */
-  bfd_arch_lvx,        /* LVX VLIW processor (KV4 superset) */
+  bfd_arch_lvx,        /* LVX VLIW processor */
 #define bfd_mach_lvx_1             1
 #define bfd_mach_lvx_1_64          2
 #define bfd_mach_lvx_2             3

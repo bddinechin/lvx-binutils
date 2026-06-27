@@ -139,7 +139,7 @@ struct lvx_as_params {
   int abi;
   /* The target's OS/ABI.  */
   int osabi;
-  /* The target core (0: KV4-1, 1: LVX-1, 2: LVX-2).  */
+  /* The target core (1: LVX-1, 2: LVX-2).  */
   int core;
   /* Guard to check if LVX_CORE has been set.  */
   int core_set;
