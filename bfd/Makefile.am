@@ -121,7 +121,7 @@ ALL_MACHINES = \
 	cpu-iamcu.lo \
 	cpu-ip2k.lo \
 	cpu-iq2000.lo \
-	cpu-kvx.lo \
+	cpu-lvx.lo \
 	cpu-lm32.lo \
 	cpu-loongarch.lo \
 	cpu-m10200.lo \
@@ -205,7 +205,7 @@ ALL_MACHINES_CFILES = \
 	cpu-iamcu.c \
 	cpu-ip2k.c \
 	cpu-iq2000.c \
-	cpu-kvx.c \
+	cpu-lvx.c \
 	cpu-lm32.c \
 	cpu-loongarch.c \
 	cpu-m10200.c \
@@ -546,7 +546,7 @@ BFD64_BACKENDS = \
 	coff64-rs6000.lo \
 	elf32-aarch64.lo \
 	elf32-ia64.lo \
-	elf32-kvx.lo \
+	elf32-lvx.lo \
 	elf32-loongarch.lo \
 	elf32-mips.lo \
 	elf32-riscv.lo \
@@ -560,7 +560,7 @@ BFD64_BACKENDS = \
 	elf64-hppa.lo \
 	elf64-ia64-vms.lo \
 	elf64-ia64.lo \
-	elf64-kvx.lo \
+	elf64-lvx.lo \
 	elf64-loongarch.lo \
 	elf64-mips.lo \
 	elf64-mmix.lo \
@@ -575,7 +575,7 @@ BFD64_BACKENDS = \
 	elfn32-mips.lo \
 	elfxx-aarch64.lo \
 	elfxx-ia64.lo \
-	elfxx-kvx.lo \
+	elfxx-lvx.lo \
 	elfxx-loongarch.lo \
 	elfxx-mips.lo \
 	elfxx-riscv.lo \
@@ -624,7 +624,7 @@ BFD64_BACKENDS_CFILES = \
 	elfn32-mips.c \
 	elfxx-aarch64.c \
 	elfxx-ia64.c \
-	elfxx-kvx.c \
+	elfxx-lvx.c \
 	elfxx-loongarch.c \
 	elfxx-mips.c \
 	elfxx-riscv.c \
@@ -690,7 +690,7 @@ SOURCE_CFILES = \
 
 BUILD_CFILES = \
 	elf32-aarch64.c elf64-aarch64.c \
-	elf32-kvx.c elf64-kvx.c \
+	elf32-lvx.c elf64-lvx.c \
 	elf32-ia64.c elf64-ia64.c \
 	elf32-loongarch.c elf64-loongarch.c \
 	elf32-riscv.c elf64-riscv.c \
@@ -861,11 +861,11 @@ elf64-ia64.c : elfnn-ia64.c
 	$(AM_V_at)echo "#line 1 \"$<\"" > $@
 	$(AM_V_GEN)$(SED) -e s/NN/64/g < $< >> $@
 
-elf32-kvx.c : elfnn-kvx.c
+elf32-lvx.c : elfnn-lvx.c
 	$(AM_V_at)echo "#line 1 \"$<\"" > $@
 	$(AM_V_GEN)$(SED) -e s/NN/32/g < $< >> $@
 
-elf64-kvx.c : elfnn-kvx.c
+elf64-lvx.c : elfnn-lvx.c
 	$(AM_V_at)echo "#line 1 \"$<\"" > $@
 	$(AM_V_GEN)$(SED) -e s/NN/64/g < $< >> $@
 

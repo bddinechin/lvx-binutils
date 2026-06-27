@@ -6,30 +6,30 @@
 
 @ifset GENERIC
 @page
-@node KVX-Dependent
-@chapter KVX Dependent Features
+@node LVX-Dependent
+@chapter LVX Dependent Features
 @end ifset
 
 Labels followed by `::' are extern symbols.
 
 @ifclear GENERIC
 @node Machine Dependencies
-@chapter KVX Dependent Features
+@chapter LVX Dependent Features
 @end ifclear
 
-@cindex KVX support
+@cindex LVX support
 @menu
-* KVX Assembler::               KVX Assembler Syntax
+* LVX Assembler::               LVX Assembler Syntax
 * Instruction Modifiers::       Instruction Modifiers List
-* KVX Options::                 Options
-* KVX Directives::              KVX Machine Directives
+* LVX Options::                 Options
+* LVX Directives::              LVX Machine Directives
 @end menu
 
-@node KVX Assembler
-@section KVX Assembler Syntax
-@cindex KVX Assembler
+@node LVX Assembler
+@section LVX Assembler Syntax
+@cindex LVX Assembler
 
-The assembler syntax of the KVX architecture is loosely based on the syntax of
+The assembler syntax of the LVX architecture is loosely based on the syntax of
 the IA-64 assembler.  Most notably, it uses equal signs (`='), question marks
 (`?') and commas (`,') to improve the readability of the instructions.
 Instructions can be suffixed by modifiers which are prefixed by a period (`.'),
@@ -87,7 +87,7 @@ can be omitted.
 
 @table @dfn
 
-@cindex @samp{comparison} modifier, KVX
+@cindex @samp{comparison} modifier, LVX
 @item comparison
 Accepted values: @code{.ne} (not equal); @code{.eq} (equal); @code{.lt} (less
 than); @code{.ge} greater or equal; @code{.le} lesser or equal; @code{.gt}
@@ -97,7 +97,7 @@ unsigned comparison; @code{.all} checks if all bits are set in the mask;
 any bit is set in the mask; and @code{.none} checks that none of the bits of
 the mask are set.
 
-@cindex @samp{conjugate} modifier, KVX
+@cindex @samp{conjugate} modifier, LVX
 @item conjugate
 Accepted values: @code{.} and @code{.c}.
 
@@ -105,7 +105,7 @@ If this modifier is present the conjugate of the first input operand is
 used in the computation.  This modifier is part of the mnemonic on some
 instructions such as MULWC.C.
 
-@cindex @samp{doscale} modifier, KVX
+@cindex @samp{doscale} modifier, LVX
 @item doscale
 Accepted values: @code{.} and @code{.xs}.
 
@@ -114,7 +114,7 @@ All instructions which accept this modifier accept an address of the form
 @code{base + offset}, however when the modifier is present the accessed address
 is @code{base + offset * sizeof(offset)}.
 
-@cindex @samp{floatcomp} modifier, KVX
+@cindex @samp{floatcomp} modifier, LVX
 @item floatcomp
 Accepted values: @code{.one} (ordered not equal), @code{.ueq} (unordered
 equal), @code{.oeq} (ordered equal), @code{.une} (unordered not equal),
@@ -123,7 +123,7 @@ equal), @code{.oeq} (ordered equal), @code{.une} (unordered not equal),
 equal), @code{.ult} (unordered less than).
 
 @c hum... scalarcond
-@cindex @samp{lsucond} modifier, KVX
+@cindex @samp{lsucond} modifier, LVX
 @item lsucond
 Accepted values: @code{.dnez} (double not equal to zero), @code{.deqz} (double
 equal to zero), @code{.dltz} (double less than zero), @code{.dgez} (double
@@ -134,20 +134,20 @@ zero), @code{.wltz} (word less than zero), @code{.wgez} (word greater or equal
 to zero), @code{.wlez} (word less or equal to zero), @code{.wgtz} (word greater
 than zero).
 
-@cindex @samp{rounding} modifier, KVX
+@cindex @samp{rounding} modifier, LVX
 @item rounding
 Accepted values: @code{.} (use the rounding stored in @code{$cs}), @code{.rn}
 (round to nearest, ties to even), @code{.ru} (round up), @code{.rd} (round
 down), @code{rz} (round towards zero).
 
-@cindex @samp{silent} modifier, KVX
+@cindex @samp{silent} modifier, LVX
 @item silent
 Accepted values: @code{.} (no splat), @code{.s} (silent).
 
 This modifier controls whether floating point operations should update the IEEE
 754 flags (stored in @code{$cs}).
 
-@cindex @samp{splat32} modifier, KVX
+@cindex @samp{splat32} modifier, LVX
 @item splat32
 Accepted values: @code{.} (no splat), @code{.@@} (splat).
 
@@ -160,23 +160,23 @@ into a 64-bit operand by replicating it twice.
 
 @table @dfn
 
-@cindex @samp{rectify} modifier, KVX
+@cindex @samp{rectify} modifier, LVX
 @item rectify
 Available values: @code{.} (none), @code{.relu}.
 Applies a ReLU (max between 0 and the argument) to the input operand.
 
-@cindex @samp{roundint} modifier, KVX
+@cindex @samp{roundint} modifier, LVX
 @item roundint
 Available values: @code{.rn} (round to nearest, ties to even), @code{.ru}
 (round up), @code{.rd} (round down), @code{.rz} (round toward zero),
 @code{.rhu} (round half up).
 
-@cindex @samp{saturate} modifier, KVX
+@cindex @samp{saturate} modifier, LVX
 @item saturate
 Available values: @code{.sat} (signed saturated arithmetic), @code{.satu}
 (unsigned saturated arithmetic).
 
-@cindex @samp{speculate} modifier, KVX
+@cindex @samp{speculate} modifier, LVX
 @item speculate
 Available values: @code{.} (nothing), @code{.s} (speculate).
 When the modifier is present the load is non trapping and return 0 on illegal
@@ -188,7 +188,7 @@ addresses.
 
 @table @dfn
 
-@cindex @samp{accesses} modifier, KVX
+@cindex @samp{accesses} modifier, LVX
 @item accesses
 Available values: @code{.} (all accesses), @code{.w} (all writes), @code{.r}
 (all reads), @code{.wa} (all write access (asynchronously).
@@ -196,7 +196,7 @@ Available values: @code{.} (all accesses), @code{.w} (all writes), @code{.r}
 This modifier is available on the fence instruction and the modifier is here to
 filter the types of accesses that the fence should block.
 
-@cindex @samp{boolcas} modifier, KVX
+@cindex @samp{boolcas} modifier, LVX
 @item boolcas
 Available values: @code{.v} (valued compare and swap), @code{.} (boolean compare and swap).
 
@@ -204,44 +204,44 @@ This modifier is available on the compare and swap instructions.  The valued
 variant returns the current value in memory while the boolean compare and swap
 only tells whether the compare and swap succeeded.
 
-@cindex @samp{cachelev} modifier, KVX
+@cindex @samp{cachelev} modifier, LVX
 @item cachelev
 Available values: @code{.l1} (L1 cache), @code{.l2} (L2 cache).
 
 This modifier is available on instruction which are dedicated to cache
 maintenance, and allows to select the cache.
 
-@cindex @samp{channel} modifier, KVX
+@cindex @samp{channel} modifier, LVX
 @item channel
 Available values: @code{.f} (forward), @code{.b} (backward).
 
 This modifier is available on instructions dedicated to PE to PE communication,
 and allow to select the communication channel.
 
-@cindex @samp{coherency} modifier, KVX
+@cindex @samp{coherency} modifier, LVX
 @item coherence
 Available values: @code{.} (local), @code{.g} (global).
 
-@cindex @samp{lsomask} modifier, KVX
+@cindex @samp{lsomask} modifier, LVX
 @item lsomask
 Available values: @code{.u0}, @code{.u1}, @code{.u2}, @code{.u3}, @code{.mt},
 @code{.mf}, @code{.mtc}, @code{.mfc}.
 
-@cindex @samp{lsumask} modifier, KVX
+@cindex @samp{lsumask} modifier, LVX
 @item lsumask
 Available values: @code{.dnez}, @code{.dqez}, @code{.wnez}, @code{.weqz},
 @code{.mt}, @code{.mf}, @code{.mtc}, @code{.mfc}.
 
-@cindex @samp{lsupack} modifier, KVX
+@cindex @samp{lsupack} modifier, LVX
 @item lsupack
 Available values: @code{.}, @code{.q}, @code{.d}, @code{.w}, @code{.h},
 @code{.b}.
 
-@cindex @samp{qindex} modifier, KVX
+@cindex @samp{qindex} modifier, LVX
 @item qindex
 Available values: @code{.q0}, @code{.q1}, @code{.q2}, @code{.q3}.
 
-@cindex @samp{shuffleV} modifier, KVX
+@cindex @samp{shuffleV} modifier, LVX
 @item shuffleV
 Available values: @code{.} (no shuffle), @code{.td} (transpose double words
 4x4).
@@ -250,7 +250,7 @@ This modifier is available on xcopyv and xsplatov.  When the modifier is
 present, the input operand (interpreted as a 4x4 matrix of words) is
 transposed.
 
-@cindex @samp{shuffleX} modifier, KVX
+@cindex @samp{shuffleX} modifier, LVX
 @item shuffleX
 Available values: @code{.} (no shuffle), @code{.zd} (zip double words),
 @code{.ud} (unzip double words), @code{.tq} (transpose quadruple words 2x2),
@@ -260,14 +260,14 @@ words).
 This modifier is available on xcopyx and xplatox.  When the modifier is
 present the input operand is shuffled according to the modifier.
 
-@cindex @samp{transpose} modifier, KVX
+@cindex @samp{transpose} modifier, LVX
 @item transpose
 Available values: @code{.} (normal normal), @code{.tn} (transpose normal),
 @code{.nt} (normal transpose), @code{.tt} (transpose transpose).
 
 This modifier specify whether the input operands should be transposed.
 
-@cindex @samp{variant} modifier, KVX
+@cindex @samp{variant} modifier, LVX
 @item variant
 Available values: @code{.} (cached), @code{.u} (uncached), @code{.s}
 (speculative), @code{.us} (uncached speculative).
@@ -277,89 +277,89 @@ policy and whether the cache should trap.
 
 @end table
 
-@node KVX Options
+@node LVX Options
 @section Options
-@cindex KVX Options
-@cindex options for KVX
+@cindex LVX Options
+@cindex options for LVX
 
 @c man begin OPTIONS
 @table @gcctabopt
 
-@cindex @samp{--dump-insn} option, KVX
+@cindex @samp{--dump-insn} option, LVX
 @item --dump-insn
 Dump the full list of instructions.
 
-@cindex @samp{-march} option, KVX
+@cindex @samp{-march} option, LVX
 @item -march=
 The assembler supports the following architectures: kv3-1, kv3-2.
 
-@cindex @samp{--check-resources} option, KVX
+@cindex @samp{--check-resources} option, LVX
 @item --check-resources
 Check that each bundle does not use more resources than available.  This is the
 default.
 
-@cindex @samp{--no-check-resources} option, KVX
+@cindex @samp{--no-check-resources} option, LVX
 @item --no-check-resources
 Do not check that each bundle does not use more resources than available.
 
-@cindex @samp{--generate-illegal-code} option, KVX
+@cindex @samp{--generate-illegal-code} option, LVX
 @item --generate-illegal-code
 For debugging purposes only.  In order to properly work, the bundle is sorted
 with respect to the issues it uses.  If this option is turned on the assembler
 will not sort the bundle instructions and illegal bundles might be formed unless
 they were properly sorted by hand.
 
-@cindex @samp{--dump-table} option, KVX
+@cindex @samp{--dump-table} option, LVX
 @item --dump-table
 Dump the table of opcodes.
 
-@cindex @samp{--mpic} option, KVX
-@cindex @samp{--mPIC} option, KVX
+@cindex @samp{--mpic} option, LVX
+@cindex @samp{--mPIC} option, LVX
 @item --mpic | --mPIC
 Generate position independent code.
 
-@cindex @samp{--mnopic} option, KVX
+@cindex @samp{--mnopic} option, LVX
 @item --mnopic
 Generate position dependent code.
 
-@cindex @samp{-m32} option, KVX
+@cindex @samp{-m32} option, LVX
 @item -m32
 Generate 32-bits code.
 
-@cindex @samp{--all-sfr} option, KVX
+@cindex @samp{--all-sfr} option, LVX
 @item --all-sfr
 This switch enables the register class "system register".  This register
 class is used when performing system validation and allows the full class of
 system registers to be used even on instructions that are only valid with some
 specific system registers.
 
-@cindex @samp{--diagnostics} option, KVX
+@cindex @samp{--diagnostics} option, LVX
 @item --diagnostics
 Print multi-line errors.  This is the default.
 
-@cindex @samp{--no-diagnostics} option, KVX
+@cindex @samp{--no-diagnostics} option, LVX
 @item --no-diagnostics
 Print succinct diagnostics on one line.
 
 @end table
 @c man end
 
-@node KVX Directives
-@section KVX Machine Directives
+@node LVX Directives
+@section LVX Machine Directives
 
-@cindex machine directives, KVX
-@cindex KVX machine directives
+@cindex machine directives, LVX
+@cindex LVX machine directives
 @table @code
 
-@cindex @code{.align} directive, KVX
+@cindex @code{.align} directive, LVX
 @item .align ALIGNMENT
 Pad with NOPs until the next boundary with the required ALIGNMENT.
 
-@cindex @code{.dword} directive, KVX
+@cindex @code{.dword} directive, LVX
 @item .dword
 Declare a double-word-sized (8 bytes) constant.
 
-@cindex @code{.endp} directive, KVX
+@cindex @code{.endp} directive, LVX
 @item .endp [PROC]
 This directive marks the end of the procedure PROC.  The name of the procedure
 is always ignored (it is only here as a visual indicator).
@@ -378,23 +378,23 @@ is equivalent to the more traditional
 .size NAME,.-NAME
 @end smallexample
 
-@cindex @code{.file} directive, KVX
+@cindex @code{.file} directive, LVX
 @item .file
 This directive is only supported when producing ELF files.
 @pxref{File,,@code{.file}} for details.
 
-@cindex @code{.loc} directive, KVX
+@cindex @code{.loc} directive, LVX
 @item .loc FILENO LINENO
 This directive is only supported when producing ELF files.
 @pxref{Line,,@code{.line}} for details.
 
-@cindex @code{.proc} directive, KVX
+@cindex @code{.proc} directive, LVX
 @item .proc PROC
 This directive marks the start of procedure, the name of the procedure PROC is
 mandatory and all @code{.proc} directive should be matched by exactly one
 @code{.endp} directive.
 
-@cindex @code{.word} directive, KVX
+@cindex @code{.word} directive, LVX
 @item .word
 Declare a word-sized (4 bytes) constant.
 

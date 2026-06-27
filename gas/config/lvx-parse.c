@@ -1,4 +1,4 @@
-/* kvx-parse.c -- Recursive decent parser driver for the KVX ISA
+/* lvx-parse.c -- Recursive decent parser driver for the LVX ISA
 
    Copyright (C) 2009-2024 Free Software Foundation, Inc.
    Contributed by Kalray SA.
@@ -26,8 +26,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdarg.h>
-#include <elf/kvx_elfids.h>
-#include "kvx-parse.h"
+#include <elf/lvx_elfids.h>
+#include "lvx-parse.h"
 
 /* This is bad! */
 struct node_list_s {
@@ -45,7 +45,7 @@ struct node_s {
 
 
 static int
-has_relocation_of_size (const struct kvx_reloc **relocs)
+has_relocation_of_size (const struct lvx_reloc **relocs)
 {
   const int symbol_size = env.params.arch_size;
 
@@ -69,7 +69,7 @@ has_relocation_of_size (const struct kvx_reloc **relocs)
   if (!relocs)
     return 0;
 
-  struct kvx_reloc **relocs_it = (struct kvx_reloc **) relocs;
+  struct lvx_reloc **relocs_it = (struct lvx_reloc **) relocs;
   int has_only_one_p = relocs[0] && !relocs[1];
 
   while (*relocs_it)
@@ -77,23 +77,23 @@ has_relocation_of_size (const struct kvx_reloc **relocs)
       switch ((*relocs_it)->relative)
       {
 	/* An absolute reloc needs a full size symbol reloc */
-	case KVX_REL_ABS:
+	case LVX_REL_ABS:
 	  if ((*relocs_it)->bitsize >= symbol_size)
 	    return 1;
 	  break;
 
 	  /* Most likely relative jumps. Let something else check size is
 	     OK. We don't currently have several relocations for such insns */
-	case KVX_REL_PC:
+	case LVX_REL_PC:
 	  if (has_only_one_p)
 	    return 1;
 	  break;
 
 	  /* These relocations should be handled elsewhere with pseudo functions */
-	case KVX_REL_GP:
-	case KVX_REL_TP:
-	case KVX_REL_GOT:
-	case KVX_REL_BASE:
+	case LVX_REL_GP:
+	case LVX_REL_TP:
+	case LVX_REL_GOT:
+	case LVX_REL_BASE:
 	  break;
       }
       relocs_it++;
@@ -103,26 +103,26 @@ has_relocation_of_size (const struct kvx_reloc **relocs)
 }
 
 struct pseudo_func *
-kvx_get_pseudo_func2 (symbolS * sym, struct kvx_reloc **relocs);
+lvx_get_pseudo_func2 (symbolS * sym, struct lvx_reloc **relocs);
 struct pseudo_func *
-kvx_get_pseudo_func2 (symbolS *sym, struct kvx_reloc **relocs)
+lvx_get_pseudo_func2 (symbolS *sym, struct lvx_reloc **relocs)
 {
   if (!relocs)
     return NULL;
 
-  struct kvx_reloc **relocs_it = (struct kvx_reloc **) relocs;
+  struct lvx_reloc **relocs_it = (struct lvx_reloc **) relocs;
 
   for (int i = 0; i < 26; i++)
   {
-    if (sym == kvx_core_info->pseudo_funcs[i].sym)
+    if (sym == lvx_core_info->pseudo_funcs[i].sym)
     {
       relocs_it = relocs;
       while (*relocs_it)
 	{
-	  if (*relocs_it == kvx_core_info->pseudo_funcs[i].pseudo_relocs.kreloc
-	      && (env.params.arch_size == (int) kvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes
-		|| kvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes == PSEUDO_ALL))
-	    return &kvx_core_info->pseudo_funcs[i];
+	  if (*relocs_it == lvx_core_info->pseudo_funcs[i].pseudo_relocs.kreloc
+	      && (env.params.arch_size == (int) lvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes
+		|| lvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes == PSEUDO_ALL))
+	    return &lvx_core_info->pseudo_funcs[i];
 	  relocs_it++;
 	}
     }
@@ -430,7 +430,7 @@ promote_token (struct token_s tok)
 	  while (class[imm_idx + 1].class_id != -1
 	      && ((unsigned int) (class[imm_idx + 1].sz < 0 ? - class[imm_idx + 1].sz - !neg_power2_p : class[imm_idx + 1].sz) < len
 		 || (exp.X_op == O_symbol && !has_relocation_of_size (str_hash_find (env.reloc_hash, TOKEN_NAME (class[imm_idx + 1].class_id))))
-		 || (exp.X_op == 64 && !kvx_get_pseudo_func2 (exp.X_op_symbol, str_hash_find (env.reloc_hash, TOKEN_NAME (class[imm_idx + 1].class_id))))))
+		 || (exp.X_op == 64 && !lvx_get_pseudo_func2 (exp.X_op_symbol, str_hash_find (env.reloc_hash, TOKEN_NAME (class[imm_idx + 1].class_id))))))
 	    imm_idx += 1;
 
 	  return class[imm_idx + 1].class_id == -1 ? class[imm_idx].class_id : class[imm_idx + 1].class_id;
@@ -542,7 +542,7 @@ get_token_class (struct token_s *token, struct token_classes *classes, int insn_
 			  (str_hash_find (env.reloc_hash,
 					  TOKEN_NAME (class[cur].class_id)))))
 		 || (exp.X_op == O_pseudo_fixup
-		     && !(kvx_get_pseudo_func2
+		     && !(lvx_get_pseudo_func2
 			  (exp.X_op_symbol,
 			   str_hash_find (env.reloc_hash,
 					  TOKEN_NAME (class[cur].class_id)))))))
@@ -550,7 +550,7 @@ get_token_class (struct token_s *token, struct token_classes *classes, int insn_
 
       token->val = uval;
 //      if (exp.X_op == O_pseudo_fixup)
-//	  token->val = (uintptr_t) !kvx_get_pseudo_func2 (exp.X_op_symbol, str_hash_find (env.reloc_hash, TOKEN_NAME (class[cur].class_id)));
+//	  token->val = (uintptr_t) !lvx_get_pseudo_func2 (exp.X_op_symbol, str_hash_find (env.reloc_hash, TOKEN_NAME (class[cur].class_id)));
       found = 1;
     }
   else
@@ -1054,7 +1054,7 @@ retry:;
    updating it many times during the parsing.
 
    Currently, only assigning correct values to modifiers is of interest.  The
-   real value of registers is computed in tc-kvx.c:insert_operand.  */
+   real value of registers is computed in tc-lvx.c:insert_operand.  */
 
 static void
 assign_final_values (struct token_list *lst)
@@ -1068,8 +1068,8 @@ assign_final_values (struct token_list *lst)
 	{
 	  int idx = cur->class_id - env.fst_mod;
 	  int found = 0;
-	  for (int i = 0 ; !found && kvx_modifiers[idx][i]; ++i)
-	    if ((found = !strcmp (cur->tok, kvx_modifiers[idx][i])))
+	  for (int i = 0 ; !found && lvx_modifiers[idx][i]; ++i)
+	    if ((found = !strcmp (cur->tok, lvx_modifiers[idx][i])))
 	      cur->val = i;
 	}
       cur = cur->next;
@@ -1177,13 +1177,13 @@ setup (int core)
 {
   switch (core)
   {
-  case ELF_KVX_CORE_KV3_1:
+  case ELF_LVX_CORE_KV3_1:
     setup_kv3_v1 ();
     break;
-  case ELF_KVX_CORE_KV3_2:
+  case ELF_LVX_CORE_KV3_2:
     setup_kv3_v2 ();
     break;
-  case ELF_KVX_CORE_KV4_1:
+  case ELF_LVX_CORE_KV4_1:
     setup_kv4_v1 ();
     break;
   default:

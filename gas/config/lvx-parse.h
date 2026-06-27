@@ -1,4 +1,4 @@
-/* kvx-parse.h -- Recursive decent parser tables for the KVX ISA
+/* lvx-parse.h -- Recursive decent parser tables for the LVX ISA
 
    Copyright (C) 2009-2024 Free Software Foundation, Inc.
    Contributed by Kalray SA.
@@ -19,8 +19,8 @@
    along with this program; see the file COPYING3. If not,
    see <http://www.gnu.org/licenses/>.  */
 
-#ifndef __H_KVX_PARSER__
-#define __H_KVX_PARSER__
+#ifndef __H_LVX_PARSER__
+#define __H_LVX_PARSER__
 
 struct token_list* parse (struct token_s tok);
 void free_token_list (struct token_list* tok_list);
@@ -9677,8 +9677,8 @@ static struct rule rules_kv3_v1[] = {
   { rule_kv3_v1_1280 }, { rule_kv3_v1_1281 }, { rule_kv3_v1_1282 },
 };
 
-static inline /* enum kvx_tokens_kv3_v1 */ int
-promote_immediate_kv3_v1 (/* enum kvx_tokens_kv3_v1 */ int tok)
+static inline /* enum lvx_tokens_kv3_v1 */ int
+promote_immediate_kv3_v1 (/* enum lvx_tokens_kv3_v1 */ int tok)
 {
   switch (tok)
     {
@@ -22338,8 +22338,8 @@ static struct rule rules_kv3_v2[] = {
   { rule_kv3_v2_1710 }, { rule_kv3_v2_1711 }, { rule_kv3_v2_1712 },
 };
 
-static inline /* enum kvx_tokens_kv3_v2 */ int
-promote_immediate_kv3_v2 (/* enum kvx_tokens_kv3_v2 */ int tok)
+static inline /* enum lvx_tokens_kv3_v2 */ int
+promote_immediate_kv3_v2 (/* enum lvx_tokens_kv3_v2 */ int tok)
 {
   switch (tok)
     {
@@ -38770,8 +38770,8 @@ static struct rule rules_kv4_v1[] = {
   { rule_kv4_v1_2070 }, { rule_kv4_v1_2071 }, { rule_kv4_v1_2072 },
 };
 
-static inline /* enum kvx_tokens_kv4_v1 */ int
-promote_immediate_kv4_v1 (/* enum kvx_tokens_kv4_v1 */ int tok)
+static inline /* enum lvx_tokens_kv4_v1 */ int
+promote_immediate_kv4_v1 (/* enum lvx_tokens_kv4_v1 */ int tok)
 {
   switch (tok)
     {
@@ -38842,4 +38842,4 @@ setup_kv4_v1 (void)
 }
 
 /* }}} KV4_V1 END */
-#endif /* __H_KVX_PARSER__ */
+#endif /* __H_LVX_PARSER__ */

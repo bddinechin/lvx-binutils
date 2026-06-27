@@ -1,4 +1,4 @@
-/* KVX-specific support for ELF.
+/* LVX-specific support for ELF.
    Copyright (C) 2009-2024 Free Software Foundation, Inc.
    Contributed by Kalray SA.
 
@@ -19,7 +19,7 @@
    see <http://www.gnu.org/licenses/>.  */
 
 #include "sysdep.h"
-#include "elfxx-kvx.h"
+#include "elfxx-lvx.h"
 #include <stdarg.h>
 #include <string.h>
 
@@ -28,7 +28,7 @@
    BITS.  */
 
 static bfd_reloc_status_type
-kvx_unsigned_overflow (bfd_vma value, unsigned int bits)
+lvx_unsigned_overflow (bfd_vma value, unsigned int bits)
 {
   bfd_vma lim;
   if (bits >= sizeof (bfd_vma) * 8)
@@ -44,7 +44,7 @@ kvx_unsigned_overflow (bfd_vma value, unsigned int bits)
    BITS.  */
 
 static bfd_reloc_status_type
-kvx_signed_overflow (bfd_vma value, unsigned int bits)
+lvx_signed_overflow (bfd_vma value, unsigned int bits)
 {
   bfd_vma lim;
 
@@ -59,7 +59,7 @@ kvx_signed_overflow (bfd_vma value, unsigned int bits)
 /* Insert the addend/value into the instruction or data object being
    relocated.  */
 bfd_reloc_status_type
-_bfd_kvx_elf_put_addend (bfd *abfd,
+_bfd_lvx_elf_put_addend (bfd *abfd,
 			 bfd_byte *address,
 			 bfd_reloc_code_real_type r_type ATTRIBUTE_UNUSED,
 			 reloc_howto_type *howto,
@@ -95,11 +95,11 @@ _bfd_kvx_elf_put_addend (bfd *abfd,
     case complain_overflow_dont:
       break;
     case complain_overflow_signed:
-      status = kvx_signed_overflow (addend,
+      status = lvx_signed_overflow (addend,
 				    howto->bitsize + howto->rightshift);
       break;
     case complain_overflow_unsigned:
-      status = kvx_unsigned_overflow (addend,
+      status = lvx_unsigned_overflow (addend,
 				      howto->bitsize + howto->rightshift);
       break;
     case complain_overflow_bitfield:
@@ -109,11 +109,11 @@ _bfd_kvx_elf_put_addend (bfd *abfd,
 
   addend >>= howto->rightshift;
 
-  /* FIXME KVX : AARCH64 is "redoing" what the link_relocate bfd
+  /* FIXME LVX : AARCH64 is "redoing" what the link_relocate bfd
    * function does ie. extract bitfields and apply then to the
    * existing content (insn) (howto's job) Not sure exactly
    * why. Maybe because we need this even when not applying reloc
-   * against a input_bfd (eg. when doing PLT).  On KVX, we have not
+   * against a input_bfd (eg. when doing PLT).  On LVX, we have not
    * reached a point where we would need to write similar
    * functions for each insn. So we'll simply enrich the default
    * case for handling a bit more than "right aligned bitfields"
@@ -150,14 +150,14 @@ _bfd_kvx_elf_put_addend (bfd *abfd,
 }
 
 bool
-_bfd_kvx_elf_grok_prstatus (bfd *abfd, Elf_Internal_Note *note)
+_bfd_lvx_elf_grok_prstatus (bfd *abfd, Elf_Internal_Note *note)
 {
   int offset;
   size_t size;
 
   switch (note->descsz)
     {
-    case 680: /* sizeof(struct elf_prstatus) on Linux/kvx.  */
+    case 680: /* sizeof(struct elf_prstatus) on Linux/lvx.  */
       /* pr_cursig */
       elf_tdata (abfd)->core->signal = bfd_get_16 (abfd, note->descdata + 12);
 
@@ -179,11 +179,11 @@ _bfd_kvx_elf_grok_prstatus (bfd *abfd, Elf_Internal_Note *note)
 }
 
 bool
-_bfd_kvx_elf_grok_psinfo (bfd *abfd, Elf_Internal_Note *note)
+_bfd_lvx_elf_grok_psinfo (bfd *abfd, Elf_Internal_Note *note)
 {
   switch (note->descsz)
     {
-    case 136: /* This is sizeof(struct elf_prpsinfo) on Linux/kvx.  */
+    case 136: /* This is sizeof(struct elf_prpsinfo) on Linux/lvx.  */
       elf_tdata (abfd)->core->pid = bfd_get_32 (abfd, note->descdata + 24);
       elf_tdata (abfd)->core->program
 	= _bfd_elfcore_strndup (abfd, note->descdata + 40, 16);

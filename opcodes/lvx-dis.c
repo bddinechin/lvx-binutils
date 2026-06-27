@@ -1,4 +1,4 @@
-/* kvx-dis.c -- Kalray MPPA generic disassembler.
+/* lvx-dis.c -- Kalray MPPA generic disassembler.
    Copyright (C) 2009-2023 Free Software Foundation, Inc.
    Contributed by Kalray SA.
 
@@ -27,18 +27,18 @@
 #include "opintl.h"
 #include <assert.h>
 #include "elf-bfd.h"
-#include "kvx-dis.h"
+#include "lvx-dis.h"
 
-#include "elf/kvx.h"
-#include "opcode/kvx.h"
+#include "elf/lvx.h"
+#include "opcode/lvx.h"
 
 #define FAIL(s) ((s) != NULL)
 
-/* Begin synchronize with processor/kvx-family/BE/LAO/kvx-Bundle.c  */
+/* Begin synchronize with processor/lvx-family/BE/LAO/lvx-Bundle.c  */
 
-#define KVX_PARALLEL_MASK (0x80000000)
+#define LVX_PARALLEL_MASK (0x80000000)
 
-/* Steering values for the KVX VLIW architecture.  */
+/* Steering values for the LVX VLIW architecture.  */
 typedef enum {
   Steering_BCU,
   Steering_LSU,
@@ -82,25 +82,25 @@ typedef enum {
 typedef uint8_t KV4_EXU;
 
 static inline int
-kvx_steering(uint32_t x)
+lvx_steering(uint32_t x)
 {
   return (((x) & 0x60000000) >> 29);
 }
 
 static inline int
-kvx_exu_tag(uint32_t x)
+lvx_exu_tag(uint32_t x)
 {
   return  (((x) & 0x18000000) >> 27);
 }
 
 static inline int
-kvx_has_parallel_bit(uint32_t x)
+lvx_has_parallel_bit(uint32_t x)
 {
-  return (((x) & KVX_PARALLEL_MASK) == KVX_PARALLEL_MASK);
+  return (((x) & LVX_PARALLEL_MASK) == LVX_PARALLEL_MASK);
 }
 
 static inline int
-kvx_is_nop_opcode(uint32_t x)
+lvx_is_nop_opcode(uint32_t x)
 {
   return ((x)<<1) == 0xFFFFFFFE;
 }
@@ -112,19 +112,19 @@ kv3_is_tca_opcode(uint32_t x)
   return (major > 1) && (major < 8);
 }
 
-/* End synchronize with processor/kvx-family/BE/LAO/kvx-Bundle.c  */
+/* End synchronize with processor/lvx-family/BE/LAO/lvx-Bundle.c  */
 
 /* A raw instruction.  */
 struct raw_insn
 {
-  uint32_t syllables[KVX_MAXSYLLABLES];
+  uint32_t syllables[LVX_MAXSYLLABLES];
   short length;
   short read_size;
 };
 
-static uint32_t kvx_bundle_words[KVX_MAXBUNDLEWORDS];
+static uint32_t lvx_bundle_words[LVX_MAXBUNDLEWORDS];
 
-static struct raw_insn kvx_bundle_insns[KVX_MAXBUNDLEISSUE];
+static struct raw_insn lvx_bundle_insns[LVX_MAXBUNDLEISSUE];
 
 /* An issued instruction.  */
 struct issued_insn
@@ -143,7 +143,7 @@ static int opt_compact_assembly = 0;
 /* Option for displaying the conditional syntax.  */
 
 void
-parse_kvx_dis_option (const char *option)
+parse_lvx_dis_option (const char *option)
 {
   /* Try to match options that are simple flags.  */
   if (startswith (option, "pretty"))
@@ -169,7 +169,7 @@ parse_kvx_dis_option (const char *option)
 }
 
 static void
-parse_kvx_dis_options (const char *options)
+parse_lvx_dis_options (const char *options)
 {
   const char *option_end;
 
@@ -190,7 +190,7 @@ parse_kvx_dis_options (const char *options)
       while (*option_end != ',' && *option_end != '\0')
 	option_end++;
 
-      parse_kvx_dis_option (options);
+      parse_lvx_dis_option (options);
 
       /* Go on to the next one.  If option_end points to a comma, it
 	 will be skipped above.  */
@@ -198,76 +198,76 @@ parse_kvx_dis_options (const char *options)
     }
 }
 
-struct kvx_dis_env
+struct lvx_dis_env
 {
-  int kvx_arch_size;
-  struct kvx_opc *opc_table;
-  struct kvx_register *kvx_registers;
-  const char ***kvx_modifiers;
-  int *kvx_dec_registers;
-  int *kvx_regfiles;
-  unsigned int kvx_max_dec_registers;
+  int lvx_arch_size;
+  struct lvx_opc *opc_table;
+  struct lvx_register *lvx_registers;
+  const char ***lvx_modifiers;
+  int *lvx_dec_registers;
+  int *lvx_regfiles;
+  unsigned int lvx_max_dec_registers;
   int initialized_p;
 };
 
-static struct kvx_dis_env env = {
-  .kvx_arch_size = 0,
+static struct lvx_dis_env env = {
+  .lvx_arch_size = 0,
   .opc_table = NULL,
-  .kvx_registers = NULL,
-  .kvx_modifiers = NULL,
-  .kvx_dec_registers = NULL,
-  .kvx_regfiles = NULL,
+  .lvx_registers = NULL,
+  .lvx_modifiers = NULL,
+  .lvx_dec_registers = NULL,
+  .lvx_regfiles = NULL,
   .initialized_p = 0,
-  .kvx_max_dec_registers = 0
+  .lvx_max_dec_registers = 0
 };
 
 static void
-kvx_dis_init (struct disassemble_info *info)
+lvx_dis_init (struct disassemble_info *info)
 {
-  env.kvx_arch_size = 32;
+  env.lvx_arch_size = 32;
   switch (info->mach)
     {
     case bfd_mach_kv3_1_64:
-      env.kvx_arch_size = 64;
+      env.lvx_arch_size = 64;
       /* fallthrough */
     case bfd_mach_kv3_1_usr:
     case bfd_mach_kv3_1:
     default:
       env.opc_table = kv3_v1_optab;
-      env.kvx_regfiles = kv3_v1_regfiles;
-      env.kvx_registers = kv3_v1_registers;
-      env.kvx_modifiers = kv3_v1_modifiers;
-      env.kvx_dec_registers = kv3_v1_dec_registers;
-      env.kvx_max_dec_registers = kv3_v1_regfiles[KV3_V1_REGFILE_DEC_REGISTERS];
+      env.lvx_regfiles = kv3_v1_regfiles;
+      env.lvx_registers = kv3_v1_registers;
+      env.lvx_modifiers = kv3_v1_modifiers;
+      env.lvx_dec_registers = kv3_v1_dec_registers;
+      env.lvx_max_dec_registers = kv3_v1_regfiles[KV3_V1_REGFILE_DEC_REGISTERS];
       break;
     case bfd_mach_kv3_2_64:
-      env.kvx_arch_size = 64;
+      env.lvx_arch_size = 64;
       /* fallthrough */
     case bfd_mach_kv3_2_usr:
     case bfd_mach_kv3_2:
       env.opc_table = kv3_v2_optab;
-      env.kvx_regfiles = kv3_v2_regfiles;
-      env.kvx_registers = kv3_v2_registers;
-      env.kvx_modifiers = kv3_v2_modifiers;
-      env.kvx_dec_registers = kv3_v2_dec_registers;
-      env.kvx_max_dec_registers = kv3_v2_regfiles[KV3_V2_REGFILE_DEC_REGISTERS];
+      env.lvx_regfiles = kv3_v2_regfiles;
+      env.lvx_registers = kv3_v2_registers;
+      env.lvx_modifiers = kv3_v2_modifiers;
+      env.lvx_dec_registers = kv3_v2_dec_registers;
+      env.lvx_max_dec_registers = kv3_v2_regfiles[KV3_V2_REGFILE_DEC_REGISTERS];
       break;
     case bfd_mach_kv4_1_64:
-      env.kvx_arch_size = 64;
+      env.lvx_arch_size = 64;
       /* fallthrough */
     case bfd_mach_kv4_1_usr:
     case bfd_mach_kv4_1:
       env.opc_table = kv4_v1_optab;
-      env.kvx_regfiles = kv4_v1_regfiles;
-      env.kvx_registers = kv4_v1_registers;
-      env.kvx_modifiers = kv4_v1_modifiers;
-      env.kvx_dec_registers = kv4_v1_dec_registers;
-      env.kvx_max_dec_registers = kv4_v1_regfiles[KV4_V1_REGFILE_DEC_REGISTERS];
+      env.lvx_regfiles = kv4_v1_regfiles;
+      env.lvx_registers = kv4_v1_registers;
+      env.lvx_modifiers = kv4_v1_modifiers;
+      env.lvx_dec_registers = kv4_v1_dec_registers;
+      env.lvx_max_dec_registers = kv4_v1_regfiles[KV4_V1_REGFILE_DEC_REGISTERS];
       break;
     }
 
   if (info->disassembler_options)
-    parse_kvx_dis_options (info->disassembler_options);
+    parse_lvx_dis_options (info->disassembler_options);
 
   env.initialized_p = 1;
 }
@@ -292,8 +292,8 @@ kv3_steer_bundle_insns (int word_cnt, int *_insn_cnt)
   int index = 0;
   for (; index < word_cnt; index++)
     {
-      uint32_t syllable = kvx_bundle_words[index];
-      switch (kvx_steering (syllable))
+      uint32_t syllable = lvx_bundle_words[index];
+      switch (lvx_steering (syllable))
 	{
 	case Steering_BCU:
 	  /* BCU or EXT instruction.  */
@@ -330,7 +330,7 @@ kv3_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 		{
 		  /* Not first syllable in bundle, IMMX.  */
 		  struct issued_insn *issued_insn =
-		    &(issued_insns[KV3_EXU_ALU0 + kvx_exu_tag (syllable)]);
+		    &(issued_insns[KV3_EXU_ALU0 + lvx_exu_tag (syllable)]);
 		  int immx_count = issued_insn->immx_count;
 		  if (immx_count > 1)
 		    return FAIL("Too many IMMX syllables");
@@ -368,7 +368,7 @@ kv3_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 	      issued_insns[KV3_EXU_LSU].nb_syllables = 1;
 	      lsu_taken = 1;
 	    }
-	  else if (!kvx_is_nop_opcode (syllable))
+	  else if (!lvx_is_nop_opcode (syllable))
 	    return FAIL("Too many ALU instructions");
 	  break;
 
@@ -390,14 +390,14 @@ kv3_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 	  lsu_taken = 1;
 	}
 
-      if (!(kvx_has_parallel_bit (syllable)))
+      if (!(lvx_has_parallel_bit (syllable)))
 	break;
     }
 
-  if (kvx_has_parallel_bit (kvx_bundle_words[index]))
+  if (lvx_has_parallel_bit (lvx_bundle_words[index]))
     return FAIL("Bundle exceeds maximum size");
 
-  /* Fill KVX_BUNDLE_INSNS and count read syllables.  */
+  /* Fill LVX_BUNDLE_INSNS and count read syllables.  */
   int insn_idx = 0;
   for (int exu = 0; exu < KV3_EXU__; exu++)
     {
@@ -406,21 +406,21 @@ kv3_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 	  int syllable_idx = 0;
 
 	  /* First copy the opcode.  */
-	  kvx_bundle_insns[insn_idx].syllables[syllable_idx++] =
+	  lvx_bundle_insns[insn_idx].syllables[syllable_idx++] =
 	      issued_insns[exu].opcode;
-	  kvx_bundle_insns[insn_idx].length = 1;
+	  lvx_bundle_insns[insn_idx].length = 1;
 
 	  /* Copy up to two immediate extension words.  */
 	  for (int j = 0; j < 2; j++)
 	    if (issued_insns[exu].immx_valid[j])
 	      {
-		kvx_bundle_insns[insn_idx].syllables[syllable_idx++] =
+		lvx_bundle_insns[insn_idx].syllables[syllable_idx++] =
 		    issued_insns[exu].immx_words[j];
-		kvx_bundle_insns[insn_idx].length++;
+		lvx_bundle_insns[insn_idx].length++;
 	      }
 	
-	  kvx_bundle_insns[insn_idx].read_size =
-	      kvx_bundle_insns[insn_idx].length * 4;
+	  lvx_bundle_insns[insn_idx].read_size =
+	      lvx_bundle_insns[insn_idx].length * 4;
 
 	  insn_idx++;
 	}
@@ -448,8 +448,8 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
   int index = 0;
   for (; index < word_cnt; index++)
     {
-      uint32_t syllable = kvx_bundle_words[index];
-      switch (kvx_steering (syllable))
+      uint32_t syllable = lvx_bundle_words[index];
+      switch (lvx_steering (syllable))
 	{
 	case Steering_BCU:
 	  if (index == 0)
@@ -462,7 +462,7 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 	  else if (index == 1 && bcu_inuse == 1)
 	    /* Second BCU syllable in bundle following a BCU issued in BCU1.  */
 	    {
-	      if (kvx_exu_tag (syllable) == 0)
+	      if (lvx_exu_tag (syllable) == 0)
 		/* Case of BCU with extended offset.  */
 		{
 		  issued_insns[KV4_EXU_BCU0].immx_words[0] = syllable;
@@ -480,7 +480,7 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 	  else
 	    {
 	      /* Steering BCU and not first or second, must be IMMX.  */
-	      int exu_tag = KV4_EXU_ALU0 + kvx_exu_tag(syllable);
+	      int exu_tag = KV4_EXU_ALU0 + lvx_exu_tag(syllable);
 	      struct issued_insn *issued_insn = &(issued_insns[exu_tag]);
 	      int immx_count = issued_insn->immx_count;
 	      if (immx_count > 1)
@@ -572,15 +572,15 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 	  break;
 	}
 
-      if (!(kvx_has_parallel_bit (syllable)))
+      if (!(lvx_has_parallel_bit (syllable)))
 	break;
 
     }
 
-  if (kvx_has_parallel_bit (kvx_bundle_words[index]))
+  if (lvx_has_parallel_bit (lvx_bundle_words[index]))
     return FAIL("Bundle exceeds maximum size");
 
-  /* Fill KVX_BUNDLE_INSNS and count read syllables.  */
+  /* Fill LVX_BUNDLE_INSNS and count read syllables.  */
   int insn_idx = 0;
   for (int exu = 0; exu < KV4_EXU__; exu++)
     {
@@ -589,21 +589,21 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 	  int syllable_idx = 0;
 
 	  /* First copy the opcode.  */
-	  kvx_bundle_insns[insn_idx].syllables[syllable_idx++] =
+	  lvx_bundle_insns[insn_idx].syllables[syllable_idx++] =
 	      issued_insns[exu].opcode;
-	  kvx_bundle_insns[insn_idx].length = 1;
+	  lvx_bundle_insns[insn_idx].length = 1;
 
 	  /* Copy up to two immediate extension words.  */
 	  for (int j = 0; j < 2; j++)
 	    if (issued_insns[exu].immx_valid[j])
 	      {
-		kvx_bundle_insns[insn_idx].syllables[syllable_idx++] =
+		lvx_bundle_insns[insn_idx].syllables[syllable_idx++] =
 		    issued_insns[exu].immx_words[j];
-		kvx_bundle_insns[insn_idx].length++;
+		lvx_bundle_insns[insn_idx].length++;
 	      }
 
-	  kvx_bundle_insns[insn_idx].read_size =
-	      kvx_bundle_insns[insn_idx].length * 4;
+	  lvx_bundle_insns[insn_idx].read_size =
+	      lvx_bundle_insns[insn_idx].length * 4;
 
 	  insn_idx++;
 	}
@@ -614,7 +614,7 @@ kv4_steer_bundle_insns (int word_cnt, int *_insn_cnt)
 }
 
 static int
-kvx_steer_bundle_insns (struct disassemble_info *info,
+lvx_steer_bundle_insns (struct disassemble_info *info,
 		       int word_cnt, int *_insn_cnt)
 {
   switch (info->mach)
@@ -640,7 +640,7 @@ kvx_steer_bundle_insns (struct disassemble_info *info,
 struct decoded_insn
 {
   /* The entry in the opc_table.  */
-  struct kvx_opc *opc;
+  struct lvx_opc *opc;
   /* The number of operands.  */
   int nb_ops;
   /* The operand type.  */
@@ -663,25 +663,25 @@ struct decoded_insn
     /* If it is a modifier, the modifier category.
        An index in the modifier table.  */
     int mod_idx;
-  } operands[KVX_MAXOPERANDS];
+  } operands[LVX_MAXOPERANDS];
 };
 
 static int
 decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *res)
 {
 
-  unsigned kvx_opcode_keep_flags = env.kvx_arch_size == 32 ?
-				    KVX_OPCODE_FLAG_MODE32 :
-				    KVX_OPCODE_FLAG_MODE64;
-  unsigned kvx_opcode_skip_flags = KVX_OPCODE_FLAG_RISCV;
+  unsigned lvx_opcode_keep_flags = env.lvx_arch_size == 32 ?
+				    LVX_OPCODE_FLAG_MODE32 :
+				    LVX_OPCODE_FLAG_MODE64;
+  unsigned lvx_opcode_skip_flags = LVX_OPCODE_FLAG_RISCV;
 
   int found = 0;
   int idx = 0;
-  for (struct kvx_opc *opc = env.opc_table;
+  for (struct lvx_opc *opc = env.opc_table;
        opc->as_op && (((char) opc->as_op[0]) != 0); opc++)
     {
-      if (!(opc->codewords[0].flags & kvx_opcode_keep_flags)
-	  || (opc->codewords[0].flags & kvx_opcode_skip_flags))
+      if (!(opc->codewords[0].flags & lvx_opcode_keep_flags)
+	  || (opc->codewords[0].flags & lvx_opcode_skip_flags))
 	continue;
 
       if (opc->wordcount != raw_insn->length)
@@ -699,7 +699,7 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 
 	  for (int i = 0; opc->format[i]; i++)
 	    {
-	      struct kvx_bitfield *bf = opc->format[i]->bfield;
+	      struct lvx_bitfield *bf = opc->format[i]->bfield;
 	      int bf_nb = opc->format[i]->bitfields;
 	      int width = opc->format[i]->width;
 	      int type = opc->format[i]->type;
@@ -718,16 +718,16 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		  encoded_value &= (1LL << bf[bf_idx].size) - 1;
 		  value |= encoded_value << bf[bf_idx].from_offset;
 		}
-	      if (flags & KVX_OPERAND_SIGNED)
+	      if (flags & LVX_OPERAND_SIGNED)
 		{
 		  uint64_t signbit = 1LL << (width - 1);
 		  value = (value ^ signbit) - signbit;
 		}
 	      value = (value << shift) + bias;
 
-#define KVX_PRINT_REG(regfile,value) \
-    if(env.kvx_regfiles[regfile]+value < env.kvx_max_dec_registers) { \
-	res->operands[idx].val = env.kvx_dec_registers[env.kvx_regfiles[regfile]+value]; \
+#define LVX_PRINT_REG(regfile,value) \
+    if(env.lvx_regfiles[regfile]+value < env.lvx_max_dec_registers) { \
+	res->operands[idx].val = env.lvx_dec_registers[env.lvx_regfiles[regfile]+value]; \
 	res->operands[idx].type = CAT_REGISTER; \
 	idx++; \
     } else { \
@@ -741,13 +741,13 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		  switch (type)
 		    {
 		    case RegClass_kv3_v1_singleReg:
-		      KVX_PRINT_REG (KV3_V1_REGFILE_DEC_GPR, value)
+		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_GPR, value)
 		      break;
 		    case RegClass_kv3_v1_pairedReg:
-		      KVX_PRINT_REG (KV3_V1_REGFILE_DEC_PGR, value)
+		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_PGR, value)
 		      break;
 		    case RegClass_kv3_v1_quadReg:
-		      KVX_PRINT_REG (KV3_V1_REGFILE_DEC_QGR, value)
+		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_QGR, value)
 		      break;
 		    case RegClass_kv3_v1_systemReg:
 		    case RegClass_kv3_v1_aloneReg:
@@ -756,13 +756,13 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    case RegClass_kv3_v1_onlysetReg:
 		    case RegClass_kv3_v1_onlyfxReg:
 		    case RegClass_kv3_v1_onlyswapReg:
-		      KVX_PRINT_REG (KV3_V1_REGFILE_DEC_SFR, value)
+		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_SFR, value)
 		      break;
 		    case RegClass_kv3_v1_xworddReg0M4:
 		    case RegClass_kv3_v1_xworddReg1M4:
 		    case RegClass_kv3_v1_xworddReg2M4:
 		    case RegClass_kv3_v1_xworddReg3M4:
-		      KVX_PRINT_REG (KV3_V1_REGFILE_DEC_XCR, value)
+		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_XCR, value)
 		      break;
 		    case RegClass_kv3_v1_xwordqRegE:
 		    case RegClass_kv3_v1_xwordqRegO:
@@ -770,18 +770,18 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    case RegClass_kv3_v1_xwordqReg1M4:
 		    case RegClass_kv3_v1_xwordqReg2M4:
 		    case RegClass_kv3_v1_xwordqReg3M4:
-		      KVX_PRINT_REG (KV3_V1_REGFILE_DEC_XBR, value)
+		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_XBR, value)
 		      break;
 		    case RegClass_kv3_v1_xwordoReg:
 		    case RegClass_kv3_v1_xwordoRegE:
 		    case RegClass_kv3_v1_xwordoRegO:
-		      KVX_PRINT_REG (KV3_V1_REGFILE_DEC_XVR, value)
+		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_XVR, value)
 		      break;
 		    case RegClass_kv3_v1_xwordxReg:
-		      KVX_PRINT_REG (KV3_V1_REGFILE_DEC_XTR, value)
+		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_XTR, value)
 		      break;
 		    case RegClass_kv3_v1_xwordvReg:
-		      KVX_PRINT_REG (KV3_V1_REGFILE_DEC_XMR, value)
+		      LVX_PRINT_REG (KV3_V1_REGFILE_DEC_XMR, value)
 		      break;
 		    case Immediate_kv3_v1_sysnumber:
 		    case Immediate_kv3_v1_signed10:
@@ -794,7 +794,7 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    case Immediate_kv3_v1_wrapped64:
 		    case Immediate_kv3_v1_unsigned6:
 		      res->operands[idx].val = value;
-		      res->operands[idx].sign = flags & KVX_OPERAND_SIGNED;
+		      res->operands[idx].sign = flags & LVX_OPERAND_SIGNED;
 		      res->operands[idx].width = width;
 		      res->operands[idx].type = CAT_IMMEDIATE;
 		      res->operands[idx].pcrel = 0;
@@ -803,7 +803,7 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    case Immediate_kv3_v1_pcrel17:
 		    case Immediate_kv3_v1_pcrel27:
 		      res->operands[idx].val = value + memaddr;
-		      res->operands[idx].sign = flags & KVX_OPERAND_SIGNED;
+		      res->operands[idx].sign = flags & LVX_OPERAND_SIGNED;
 		      res->operands[idx].width = width;
 		      res->operands[idx].type = CAT_IMMEDIATE;
 		      res->operands[idx].pcrel = 1;
@@ -828,9 +828,9 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		      {
 			int sz = 0;
 			int mod_idx = type - Modifier_kv3_v1_column;
-			for (sz = 0; env.kvx_modifiers[mod_idx][sz]; ++sz);
+			for (sz = 0; env.lvx_modifiers[mod_idx][sz]; ++sz);
 			const char *mod = value < (unsigned) sz
-			  ? env.kvx_modifiers[mod_idx][value] : NULL;
+			  ? env.lvx_modifiers[mod_idx][value] : NULL;
 			if (!mod) goto retry;
 			res->operands[idx].val = value;
 			res->operands[idx].type = CAT_MODIFIER;
@@ -849,13 +849,13 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		  switch (type)
 		    {
 		    case RegClass_kv3_v2_singleReg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_GPR, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_GPR, value)
 		      break;
 		    case RegClass_kv3_v2_pairedReg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_PGR, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_PGR, value)
 		      break;
 		    case RegClass_kv3_v2_quadReg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_QGR, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_QGR, value)
 		      break;
 		    case RegClass_kv3_v2_systemReg:
 		    case RegClass_kv3_v2_aloneReg:
@@ -864,46 +864,46 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    case RegClass_kv3_v2_onlysetReg:
 		    case RegClass_kv3_v2_onlyfxReg:
 		    case RegClass_kv3_v2_onlyswapReg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_SFR, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_SFR, value)
 		      break;
 		    case RegClass_kv3_v2_xworddReg:
 		    case RegClass_kv3_v2_xworddReg0M4:
 		    case RegClass_kv3_v2_xworddReg1M4:
 		    case RegClass_kv3_v2_xworddReg2M4:
 		    case RegClass_kv3_v2_xworddReg3M4:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_XCR, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_XCR, value)
 		      break;
 		    case RegClass_kv3_v2_xwordqReg:
 		    case RegClass_kv3_v2_xwordqRegE:
 		    case RegClass_kv3_v2_xwordqRegO:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_XBR, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_XBR, value)
 		      break;
 		    case RegClass_kv3_v2_xwordoReg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_XVR, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_XVR, value)
 		      break;
 		    case RegClass_kv3_v2_xwordxReg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_XTR, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_XTR, value)
 		      break;
 		    case RegClass_kv3_v2_xwordvReg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_XMR, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_XMR, value)
 		      break;
 		    case RegClass_kv3_v2_buffer2Reg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_X2R, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_X2R, value)
 		      break;
 		    case RegClass_kv3_v2_buffer4Reg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_X4R, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_X4R, value)
 		      break;
 		    case RegClass_kv3_v2_buffer8Reg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_X8R, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_X8R, value)
 		      break;
 		    case RegClass_kv3_v2_buffer16Reg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_X16R, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_X16R, value)
 		      break;
 		    case RegClass_kv3_v2_buffer32Reg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_X32R, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_X32R, value)
 		      break;
 		    case RegClass_kv3_v2_buffer64Reg:
-		      KVX_PRINT_REG (KV3_V2_REGFILE_DEC_X64R, value)
+		      LVX_PRINT_REG (KV3_V2_REGFILE_DEC_X64R, value)
 		      break;
 		    case Immediate_kv3_v2_brknumber:
 		    case Immediate_kv3_v2_sysnumber:
@@ -917,7 +917,7 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    case Immediate_kv3_v2_wrapped64:
 		    case Immediate_kv3_v2_unsigned6:
 		      res->operands[idx].val = value;
-		      res->operands[idx].sign = flags & KVX_OPERAND_SIGNED;
+		      res->operands[idx].sign = flags & LVX_OPERAND_SIGNED;
 		      res->operands[idx].width = width;
 		      res->operands[idx].type = CAT_IMMEDIATE;
 		      res->operands[idx].pcrel = 0;
@@ -926,7 +926,7 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    case Immediate_kv3_v2_pcrel27:
 		    case Immediate_kv3_v2_pcrel17:
 		      res->operands[idx].val = value + memaddr;
-		      res->operands[idx].sign = flags & KVX_OPERAND_SIGNED;
+		      res->operands[idx].sign = flags & LVX_OPERAND_SIGNED;
 		      res->operands[idx].width = width;
 		      res->operands[idx].type = CAT_IMMEDIATE;
 		      res->operands[idx].pcrel = 1;
@@ -959,10 +959,10 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		      {
 			int sz = 0;
 			int mod_idx = type - Modifier_kv3_v2_accesses;
-			for (sz = 0; env.kvx_modifiers[mod_idx][sz];
+			for (sz = 0; env.lvx_modifiers[mod_idx][sz];
 			     ++sz);
 			const char *mod = value < (unsigned) sz
-			  ? env.kvx_modifiers[mod_idx][value] : NULL;
+			  ? env.lvx_modifiers[mod_idx][value] : NULL;
 			if (!mod) goto retry;
 			res->operands[idx].val = value;
 			res->operands[idx].type = CAT_MODIFIER;
@@ -983,13 +983,13 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    case RegClass_kv4_v1_singleReg:
 		    case RegClass_kv4_v1_worddRegE:
 		    case RegClass_kv4_v1_worddRegO:
-		      KVX_PRINT_REG (KVX_REGFILE_DEC_GPR, value)
+		      LVX_PRINT_REG (LVX_REGFILE_DEC_GPR, value)
 		      break;
 		    case RegClass_kv4_v1_pairedReg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_PGR, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_PGR, value)
 		      break;
 		    case RegClass_kv4_v1_quadReg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_QGR, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_QGR, value)
 		      break;
 		    case RegClass_kv4_v1_systemReg:
 		    case RegClass_kv4_v1_aloneReg:
@@ -998,52 +998,52 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    case RegClass_kv4_v1_onlysetReg:
 		    case RegClass_kv4_v1_onlyfxReg:
 		    case RegClass_kv4_v1_onlyswapReg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_SFR, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_SFR, value)
 		      break;
 		    case RegClass_kv4_v1_xworddReg:
 		    case RegClass_kv4_v1_xworddReg0M4:
 		    case RegClass_kv4_v1_xworddReg1M4:
 		    case RegClass_kv4_v1_xworddReg2M4:
 		    case RegClass_kv4_v1_xworddReg3M4:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_XCR, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_XCR, value)
 		      break;
 		    case RegClass_kv4_v1_xwordqReg:
 		    case RegClass_kv4_v1_xwordqRegE:
 		    case RegClass_kv4_v1_xwordqRegO:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_XBR, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_XBR, value)
 		      break;
 		    case RegClass_kv4_v1_xwordoReg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_XVR, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_XVR, value)
 		      break;
 		    case RegClass_kv4_v1_xwordxReg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_XTR, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_XTR, value)
 		      break;
 		    case RegClass_kv4_v1_xwordvReg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_XMR, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_XMR, value)
 		      break;
 		    case RegClass_kv4_v1_buffer2Reg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_X2R, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_X2R, value)
 		      break;
 		    case RegClass_kv4_v1_buffer4Reg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_X4R, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_X4R, value)
 		      break;
 		    case RegClass_kv4_v1_buffer8Reg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_X8R, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_X8R, value)
 		      break;
 		    case RegClass_kv4_v1_buffer16Reg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_X16R, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_X16R, value)
 		      break;
 		    case RegClass_kv4_v1_buffer32Reg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_X32R, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_X32R, value)
 		      break;
 		    case RegClass_kv4_v1_buffer64Reg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_X64R, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_X64R, value)
 		      break;
 		    case RegClass_kv4_v1_mainReg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_FIRST_RV_BIR, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_FIRST_RV_BIR, value)
 		      break;
 		    case RegClass_kv4_v1_floatReg:
-		      KVX_PRINT_REG (KV4_V1_REGFILE_DEC_RV_FPR, value)
+		      LVX_PRINT_REG (KV4_V1_REGFILE_DEC_RV_FPR, value)
 		      break;
 		    case Immediate_kv4_v1_brknumber:
 		    case Immediate_kv4_v1_sysnumber:
@@ -1059,7 +1059,7 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    case Immediate_kv4_v1_wrapped64:
 		    case Immediate_kv4_v1_unsigned6:
 		      res->operands[idx].val = value;
-		      res->operands[idx].sign = flags & KVX_OPERAND_SIGNED;
+		      res->operands[idx].sign = flags & LVX_OPERAND_SIGNED;
 		      res->operands[idx].width = width;
 		      res->operands[idx].type = CAT_IMMEDIATE;
 		      res->operands[idx].pcrel = 0;
@@ -1074,7 +1074,7 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    case Immediate_kv4_v1_pcrel44s2:
 		    case Immediate_kv4_v1_pcrel54s2:
 		      res->operands[idx].val = value + memaddr;
-		      res->operands[idx].sign = flags & KVX_OPERAND_SIGNED;
+		      res->operands[idx].sign = flags & LVX_OPERAND_SIGNED;
 		      res->operands[idx].width = width;
 		      res->operands[idx].type = CAT_IMMEDIATE;
 		      res->operands[idx].pcrel = 1;
@@ -1114,9 +1114,9 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		      {
 			int sz = 0;
 			int mod_idx = type - Modifier_kv4_v1_accesses;
-			for (sz = 0; env.kvx_modifiers[mod_idx][sz]; ++sz);
+			for (sz = 0; env.lvx_modifiers[mod_idx][sz]; ++sz);
 			const char *mod = value < (unsigned) sz
-			  ? env.kvx_modifiers[mod_idx][value] : NULL;
+			  ? env.lvx_modifiers[mod_idx][value] : NULL;
 			if (!mod) goto retry;
 			res->operands[idx].val = value;
 			res->operands[idx].type = CAT_MODIFIER;
@@ -1131,7 +1131,7 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    };
 		}
 
-#undef KVX_PRINT_REG
+#undef LVX_PRINT_REG
 	    }
 
 	  found = 1;
@@ -1146,7 +1146,7 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 }
 
 int
-print_insn_kvx (bfd_vma memaddr, struct disassemble_info *info)
+print_insn_lvx (bfd_vma memaddr, struct disassemble_info *info)
 {
   static int insn_idx = 0;
   static int insn_cnt = 0;
@@ -1156,7 +1156,7 @@ print_insn_kvx (bfd_vma memaddr, struct disassemble_info *info)
   int invalid_bundle = 0;
 
   if (!env.initialized_p)
-    kvx_dis_init (info);
+    lvx_dis_init (info);
 
   /* Clear instruction information field.  */
   info->insn_info_valid = 0;
@@ -1171,17 +1171,17 @@ print_insn_kvx (bfd_vma memaddr, struct disassemble_info *info)
 
 
   /* If this is the beginning of the bundle, read BUNDLESIZE words and
-     issue insns into KVX_BUNDLE_INSNS[].  */
+     issue insns into LVX_BUNDLE_INSNS[].  */
   if (insn_idx == 0)
     {
       int word_cnt = 0;
       do
 	{
 	  int status;
-	  assert (word_cnt < KVX_MAXBUNDLEWORDS);
+	  assert (word_cnt < LVX_MAXBUNDLEWORDS);
 	  status =
 	    (*info->read_memory_func) (memaddr + 4 * word_cnt,
-				       (bfd_byte *) (kvx_bundle_words +
+				       (bfd_byte *) (lvx_bundle_words +
 						     word_cnt), 4, info);
 	  if (status != 0)
 	    {
@@ -1191,13 +1191,13 @@ print_insn_kvx (bfd_vma memaddr, struct disassemble_info *info)
 	    }
 	  word_cnt++;
 	}
-      while (kvx_has_parallel_bit (kvx_bundle_words[word_cnt - 1])
-	     && word_cnt < KVX_MAXBUNDLEWORDS - 1);
-      invalid_bundle = kvx_steer_bundle_insns (info, word_cnt, &insn_cnt);
+      while (lvx_has_parallel_bit (lvx_bundle_words[word_cnt - 1])
+	     && word_cnt < LVX_MAXBUNDLEWORDS - 1);
+      invalid_bundle = lvx_steer_bundle_insns (info, word_cnt, &insn_cnt);
     }
 
-  assert (insn_idx < KVX_MAXBUNDLEISSUE);
-  raw_insn = &(kvx_bundle_insns[insn_idx]);
+  assert (insn_idx < LVX_MAXBUNDLEISSUE);
+  raw_insn = &(lvx_bundle_insns[insn_idx]);
   readsofar = raw_insn->read_size;
   insn_idx++;
 
@@ -1236,11 +1236,11 @@ print_insn_kvx (bfd_vma memaddr, struct disassemble_info *info)
 	    {
 	    case CAT_REGISTER:
 	      (*info->fprintf_func) (info->stream, "%s",
-				     env.kvx_registers[dec.operands[i].val].name);
+				     env.lvx_registers[dec.operands[i].val].name);
 	      break;
 	    case CAT_MODIFIER:
 	      {
-		const char *mod = env.kvx_modifiers[dec.operands[i].mod_idx][dec.operands[i].val];
+		const char *mod = env.lvx_modifiers[dec.operands[i].mod_idx][dec.operands[i].val];
 		(*info->fprintf_func) (info->stream, "%s", !mod || !strcmp (mod, ".") ? "" : mod);
 	      }
 	      break;
@@ -1347,40 +1347,40 @@ print_insn_kvx (bfd_vma memaddr, struct disassemble_info *info)
 int
 decode_prologue_epilogue_bundle (bfd_vma memaddr,
 				 struct disassemble_info *info,
-				 struct kvx_prologue_epilogue_bundle *peb)
+				 struct lvx_prologue_epilogue_bundle *peb)
 {
   int i, nb_insn, nb_syl;
 
   peb->nb_insn = 0;
 
-  if (info->arch != bfd_arch_kvx)
+  if (info->arch != bfd_arch_lvx)
     return -1;
 
   if (!env.initialized_p)
-    kvx_dis_init (info);
+    lvx_dis_init (info);
 
   /* Read the bundle.  */
   nb_syl = 0;
   do
     {
-      if (nb_syl >= KVX_MAXBUNDLEWORDS)
+      if (nb_syl >= LVX_MAXBUNDLEWORDS)
 	return -1;
       if ((*info->read_memory_func) (memaddr + 4 * nb_syl,
-				     (bfd_byte *) &kvx_bundle_words[nb_syl], 4,
+				     (bfd_byte *) &lvx_bundle_words[nb_syl], 4,
 				     info))
 	return -1;
       nb_syl++;
     }
-  while (kvx_has_parallel_bit (kvx_bundle_words[nb_syl - 1])
-	 && nb_syl < KVX_MAXBUNDLEWORDS - 1);
-  if (kvx_steer_bundle_insns (info, nb_syl, &nb_insn))
+  while (lvx_has_parallel_bit (lvx_bundle_words[nb_syl - 1])
+	 && nb_syl < LVX_MAXBUNDLEWORDS - 1);
+  if (lvx_steer_bundle_insns (info, nb_syl, &nb_insn))
     return -1;
 
   /* Check for extension to right if this is not the end of bundle
      find the format of this raw_insn.  */
   for (int idx_insn = 0; idx_insn < nb_insn; idx_insn++)
     {
-      struct raw_insn *raw_insn = &kvx_bundle_insns[idx_insn];
+      struct raw_insn *raw_insn = &lvx_bundle_insns[idx_insn];
       int is_add = 0, is_get = 0, is_a_peb_insn = 0, is_copyd = 0;
 
       struct decoded_insn dec;
@@ -1389,7 +1389,7 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 	continue;
 
       const char *op_name = dec.opc->as_op;
-      struct kvx_prologue_epilogue_insn *crt_peb_insn;
+      struct lvx_prologue_epilogue_insn *crt_peb_insn;
 
       crt_peb_insn = &peb->insn[peb->nb_insn];
       crt_peb_insn->nb_gprs = 0;
@@ -1402,42 +1402,42 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 	is_get = 1;
       else if (!strcmp (op_name, "sd"))
 	{
-	  crt_peb_insn->insn_type = KVX_PROL_EPIL_INSN_SD;
+	  crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_SD;
 	  is_a_peb_insn = 1;
 	}
       else if (!strcmp (op_name, "sq"))
 	{
-	  crt_peb_insn->insn_type = KVX_PROL_EPIL_INSN_SQ;
+	  crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_SQ;
 	  is_a_peb_insn = 1;
 	}
       else if (!strcmp (op_name, "so"))
 	{
-	  crt_peb_insn->insn_type = KVX_PROL_EPIL_INSN_SO;
+	  crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_SO;
 	  is_a_peb_insn = 1;
 	}
       else if (!strcmp (op_name, "ret"))
 	{
-	  crt_peb_insn->insn_type = KVX_PROL_EPIL_INSN_RET;
+	  crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_RET;
 	  is_a_peb_insn = 1;
 	}
       else if (!strcmp (op_name, "goto"))
 	{
-	  crt_peb_insn->insn_type = KVX_PROL_EPIL_INSN_GOTO;
+	  crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_GOTO;
 	  is_a_peb_insn = 1;
 	}
       else if (!strcmp (op_name, "igoto"))
 	{
-	  crt_peb_insn->insn_type = KVX_PROL_EPIL_INSN_IGOTO;
+	  crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_IGOTO;
 	  is_a_peb_insn = 1;
 	}
       else if (!strcmp (op_name, "call") || !strcmp (op_name, "icall"))
 	{
-	  crt_peb_insn->insn_type = KVX_PROL_EPIL_INSN_CALL;
+	  crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_CALL;
 	  is_a_peb_insn = 1;
 	}
       else if (!strncmp (op_name, "cb", 2))
 	{
-	  crt_peb_insn->insn_type = KVX_PROL_EPIL_INSN_CB;
+	  crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_CB;
 	  is_a_peb_insn = 1;
 	}
       else
@@ -1445,8 +1445,8 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 
       for (i = 0; dec.opc->format[i]; i++)
 	{
-	  struct kvx_operand *fmt = dec.opc->format[i];
-	  struct kvx_bitfield *bf = fmt->bfield;
+	  struct lvx_operand *fmt = dec.opc->format[i];
+	  struct lvx_bitfield *bf = fmt->bfield;
 	  int bf_nb = fmt->bitfields;
 	  int width = fmt->width;
 	  int type = fmt->type;
@@ -1463,7 +1463,7 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 	      encoded_value &= (1LL << bf[bf_idx].size) - 1;
 	      value |= encoded_value << bf[bf_idx].from_offset;
 	    }
-	  if (flags & KVX_OPERAND_SIGNED)
+	  if (flags & LVX_OPERAND_SIGNED)
 	    {
 	      uint64_t signbit = 1LL << (width - 1);
 	      value = (value ^ signbit) - signbit;
@@ -1477,30 +1477,30 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 	      || chk_type (kv3_v2, RegClass_kv3_v2_singleReg)
 	      || chk_type (kv4_v1, RegClass_kv4_v1_singleReg))
 	    {
-	      if (env.kvx_regfiles[KVX_REGFILE_DEC_GPR] + value
-		  >= env.kvx_max_dec_registers)
+	      if (env.lvx_regfiles[LVX_REGFILE_DEC_GPR] + value
+		  >= env.lvx_max_dec_registers)
 		return -1;
 	      if (is_add && i < 2)
 		{
 		  if (i == 0)
 		    {
-		      if (value == KVX_GPR_REG_SP)
-			crt_peb_insn->insn_type = KVX_PROL_EPIL_INSN_ADD_SP;
-		      else if (value == KVX_GPR_REG_FP)
-			crt_peb_insn->insn_type = KVX_PROL_EPIL_INSN_ADD_FP;
+		      if (value == LVX_GPR_REG_SP)
+			crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_ADD_SP;
+		      else if (value == LVX_GPR_REG_FP)
+			crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_ADD_FP;
 		      else
 			is_add = 0;
 		    }
 		  else if (i == 1)
 		    {
-		      if (value == KVX_GPR_REG_SP)
+		      if (value == LVX_GPR_REG_SP)
 			is_a_peb_insn = 1;
-		      else if (value == KVX_GPR_REG_FP
+		      else if (value == LVX_GPR_REG_FP
 			       && crt_peb_insn->insn_type
-			       == KVX_PROL_EPIL_INSN_ADD_SP)
+			       == LVX_PROL_EPIL_INSN_ADD_SP)
 			{
 			  crt_peb_insn->insn_type
-			    = KVX_PROL_EPIL_INSN_RESTORE_SP_FROM_FP;
+			    = LVX_PROL_EPIL_INSN_RESTORE_SP_FROM_FP;
 			  is_a_peb_insn = 1;
 			}
 		      else
@@ -1511,15 +1511,15 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 		{
 		  if (i == 0)
 		    {
-		      if (value == KVX_GPR_REG_FP)
+		      if (value == LVX_GPR_REG_FP)
 			{
-			  crt_peb_insn->insn_type = KVX_PROL_EPIL_INSN_ADD_FP;
+			  crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_ADD_FP;
 			  crt_peb_insn->immediate = 0;
 			}
-		      else if (value == KVX_GPR_REG_SP)
+		      else if (value == LVX_GPR_REG_SP)
 			{
 			  crt_peb_insn->insn_type
-			    = KVX_PROL_EPIL_INSN_RESTORE_SP_FROM_FP;
+			    = LVX_PROL_EPIL_INSN_RESTORE_SP_FROM_FP;
 			  crt_peb_insn->immediate = 0;
 			}
 		      else
@@ -1527,13 +1527,13 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 		    }
 		  else if (i == 1)
 		    {
-		      if (value == KVX_GPR_REG_SP
+		      if (value == LVX_GPR_REG_SP
 			  && crt_peb_insn->insn_type
-			  == KVX_PROL_EPIL_INSN_ADD_FP)
+			  == LVX_PROL_EPIL_INSN_ADD_FP)
 			is_a_peb_insn = 1;
-		      else if (value == KVX_GPR_REG_FP
+		      else if (value == LVX_GPR_REG_FP
 			       && crt_peb_insn->insn_type
-			       == KVX_PROL_EPIL_INSN_RESTORE_SP_FROM_FP)
+			       == LVX_PROL_EPIL_INSN_RESTORE_SP_FROM_FP)
 			is_a_peb_insn = 1;
 		      else
 			is_copyd = 0;
@@ -1569,12 +1569,12 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 		   || chk_type (kv3_v2, RegClass_kv3_v2_onlyfxReg)
 		   || chk_type (kv4_v1, RegClass_kv4_v1_onlyfxReg))
 	    {
-	      if (env.kvx_regfiles[KVX_REGFILE_DEC_GPR] + value
-		  >= env.kvx_max_dec_registers)
+	      if (env.lvx_regfiles[LVX_REGFILE_DEC_GPR] + value
+		  >= env.lvx_max_dec_registers)
 		return -1;
-	      if (is_get && !strcmp (env.kvx_registers[env.kvx_dec_registers[env.kvx_regfiles[KVX_REGFILE_DEC_SFR] + value]].name, "$ra"))
+	      if (is_get && !strcmp (env.lvx_registers[env.lvx_dec_registers[env.lvx_regfiles[LVX_REGFILE_DEC_SFR] + value]].name, "$ra"))
 		{
-		  crt_peb_insn->insn_type = KVX_PROL_EPIL_INSN_GET_RA;
+		  crt_peb_insn->insn_type = LVX_PROL_EPIL_INSN_GET_RA;
 		  is_a_peb_insn = 1;
 		}
 	    }
@@ -1729,10 +1729,10 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 }
 
 void
-print_kvx_disassembler_options (FILE * stream)
+print_lvx_disassembler_options (FILE * stream)
 {
   fprintf (stream, _("\n\
-The following KVX specific disassembler options are supported for use\n\
+The following LVX specific disassembler options are supported for use\n\
 with the -M switch (multiple options should be separated by commas):\n"));
 
   fprintf (stream, _("\n\

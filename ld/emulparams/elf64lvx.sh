@@ -15,7 +15,7 @@
 #   along with this program; see the file COPYING3. If not,
 #   see <http://www.gnu.org/licenses/>.  */
 
-ARCH=kvx
+ARCH=lvx
 MACHINE=
 
 # bundle with 1 nop insn
@@ -23,11 +23,11 @@ NOP=0x00f0037f
 
 SCRIPT_NAME=elf
 ELFSIZE=64
-OUTPUT_FORMAT="elf64-kvx"
+OUTPUT_FORMAT="elf64-lvx"
 NO_REL_RELOCS=yes
 
 TEMPLATE_NAME=elf
-EXTRA_EM_FILE=kvxelf
+EXTRA_EM_FILE=lvxelf
 EMBEDDED=yes
 TEXT_START_ADDR=0x10000
 

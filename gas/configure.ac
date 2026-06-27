@@ -480,8 +480,8 @@ changequote([,])dnl
       frv)
 	using_cgen=yes
 	;;
-      kvx)
-	for f in config/kvx-parse.o; do
+      lvx)
+	for f in config/lvx-parse.o; do
 	  case " $extra_objects " in
 	    *" $f "*) ;;
 	    *) extra_objects="$extra_objects $f" ;;

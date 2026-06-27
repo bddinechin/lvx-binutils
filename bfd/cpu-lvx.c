@@ -1,4 +1,4 @@
-/* BFD support for KVX.
+/* BFD support for LVX.
    Copyright (C) 2009-2024 Free Software Foundation, Inc.
    Contributed by Kalray SA.
 
@@ -27,20 +27,12 @@
 */
 
 static const bfd_arch_info_type *
-kvx_compatible (const bfd_arch_info_type *a, const bfd_arch_info_type *b)
+lvx_compatible (const bfd_arch_info_type *a, const bfd_arch_info_type *b)
 {
   long amach =  a->mach, bmach =  b->mach;
   /* If a & b are for different architecture we can do nothing.  */
   if (a->arch != b->arch)
     return NULL;
-
-  if ((amach == bfd_mach_kv3_1_64 && bmach == bfd_mach_kv3_1_usr)
-      || (amach == bfd_mach_kv3_2_64 && bmach == bfd_mach_kv3_2_usr))
-    return b;
-
-  if ((bmach == bfd_mach_kv3_1_64 && amach == bfd_mach_kv3_1_usr)
-      || (bmach == bfd_mach_kv3_2_64 && amach == bfd_mach_kv3_2_usr))
-    return a;
 
   /* Otherwise if either a or b is the 'default' machine
    * then it can be polymorphed into the other.
@@ -71,7 +63,7 @@ scan (const struct bfd_arch_info *info, const char *string)
     return true;
 
   /* Finally check for the default architecture.  */
-  if (strcasecmp (string, "kvx") == 0)
+  if (strcasecmp (string, "lvx") == 0)
     return info->the_default;
 
   return false;
@@ -82,13 +74,13 @@ scan (const struct bfd_arch_info *info, const char *string)
   32,                          /* 32 bits in a word.  */       \
   addr_bits,                   /* bits in an address.  */      \
   8,                           /* 8 bits in a byte.  */        \
-  bfd_arch_kvx,                                                 \
+  bfd_arch_lvx,                                                 \
   machine,                     /* Machine number.  */          \
-  "kvx",                        /* Architecture name.   */      \
+  "lvx",                        /* Architecture name.   */      \
   print,                       /* Printable name.  */          \
   4,                           /* Section align power.  */     \
   default,                     /* Is this the default ?  */    \
-  kvx_compatible,					       \
+  lvx_compatible,					       \
   scan,                                                        \
   bfd_arch_default_fill,                                       \
   next,                                                \
@@ -96,29 +88,14 @@ scan (const struct bfd_arch_info *info, const char *string)
 }
 
 
-const bfd_arch_info_type bfd_kv4_1_usr_arch =
-  N (64 , bfd_mach_kv4_1_usr , "kvx:kv4-1:usr" , false , NULL);
+const bfd_arch_info_type bfd_lvx_2_64_arch =
+  N (64 , bfd_mach_lvx_2_64  , "lvx:lvx-2:64"  , false , NULL);
 
-const bfd_arch_info_type bfd_kv3_2_usr_arch =
-  N (64 , bfd_mach_kv3_2_usr , "kvx:kv3-2:usr" , false , &bfd_kv4_1_usr_arch);
+const bfd_arch_info_type bfd_lvx_1_64_arch =
+  N (64 , bfd_mach_lvx_1_64  , "lvx:lvx-1:64"  , false , &bfd_lvx_2_64_arch);
 
-const bfd_arch_info_type bfd_kv3_1_usr_arch =
-  N (64 , bfd_mach_kv3_1_usr , "kvx:kv3-1:usr" , false , &bfd_kv3_2_usr_arch);
+const bfd_arch_info_type bfd_lvx_2_arch =
+  N (64 , bfd_mach_lvx_2     , "lvx:lvx-2"     , false , &bfd_lvx_1_64_arch);
 
-const bfd_arch_info_type bfd_kv4_1_64_arch =
-  N (64 , bfd_mach_kv4_1_64  , "kvx:kv4-1:64"  , false , &bfd_kv3_1_usr_arch);
-
-const bfd_arch_info_type bfd_kv3_2_64_arch =
-  N (64 , bfd_mach_kv3_2_64  , "kvx:kv3-2:64"  , false , &bfd_kv4_1_64_arch);
-
-const bfd_arch_info_type bfd_kv3_1_64_arch =
-  N (64 , bfd_mach_kv3_1_64  , "kvx:kv3-1:64"  , false , &bfd_kv3_2_64_arch);
-
-const bfd_arch_info_type bfd_kv4_1_arch =
-  N (32 , bfd_mach_kv4_1     , "kvx:kv4-1"     , false , &bfd_kv3_1_64_arch);
-
-const bfd_arch_info_type bfd_kv3_2_arch =
-  N (32 , bfd_mach_kv3_2     , "kvx:kv3-2"     , false , &bfd_kv4_1_arch);
-
-const bfd_arch_info_type bfd_kvx_arch =
-  N (32 , bfd_mach_kv3_1     , "kvx:kv3-1"     , true  , &bfd_kv3_2_arch);
+const bfd_arch_info_type bfd_lvx_arch =
+  N (64 , bfd_mach_lvx_1     , "lvx:lvx-1"     , true  , &bfd_lvx_2_arch);

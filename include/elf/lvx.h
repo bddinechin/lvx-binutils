@@ -1,4 +1,4 @@
-/* KVX ELF support for BFD.
+/* LVX ELF support for BFD.
 
    Copyright (C) 2009-2024 Free Software Foundation, Inc.
    Contributed by Kalray SA.
@@ -19,12 +19,12 @@
    along with this program; see the file COPYING3. If not,
    see <http://www.gnu.org/licenses/>.  */
 
-#ifndef _ELF_KVX_H
-#define _ELF_KVX_H
+#ifndef _ELF_LVX_H
+#define _ELF_LVX_H
 
 #include "elf/reloc-macros.h"
 
-START_RELOC_NUMBERS (elf_kvx_reloc_type)
+START_RELOC_NUMBERS (elf_lvx_reloc_type)
     RELOC_NUMBER (R_KVX_NONE,                                  0)
     RELOC_NUMBER (R_KVX_16,                                    1)
     RELOC_NUMBER (R_KVX_32,                                    2)
@@ -119,6 +119,6 @@ START_RELOC_NUMBERS (elf_kvx_reloc_type)
     RELOC_NUMBER (R_KVX_S54S2_PCREL_UP27,                     91)
 END_RELOC_NUMBERS (R_KVX_end)
 
-#include "kvx_elfids.h"
+#include "lvx_elfids.h"
 
 #endif

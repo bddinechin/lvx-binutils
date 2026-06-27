@@ -1,4 +1,4 @@
-/* KVX-specific relocations table.
+/* LVX-specific relocations table.
    Copyright (C) 2009-2024 Free Software Foundation, Inc.
    Contributed by Kalray SA.
 
@@ -18,8 +18,8 @@
    along with this program; see the file COPYING3. If not,
    see <http://www.gnu.org/licenses/>.  */
 
-#ifdef KVX_KV3_V1_KV3_V2_KV4_V1
-static reloc_howto_type elf_kvx_howto_table[] =
+#ifdef LVX_KV3_V1_KV3_V2_KV4_V1
+static reloc_howto_type elf_lvx_howto_table[] =
 {
   HOWTO (R_KVX_NONE,			/* type */
 	 0,				/* rightshift */
@@ -1219,4 +1219,4 @@ static reloc_howto_type elf_kvx_howto_table[] =
 	 true),			/* pc_offset */
 };
 
-#endif /* KVX_KV3_V1_KV3_V2_KV4_V1 */
+#endif /* LVX_KV3_V1_KV3_V2_KV4_V1 */

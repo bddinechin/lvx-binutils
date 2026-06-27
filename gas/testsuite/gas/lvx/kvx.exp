@@ -15,9 +15,9 @@
 #   along with this program; see the file COPYING3. If not,
 #   see <http://www.gnu.org/licenses/>.  */
 
-# KVX base instruction set
+# LVX base instruction set
 
-if [istarget kvx-*-*] then {
+if [istarget lvx-*-*] then {
      set ASFLAGS "-no-diagnostics"
      run_dump_tests [lsort [glob -nocomplain $srcdir/$subdir/*.d]]
 }

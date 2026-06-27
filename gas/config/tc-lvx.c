@@ -1,4 +1,4 @@
-/* tc-kvx.c -- Assemble for the KVX ISA
+/* tc-lvx.c -- Assemble for the LVX ISA
 
    Copyright (C) 2009-2024 Free Software Foundation, Inc.
    Contributed by Kalray SA.
@@ -22,7 +22,7 @@
 #include "as.h"
 #include "obstack.h"
 #include "subsegs.h"
-#include "tc-kvx.h"
+#include "tc-lvx.h"
 #include "libiberty.h"
 
 #include <assert.h>
@@ -32,7 +32,7 @@
 #include <ctype.h>
 
 #ifdef OBJ_ELF
-#include "elf/kvx.h"
+#include "elf/lvx.h"
 #include "dwarf2dbg.h"
 #include "dw2gencfi.h"
 #endif
@@ -44,10 +44,10 @@ static void supported_cores (char buf[], size_t buflen);
 #define STREQ(x,y) !strcmp(((x) ? (x) : ""), ((y) ? (y) : ""))
 #define STRNEQ(x,y,n) !strncmp(((x) ? (x) : ""), ((y) ? (y) : ""),(n))
 
-/* The KVX_PARALLEL_BIT is set to 0 when a syllable is the last in a bundle.  */
-#define KVX_PARALLEL_BIT (1u << 31)
+/* The LVX_PARALLEL_BIT is set to 0 when a syllable is the last in a bundle.  */
+#define LVX_PARALLEL_BIT (1u << 31)
 
-/* Enumeration of KVX execution units */
+/* Enumeration of LVX execution units */
 enum KV4_EXU
   { KV4_EXU_BCU0, KV4_EXU_BCU1, KV4_EXU_ALU0, KV4_EXU_ALU1, KV4_EXU_LSU0, KV4_EXU_LSU1,
     KV4_EXU_EXT0, KV4_EXU_EXT1, KV4_EXU_EXT2, KV4_EXU_EXT3, KV4_EXU__ };
@@ -55,13 +55,13 @@ enum KV4_EXU
 enum KV3_EXU
   { KV3_EXU_BCU, KV3_EXU_EXT, KV3_EXU_ALU0, KV3_EXU_ALU1, KV3_EXU_MAU, KV3_EXU_LSU, KV3_EXU__ };
 
-#define KVX_EXU__ ((int)KV4_EXU__ > (int)KV3_EXU__ ? KV4_EXU__ : KV3_EXU__)
+#define LVX_EXU__ ((int)KV4_EXU__ > (int)KV3_EXU__ ? KV4_EXU__ : KV3_EXU__)
 
 int size_type_function = 1;
 
-struct kvx_as_env env = {
+struct lvx_as_env env = {
   .params = {
-    .abi = ELF_KVX_ABI_UNDEF,
+    .abi = ELF_LVX_ABI_UNDEF,
     .osabi = ELFOSABI_NONE,
     .core = -1,
     .core_set = 0,
@@ -87,16 +87,16 @@ struct kvx_as_env env = {
   },
 };
 
-/* Default kvx_registers array.  */
-const struct kvx_register *kvx_registers = NULL;
-/* Default kvx_modifiers array.  */
-const char ***kvx_modifiers = NULL;
-/* Default kvx_regfiles array.  */
-/* Default kvx_regfiles array and its size.  */
-const int *kvx_regfiles = NULL;
-int kvx_regfiles_size = 0;
+/* Default lvx_registers array.  */
+const struct lvx_register *lvx_registers = NULL;
+/* Default lvx_modifiers array.  */
+const char ***lvx_modifiers = NULL;
+/* Default lvx_regfiles array.  */
+/* Default lvx_regfiles array and its size.  */
+const int *lvx_regfiles = NULL;
+int lvx_regfiles_size = 0;
 /* Default values used if no assume directive is given.  */
-const struct kvx_core_info *kvx_core_info = NULL;
+const struct lvx_core_info *lvx_core_info = NULL;
 
 /***********************************************/
 /*    Generic Globals for GAS                  */
@@ -115,7 +115,7 @@ const int md_long_jump_size       = 0;
 /***********************************************/
 
 /* A fix up record.  */
-struct kvx_fixup
+struct lvx_fixup
 {
   /* The expression used.  */
   expressionS exp;
@@ -126,19 +126,19 @@ struct kvx_fixup
 };
 
 /* A single assembled instruction, also used for IMMX syllables.  */
-struct kvx_insn
+struct lvx_insn
 {
   /* Opcode table entry for this insn.  */
-  const struct kvx_opc *opdef;
+  const struct lvx_opc *opdef;
   /* Raw instruction words (syllables).  */
-  uint32_t words[KVX_MAXSYLLABLES];	
+  uint32_t words[LVX_MAXSYLLABLES];	
   /* Execution unit where issued.  */
-  int8_t kvx_exu;
+  int8_t lvx_exu;
   /* Position in reordered bubdle.  */
   int8_t insn_pos;
-  /* Index of first immx in kvx_immx_buffer.  */
+  /* Index of first immx in lvx_immx_buffer.  */
   int8_t immx0_idx;
-  /* Index of second immx in kvx_immx_buffer.  */
+  /* Index of second immx in lvx_immx_buffer.  */
   int8_t immx1_idx;
   /* Base Bundling class used to sort instructions in bundle.  */
   uint8_t bundling;
@@ -149,15 +149,15 @@ struct kvx_insn
   /* The number of fixups [0,2].  */
   int8_t nfixups;
   /* The actual fixups.  */
-  struct kvx_fixup fixups[2];
+  struct lvx_fixup fixups[2];
 };
 
 /* Instruction comparison function for qsort.  */
 static int
-kvx_insn_compare (const void *a, const void *b)
+lvx_insn_compare (const void *a, const void *b)
 {
-  struct kvx_insn *insn_a = *(struct kvx_insn **) a;
-  struct kvx_insn *insn_b = *(struct kvx_insn **) b;
+  struct lvx_insn *insn_a = *(struct lvx_insn **) a;
+  struct lvx_insn *insn_b = *(struct lvx_insn **) b;
   int bundling_a = insn_a->bundling;
   int bundling_b = insn_b->bundling;
   int order_a = insn_a->order;
@@ -169,23 +169,23 @@ kvx_insn_compare (const void *a, const void *b)
   return order_a - order_b;
 }
 
-static int (*kvx_base_bundling) (int bundling) = NULL;
-static void (*kvx_reorder_bundle) (struct kvx_insn *insns[], struct kvx_insn *issued_insns[]) = NULL;
-static void (*kvx_dump_opc) (struct kvx_opc *opc) = NULL;
-static bool kvx_insn_pcrel;
+static int (*lvx_base_bundling) (int bundling) = NULL;
+static void (*lvx_reorder_bundle) (struct lvx_insn *insns[], struct lvx_insn *issued_insns[]) = NULL;
+static void (*lvx_dump_opc) (struct lvx_opc *opc) = NULL;
+static bool lvx_insn_pcrel;
 
-static struct kvx_insn kvx_insn_buffer[KVX_MAXBUNDLEISSUE + 1];
-static int kvx_insn_cnt = 0;
-static struct kvx_insn kvx_immx_buffer[KVX_MAXOPERANDS];
-static int kvx_immx_cnt = 0;
+static struct lvx_insn lvx_insn_buffer[LVX_MAXBUNDLEISSUE + 1];
+static int lvx_insn_cnt = 0;
+static struct lvx_insn lvx_immx_buffer[LVX_MAXOPERANDS];
+static int lvx_immx_cnt = 0;
 
 static inline void
-kvx_insn_add_fixup (struct kvx_insn *insn, bfd_reloc_code_real_type reloc,
+lvx_insn_add_fixup (struct lvx_insn *insn, bfd_reloc_code_real_type reloc,
 		    expressionS exp)
 {
   int nfixups = insn->nfixups;
   if (nfixups >= NELEMS (insn->fixups))
-    as_fatal ("[kvx_insn_add_fixup] insn with more than two fixups");
+    as_fatal ("[lvx_insn_add_fixup] insn with more than two fixups");
 
   insn->fixups[nfixups].reloc = reloc;
   insn->fixups[nfixups].exp = exp;
@@ -193,26 +193,26 @@ kvx_insn_add_fixup (struct kvx_insn *insn, bfd_reloc_code_real_type reloc,
   insn->nfixups++;
 }
 
-static inline struct kvx_insn *
-kvx_insn_add_immx (struct kvx_insn *insn)
+static inline struct lvx_insn *
+lvx_insn_add_immx (struct lvx_insn *insn)
 {
   int32_t word = 0;
   if (insn->immx0_idx < 0)
     {
-      insn->immx0_idx = kvx_immx_cnt;
+      insn->immx0_idx = lvx_immx_cnt;
       word = insn->words[1];
     }
   else if (insn->immx1_idx < 0)
     {
-      insn->immx1_idx = kvx_immx_cnt;
+      insn->immx1_idx = lvx_immx_cnt;
       word = insn->words[2];
     }
   else
-    as_fatal ("[kvx_insn_add_immx] insn with more than two IMMX syllables");
+    as_fatal ("[lvx_insn_add_immx] insn with more than two IMMX syllables");
 
-  struct kvx_insn *insn_immx = kvx_immx_buffer + kvx_immx_cnt++;
-  if (kvx_immx_cnt >= NELEMS (kvx_immx_buffer))
-    as_fatal ("[kvx_insn_add_immx] max number of IMMX exceeded: %d", kvx_immx_cnt);
+  struct lvx_insn *insn_immx = lvx_immx_buffer + lvx_immx_cnt++;
+  if (lvx_immx_cnt >= NELEMS (lvx_immx_buffer))
+    as_fatal ("[lvx_insn_add_immx] max number of IMMX exceeded: %d", lvx_immx_cnt);
 
   insn_immx->words[0] = word;
   insn_immx->length = 1;
@@ -235,24 +235,24 @@ get_byte_counter (asection * sec)
 }
 
 const char *
-kvx_target_format (void)
+lvx_target_format (void)
 {
-  return env.params.arch_size == 64 ? "elf64-kvx" : "elf32-kvx";
+  return env.params.arch_size == 64 ? "elf64-lvx" : "elf32-lvx";
 }
 
 /****************************************************/
 /*  ASSEMBLER Pseudo-ops.  Some of this just        */
 /*  extends the default definitions                 */
-/*  others are KVX specific                          */
+/*  others are LVX specific                          */
 /****************************************************/
 
-static void kvx_check_resources (int);
-static void kvx_proc (int start);
-static void kvx_endp (int start);
-static void kvx_type (int start);
+static void lvx_check_resources (int);
+static void lvx_proc (int start);
+static void lvx_endp (int start);
+static void lvx_type (int start);
 
 static void
-kvx_cfi_offset (int start)
+lvx_cfi_offset (int start)
 {
   (void) start;
   offsetT offset;
@@ -324,25 +324,25 @@ const pseudo_typeS md_pseudo_table[] = {
   /* Override default 2-bytes.  */
   { "word",             cons,                  4 },
 
-  /* KVX specific pseudo.  */
+  /* LVX specific pseudo.  */
   { "dword",            cons,                  8 },
 
   /* Override align directives to have a boundary as argument
      (and not the power of two as in p2align).  */
   { "align",            s_align_bytes,         0 },
 
-  { "checkresources",   kvx_check_resources,   1 },
-  { "nocheckresources", kvx_check_resources,   0 },
+  { "checkresources",   lvx_check_resources,   1 },
+  { "nocheckresources", lvx_check_resources,   0 },
 
-  { "proc",             kvx_proc,              1 },
-  { "endp",             kvx_endp,              0 },
+  { "proc",             lvx_proc,              1 },
+  { "endp",             lvx_endp,              0 },
 
-  { "type",             kvx_type,              0 },
+  { "type",             lvx_type,              0 },
 
 #ifdef OBJ_ELF
   { "file",             dwarf2_directive_file, 0 },
   { "loc",              dwarf2_directive_loc,  0 },
-  { "cfi_offset",       kvx_cfi_offset,        0 },
+  { "cfi_offset",       lvx_cfi_offset,        0 },
 #endif
   { NULL,               0,                     0 }
 };
@@ -420,14 +420,14 @@ md_parse_option (int c, const char *arg ATTRIBUTE_UNUSED)
       break;
     case OPTION_MARCH:
       env.opts.march = strdup (arg);
-      for (int i = 0; i < KVX_NUMCORES && !find_core; ++i)
-	    if (!strcasecmp (env.opts.march, kvx_core_info_table[i]->name))
+      for (int i = 0; i < LVX_NUMCORES && !find_core; ++i)
+	    if (!strcasecmp (env.opts.march, lvx_core_info_table[i]->name))
 	      {
-		kvx_core_info = kvx_core_info_table[i];
-		kvx_registers = kvx_registers_table[i];
-		kvx_modifiers = kvx_modifiers_table[i];
-		kvx_regfiles = kvx_regfiles_table[i];
-		kvx_regfiles_size = kvx_regfiles_size_table[i];
+		lvx_core_info = lvx_core_info_table[i];
+		lvx_registers = lvx_registers_table[i];
+		lvx_modifiers = lvx_modifiers_table[i];
+		lvx_regfiles = lvx_regfiles_table[i];
+		lvx_regfiles_size = lvx_regfiles_size_table[i];
 
 		find_core = 1;
 		break;
@@ -469,10 +469,10 @@ md_parse_option (int c, const char *arg ATTRIBUTE_UNUSED)
       break;
     case OPTION_PIC:
     case OPTION_BIGPIC:
-      env.params.pic_flags |= ELF_KVX_ABI_PIC_BIT;
+      env.params.pic_flags |= ELF_LVX_ABI_PIC_BIT;
       break;
     case OPTION_NOPIC:
-      env.params.pic_flags &= ~(ELF_KVX_ABI_PIC_BIT);
+      env.params.pic_flags &= ~(ELF_LVX_ABI_PIC_BIT);
       break;
     case OPTION_32:
       env.params.arch_size = 32;
@@ -491,7 +491,7 @@ md_show_usage (FILE * stream)
   supported_cores (buf, sizeof (buf));
 
   fprintf (stream, "\n"
-"KVX specific options:\n\n"
+"LVX specific options:\n\n"
 "  --check-resources\t Perform minimal resource checking\n"
 "  --march [%s]\t Select architecture\n"
 "  -V \t\t\t Print assembler version number\n\n"
@@ -527,27 +527,27 @@ md_chars_to_number (char *buf, int n)
 /* Returns the corresponding pseudo function matching SYM and to be
    used for data section.  */
 static struct pseudo_func *
-kvx_get_pseudo_func_data_scn (symbolS * sym)
+lvx_get_pseudo_func_data_scn (symbolS * sym)
 {
-  for (int i = 0; i < kvx_core_info->nb_pseudo_funcs; i++)
-    if (sym == kvx_core_info->pseudo_funcs[i].sym
-	&& kvx_core_info->pseudo_funcs[i].pseudo_relocs.single != BFD_RELOC_UNUSED)
-	return &kvx_core_info->pseudo_funcs[i];
+  for (int i = 0; i < lvx_core_info->nb_pseudo_funcs; i++)
+    if (sym == lvx_core_info->pseudo_funcs[i].sym
+	&& lvx_core_info->pseudo_funcs[i].pseudo_relocs.single != BFD_RELOC_UNUSED)
+	return &lvx_core_info->pseudo_funcs[i];
   return NULL;
 }
 
 /* Returns the corresponding pseudo function matching SYM and operand
    format OPND.  */
 static struct pseudo_func *
-kvx_get_pseudo_func2 (symbolS *sym, struct kvx_operand * opnd)
+lvx_get_pseudo_func2 (symbolS *sym, struct lvx_operand * opnd)
 {
-  for (int i = 0; i < kvx_core_info->nb_pseudo_funcs; i++)
-    if (sym == kvx_core_info->pseudo_funcs[i].sym)
+  for (int i = 0; i < lvx_core_info->nb_pseudo_funcs; i++)
+    if (sym == lvx_core_info->pseudo_funcs[i].sym)
       for (int rel_idx = 0; rel_idx < opnd->reloc_nb; rel_idx++)
-	if (opnd->relocs[rel_idx] == kvx_core_info->pseudo_funcs[i].pseudo_relocs.kreloc
-	    && (env.params.arch_size == (int) kvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes
-	      || kvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes == PSEUDO_ALL))
-	  return &kvx_core_info->pseudo_funcs[i];
+	if (opnd->relocs[rel_idx] == lvx_core_info->pseudo_funcs[i].pseudo_relocs.kreloc
+	    && (env.params.arch_size == (int) lvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes
+	      || lvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes == PSEUDO_ALL))
+	  return &lvx_core_info->pseudo_funcs[i];
 
   return NULL;
 }
@@ -556,15 +556,15 @@ static void
 supported_cores (char buf[], size_t buflen)
 {
   buf[0] = '\0';
-  for (int i = 0; i < KVX_NUMCORES; i++)
+  for (int i = 0; i < LVX_NUMCORES; i++)
     {
       if (buf[0] == '\0')
-	strcpy (buf, kvx_core_info_table[i]->name);
+	strcpy (buf, lvx_core_info_table[i]->name);
       else
-	if ((strlen (buf) + 1 + strlen (kvx_core_info_table[i]->name) + 1) < buflen)
+	if ((strlen (buf) + 1 + strlen (lvx_core_info_table[i]->name) + 1) < buflen)
 	  {
 	    strcat (buf, "|");
-	    strcat (buf, kvx_core_info_table[i]->name);
+	    strcat (buf, lvx_core_info_table[i]->name);
 	  }
     }
 }
@@ -579,13 +579,13 @@ supported_cores (char buf[], size_t buflen)
  * handled along with relocation, 0 if not.
  */
 static bool
-insert_operand (struct kvx_insn *insn, struct kvx_operand *opnd,
+insert_operand (struct lvx_insn *insn, struct lvx_operand *opnd,
 		struct token_list *tok)
 {
   uint64_t op = 0;
-  struct kvx_bitfield *bfields = opnd->bfield;
+  struct lvx_bitfield *bfields = opnd->bfield;
   int bf_nb = opnd->bitfields;
-  struct kvx_insn *insn_immx = 0;
+  struct lvx_insn *insn_immx = 0;
 
   if (opnd->width == 0)
     return 0;
@@ -623,42 +623,42 @@ insert_operand (struct kvx_insn *insn, struct kvx_operand *opnd,
 		reloc_arg = exp;
 		reloc_arg.X_op = O_symbol;
 		struct pseudo_func *pf =
-		  kvx_get_pseudo_func2 (exp.X_op_symbol, opnd);
+		  lvx_get_pseudo_func2 (exp.X_op_symbol, opnd);
 		/* S64 uses LO10/UP27/EX27 format (3 words), with one reloc in each word (3).  */
 		/* S43 uses LO10/EX6/UP27 format (2 words), with 2 relocs in main word and 1 in extra word.  */
 		/* S37 uses LO10/UP27 format (2 words), with one reloc in each word (2).  */
 
-		/* Beware that KVX_IMMX_BUFFER must be filled in the same order as relocs should be emitted.  */
+		/* Beware that LVX_IMMX_BUFFER must be filled in the same order as relocs should be emitted.  */
 
 		if (pf->pseudo_relocs.reloc_type == S64_LO10_UP27_EX27
 		    || pf->pseudo_relocs.reloc_type == S43_LO10_UP27_EX6
 		    || pf->pseudo_relocs.reloc_type == S37_LO10_UP27)
 		  {
-		    kvx_insn_add_fixup (insn, pf->pseudo_relocs.reloc_lo10, reloc_arg);
-		    insn_immx = kvx_insn_add_immx (insn);
-		    kvx_insn_add_fixup (insn_immx, pf->pseudo_relocs.reloc_up27, reloc_arg);
+		    lvx_insn_add_fixup (insn, pf->pseudo_relocs.reloc_lo10, reloc_arg);
+		    insn_immx = lvx_insn_add_immx (insn);
+		    lvx_insn_add_fixup (insn_immx, pf->pseudo_relocs.reloc_up27, reloc_arg);
 		  }
 		else if (pf->pseudo_relocs.reloc_type == S32_LO5_UP27)
 		  {
-		    kvx_insn_add_fixup (insn, pf->pseudo_relocs.reloc_lo5, reloc_arg);
-		    insn_immx = kvx_insn_add_immx (insn);
-		    kvx_insn_add_fixup (insn_immx, pf->pseudo_relocs.reloc_up27, reloc_arg);
+		    lvx_insn_add_fixup (insn, pf->pseudo_relocs.reloc_lo5, reloc_arg);
+		    insn_immx = lvx_insn_add_immx (insn);
+		    lvx_insn_add_fixup (insn_immx, pf->pseudo_relocs.reloc_up27, reloc_arg);
 		  }
 		else if (pf->pseudo_relocs.reloc_type == S16)
 		  {
-		    kvx_insn_add_fixup (insn, pf->pseudo_relocs.single, reloc_arg);
+		    lvx_insn_add_fixup (insn, pf->pseudo_relocs.single, reloc_arg);
 		  }
 		else
 		  as_fatal ("[insert_operand] unexpected pseudo-function");
 
 		if (pf->pseudo_relocs.reloc_type == S64_LO10_UP27_EX27)
 		  {
-		    insn_immx = kvx_insn_add_immx (insn);
-		    kvx_insn_add_fixup (insn_immx, pf->pseudo_relocs.reloc_ex, reloc_arg);
+		    insn_immx = lvx_insn_add_immx (insn);
+		    lvx_insn_add_fixup (insn_immx, pf->pseudo_relocs.reloc_ex, reloc_arg);
 		  }
 		else if (pf->pseudo_relocs.reloc_type == S43_LO10_UP27_EX6)
 		  {
-		    kvx_insn_add_fixup (insn, pf->pseudo_relocs.reloc_ex, reloc_arg);
+		    lvx_insn_add_fixup (insn, pf->pseudo_relocs.reloc_ex, reloc_arg);
 		  }
 	      }
 	  }
@@ -669,7 +669,7 @@ insert_operand (struct kvx_insn *insn, struct kvx_operand *opnd,
 		/* This is a immediate: either a regular immediate, or an
 		   immediate that was saved in a variable through `.equ'.  */
 		uint64_t sval = (int64_t) tok->val;
-		op = opnd->flags & KVX_OPERAND_SIGNED ? sval : tok->val;
+		op = opnd->flags & LVX_OPERAND_SIGNED ? sval : tok->val;
 		if (op % (1 << opnd->shift))
 		  as_fatal ("[insert_operand] immediate of %s should be a multiple of %d.\n",
 			   insn->opdef->as_op, 1 << opnd->shift);
@@ -683,97 +683,58 @@ insert_operand (struct kvx_insn *insn, struct kvx_operand *opnd,
 		if (insn->nfixups != 0)
 		  as_fatal ("[insert_operand] no room for fixup ");
 
-		if (env.params.core == ELF_KVX_CORE_KV3_2)
-		  switch (opnd->type)
-		    {
-		      case Immediate_kv3_v2_pcrel17:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_PCREL17, exp);
-			break;
-		      case Immediate_kv3_v2_pcrel27:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_PCREL27, exp);
-			break;
-		      case Immediate_kv3_v2_signed10:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S37_LO10, exp);
-			break;
-		      case Immediate_kv3_v2_signed37:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S37_LO10, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S37_UP27, exp);
-			break;
-		      case Immediate_kv3_v2_signed43:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S43_LO10, exp);
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S43_EX6, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S43_UP27, exp);
-			break;
-		      case Immediate_kv3_v2_wrapped32:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S32_LO5, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S32_UP27, exp);
-			break;
-		      case Immediate_kv3_v2_wrapped64:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S64_LO10, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S64_UP27, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S64_EX27, exp);
-			break;
-		      default:
-		      as_fatal ("[insert_operand] don't know how to generate a fixup record");
-		    }
-
-		if (env.params.core == ELF_KVX_CORE_KV4_1)
+		if (ELF_LVX_IS_LVX (env.params.core) || env.params.core == ELF_LVX_CORE_KV4_1)
 		  switch (opnd->type)
 		    {
 		      case Immediate_kv4_v1_signed10:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S37_LO10, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S37_LO10, exp);
 			break;
 		      case Immediate_kv4_v1_signed37:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S37_LO10, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S37_UP27, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S37_LO10, exp);
+			insn_immx = lvx_insn_add_immx (insn);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S37_UP27, exp);
 			break;
 		      case Immediate_kv4_v1_signed43:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S43_LO10, exp);
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S43_EX6, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S43_UP27, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S43_LO10, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S43_EX6, exp);
+			insn_immx = lvx_insn_add_immx (insn);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S43_UP27, exp);
 			break;
 		      case Immediate_kv4_v1_wrapped32:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S32_LO5, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S32_UP27, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S32_LO5, exp);
+			insn_immx = lvx_insn_add_immx (insn);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S32_UP27, exp);
 			break;
 		      case Immediate_kv4_v1_wrapped64:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S64_LO10, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S64_UP27, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S64_EX27, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S64_LO10, exp);
+			insn_immx = lvx_insn_add_immx (insn);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S64_UP27, exp);
+			insn_immx = lvx_insn_add_immx (insn);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S64_EX27, exp);
 			break;
 		      case Immediate_kv4_v1_pcrel11s2:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S11S2_PCREL, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S11S2_PCREL, exp);
 			break;
 		      case Immediate_kv4_v1_pcrel17s2:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S17S2_PCREL, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S17S2_PCREL, exp);
 			break;
 		      case Immediate_kv4_v1_pcrel27s2:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S27S2_PCREL, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S27S2_PCREL, exp);
 			break;
 		      case Immediate_kv4_v1_pcrel38s2:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S38S2_PCREL_LO11, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S38S2_PCREL_UP27, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S38S2_PCREL_LO11, exp);
+			insn_immx = lvx_insn_add_immx (insn);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S38S2_PCREL_UP27, exp);
 			break;
 		      case Immediate_kv4_v1_pcrel44s2:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S44S2_PCREL_LO17, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S44S2_PCREL_UP27, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S44S2_PCREL_LO17, exp);
+			insn_immx = lvx_insn_add_immx (insn);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S44S2_PCREL_UP27, exp);
 			break;
 		      case Immediate_kv4_v1_pcrel54s2:
-			kvx_insn_add_fixup (insn, BFD_RELOC_KVX_S54S2_PCREL_LO27, exp);
-			insn_immx = kvx_insn_add_immx (insn);
-			kvx_insn_add_fixup (insn_immx, BFD_RELOC_KVX_S54S2_PCREL_UP27, exp);
+			lvx_insn_add_fixup (insn, BFD_RELOC_LVX_S54S2_PCREL_LO27, exp);
+			insn_immx = lvx_insn_add_immx (insn);
+			lvx_insn_add_fixup (insn_immx, BFD_RELOC_LVX_S54S2_PCREL_UP27, exp);
 			break;
 		      default:
 		      as_fatal ("[insert_operand] don't know how to generate a fixup record");
@@ -812,7 +773,7 @@ insert_operand (struct kvx_insn *insn, struct kvx_operand *opnd,
  * handled by insert_operand.
  */
 static void
-kvx_emit_insn (struct kvx_insn *insn, int fixup_pos, int stopflag)
+lvx_emit_insn (struct lvx_insn *insn, int fixup_pos, int stopflag)
 {
   /* If we are listing, attach frag to previous line.  */
   if (listing)
@@ -839,9 +800,9 @@ kvx_emit_insn (struct kvx_insn *insn, int fixup_pos, int stopflag)
 
       /* Handle bundle parallel bit.  */ ;
       if ((i == insn->length - 1) && stopflag)
-	syllable &= ~KVX_PARALLEL_BIT;
+	syllable &= ~LVX_PARALLEL_BIT;
       else
-	syllable |= KVX_PARALLEL_BIT;
+	syllable |= LVX_PARALLEL_BIT;
 
       /* Emit the instruction syllable.  */
       md_number_to_chars (f + (i * 4), syllable, 4);
@@ -899,11 +860,11 @@ md_operand (expressionS * e)
     case '@':
       /* Find what relocation pseudo-function we're dealing with.  */
       ch = *++input_line_pointer;
-      for (i = 0; i < kvx_core_info->nb_pseudo_funcs; ++i)
-	if (kvx_core_info->pseudo_funcs[i].name && kvx_core_info->pseudo_funcs[i].name[0] == ch)
+      for (i = 0; i < lvx_core_info->nb_pseudo_funcs; ++i)
+	if (lvx_core_info->pseudo_funcs[i].name && lvx_core_info->pseudo_funcs[i].name[0] == ch)
 	  {
-	    len = strlen (kvx_core_info->pseudo_funcs[i].name);
-	    if (strncmp (kvx_core_info->pseudo_funcs[i].name + 1,
+	    len = strlen (lvx_core_info->pseudo_funcs[i].name);
+	    if (strncmp (lvx_core_info->pseudo_funcs[i].name + 1,
 			 input_line_pointer + 1, len - 1) == 0
 		&& !is_part_of_name (input_line_pointer[len]))
 	      {
@@ -919,14 +880,14 @@ md_operand (expressionS * e)
 	}
       /* Skip '('.  */
       ++input_line_pointer;
-      if (!kvx_core_info->pseudo_funcs[i].pseudo_relocs.has_no_arg)
+      if (!lvx_core_info->pseudo_funcs[i].pseudo_relocs.has_no_arg)
 	expression (e);
       if (*input_line_pointer++ != ')')
 	{
 	  as_bad ("missing ')'");
 	  goto err;
 	}
-      if (!kvx_core_info->pseudo_funcs[i].pseudo_relocs.has_no_arg)
+      if (!lvx_core_info->pseudo_funcs[i].pseudo_relocs.has_no_arg)
 	{
 	  if (e->X_op != O_symbol)
 	    as_fatal ("[md_operand] illegal combination of relocation functions");
@@ -934,7 +895,7 @@ md_operand (expressionS * e)
       /* Make sure gas doesn't get rid of local symbols that are used
 	 in relocs.  */
       e->X_op = O_pseudo_fixup;
-      e->X_op_symbol = kvx_core_info->pseudo_funcs[i].sym;
+      e->X_op_symbol = lvx_core_info->pseudo_funcs[i].sym;
       break;
 
     default:
@@ -947,27 +908,27 @@ err:
 }
 
 /*
- * Return the KVX EXU tag for an IMMX syllable.
+ * Return the LVX EXU tag for an IMMX syllable.
  */
 static inline int
-kvx_exu_tag (uint32_t x)
+lvx_exu_tag (uint32_t x)
 {
   return  (((x) & 0x18000000) >> 27);
 }
 
 /*
  * Given a set of operands and a matching instruction, assemble it into INSN.
- * Possibly update KVX_IMMX_BUFFER and KVX_IMMX_CNT.
+ * Possibly update LVX_IMMX_BUFFER and LVX_IMMX_CNT.
  */
 static void
-assemble_insn (const struct kvx_opc *opdef, struct token_list *tok, struct kvx_insn *insn)
+assemble_insn (const struct lvx_opc *opdef, struct token_list *tok, struct lvx_insn *insn)
 {
-  struct kvx_operand **format = (struct kvx_operand **) opdef->format;
+  struct lvx_operand **format = (struct lvx_operand **) opdef->format;
 
   /* Complete INSN initialization, which has been zeroed already.  */
   insn->opdef = opdef;
   insn->immx0_idx = insn->immx1_idx = -1;
-  insn->bundling = (*kvx_base_bundling) (insn->opdef->bundling);
+  insn->bundling = (*lvx_base_bundling) (insn->opdef->bundling);
   for (int i = 0; i < opdef->wordcount; i++)
     {
       insn->words[i] = opdef->codewords[i].opcode;
@@ -988,17 +949,17 @@ assemble_insn (const struct kvx_opc *opdef, struct token_list *tok, struct kvx_i
     {
       for (int i = 1; i < opdef->wordcount; i++)
 	{
-	  if (opdef->codewords[i].flags & KVX_OPCODE_FLAG_IMMX)
+	  if (opdef->codewords[i].flags & LVX_OPCODE_FLAG_IMMX)
 	    {
-	      kvx_insn_add_immx (insn);
+	      lvx_insn_add_immx (insn);
 	    }
 	}
     }
 }
 
 /*
- * Assemble a token list into KVX_INSN_BUFFER[] and update KVX_INSN_CNT.
- * Calls assemble_insn() which may update KVX_IMMX_BUFFER and KVX_IMMX_CNT.
+ * Assemble a token list into LVX_INSN_BUFFER[] and update LVX_INSN_CNT.
+ * Calls assemble_insn() which may update LVX_IMMX_BUFFER and LVX_IMMX_CNT.
  */
 static void
 assemble_tokens (struct token_list *tok_list)
@@ -1010,12 +971,12 @@ assemble_tokens (struct token_list *tok_list)
   while (toks && toks->category == CAT_SEPARATOR)
     toks = toks->next;
 
-  /* Find the kvx_opc requested by the instruction.  */
-  struct kvx_opc *opc = NULL;
-  struct kvx_opc *try_opc = str_hash_find (env.opcode_hash, opcode);
+  /* Find the lvx_opc requested by the instruction.  */
+  struct lvx_opc *opc = NULL;
+  struct lvx_opc *try_opc = str_hash_find (env.opcode_hash, opcode);
   for (; !strcmp(opcode, try_opc->as_op); try_opc++)
     {
-      if (try_opc->codewords[0].flags & KVX_OPCODE_FLAG_RISCV)
+      if (try_opc->codewords[0].flags & LVX_OPCODE_FLAG_RISCV)
 	continue;
 
       struct token_list *toks_ = toks;
@@ -1037,11 +998,11 @@ assemble_tokens (struct token_list *tok_list)
     }
   assert (opc != NULL);
 
-  /* Ensure there is room in KVX_INSN_BUFFER then assemble a new insn.  */
-  if (kvx_insn_cnt >= NELEMS (kvx_insn_buffer))
+  /* Ensure there is room in LVX_INSN_BUFFER then assemble a new insn.  */
+  if (lvx_insn_cnt >= NELEMS (lvx_insn_buffer))
     as_fatal ("[assemble_tokens] bundle instruction buffer overflow");
-  assemble_insn (opc, toks, kvx_insn_buffer + kvx_insn_cnt);
-  kvx_insn_cnt++;
+  assemble_insn (opc, toks, lvx_insn_buffer + lvx_insn_cnt);
+  lvx_insn_cnt++;
 }
 
 /*
@@ -1049,7 +1010,7 @@ assemble_tokens (struct token_list *tok_list)
  * Returns the number of writen characters.
  */
 static int ATTRIBUTE_UNUSED
-insn_syntax (struct kvx_opc * op, char *buf, int buf_size)
+insn_syntax (struct lvx_opc * op, char *buf, int buf_size)
 {
   int chars = snprintf (buf, buf_size, "%s ", op->as_op);
   const char *fmtp = op->fmtstring;
@@ -1100,7 +1061,7 @@ insn_syntax (struct kvx_opc * op, char *buf, int buf_size)
 #define ASM_CHARS_MAX (71)
 
 static void
-kv3_dump_opc (struct kvx_opc * op ATTRIBUTE_UNUSED)
+kv3_dump_opc (struct lvx_opc * op ATTRIBUTE_UNUSED)
 {
   char asm_str[ASM_CHARS_MAX];
   int chars = insn_syntax (op, asm_str, ASM_CHARS_MAX);
@@ -1154,12 +1115,12 @@ kv3_dump_opc (struct kvx_opc * op ATTRIBUTE_UNUSED)
       as_fatal ("[kv3_dump_opc] unhandled Bundling class %d", op->bundling);
     }
 
-  if (op->codewords[0].flags & KVX_OPCODE_FLAG_MODE64
-      && op->codewords[0].flags & KVX_OPCODE_FLAG_MODE32)
+  if (op->codewords[0].flags & LVX_OPCODE_FLAG_MODE64
+      && op->codewords[0].flags & LVX_OPCODE_FLAG_MODE32)
     insn_mode = "32 and 64";
-  else if (op->codewords[0].flags & KVX_OPCODE_FLAG_MODE64)
+  else if (op->codewords[0].flags & LVX_OPCODE_FLAG_MODE64)
     insn_mode = "64";
-  else if (op->codewords[0].flags & KVX_OPCODE_FLAG_MODE32)
+  else if (op->codewords[0].flags & LVX_OPCODE_FLAG_MODE32)
     insn_mode = "32";
   else
     as_fatal ("[kv3_dump_opc] unknown instruction mode.");
@@ -1169,7 +1130,7 @@ kv3_dump_opc (struct kvx_opc * op ATTRIBUTE_UNUSED)
 }
 
 static void
-kv4_dump_opc (struct kvx_opc * op ATTRIBUTE_UNUSED)
+kv4_dump_opc (struct lvx_opc * op ATTRIBUTE_UNUSED)
 {
   char asm_str[ASM_CHARS_MAX];
   int chars = insn_syntax (op, asm_str, ASM_CHARS_MAX);
@@ -1223,12 +1184,12 @@ kv4_dump_opc (struct kvx_opc * op ATTRIBUTE_UNUSED)
       as_fatal ("[kv4_dump_opc] unhandled bundling class %d", op->bundling);
     }
 
-  if (op->codewords[0].flags & KVX_OPCODE_FLAG_MODE64
-      && op->codewords[0].flags & KVX_OPCODE_FLAG_MODE32)
+  if (op->codewords[0].flags & LVX_OPCODE_FLAG_MODE64
+      && op->codewords[0].flags & LVX_OPCODE_FLAG_MODE32)
     insn_mode = "32 and 64";
-  else if (op->codewords[0].flags & KVX_OPCODE_FLAG_MODE64)
+  else if (op->codewords[0].flags & LVX_OPCODE_FLAG_MODE64)
     insn_mode = "64";
-  else if (op->codewords[0].flags & KVX_OPCODE_FLAG_MODE32)
+  else if (op->codewords[0].flags & LVX_OPCODE_FLAG_MODE32)
     insn_mode = "32";
   else
     as_fatal ("[kv4_dump_opc] unknown instruction mode.");
@@ -1239,16 +1200,16 @@ kv4_dump_opc (struct kvx_opc * op ATTRIBUTE_UNUSED)
 
 /*
  * Fill the ISSUED_INSNS array indexed by EXU with the BUNDLE_INSNS.
- * Reorder the BUNDLE_INSNS array and update the KVX_IMMX_BUFFER entries.
+ * Reorder the BUNDLE_INSNS array and update the LVX_IMMX_BUFFER entries.
  */
 static void
-kv3_reorder_bundle (struct kvx_insn *bundle_insns[], struct kvx_insn *issued_insns[])
+kv3_reorder_bundle (struct lvx_insn *bundle_insns[], struct lvx_insn *issued_insns[])
 {
   unsigned bundle_flags = 0;
-  for (int i = 0; i < kvx_insn_cnt; i++)
+  for (int i = 0; i < lvx_insn_cnt; i++)
     {
-      struct kvx_insn *insn = bundle_insns[i];
-      const struct kvx_opc *opdef = insn->opdef;
+      struct lvx_insn *insn = bundle_insns[i];
+      const struct lvx_opc *opdef = insn->opdef;
       bundle_flags |= opdef->codewords[0].flags;
 
       int tag = -1, exu = -1;
@@ -1256,7 +1217,7 @@ kv3_reorder_bundle (struct kvx_insn *bundle_insns[], struct kvx_insn *issued_ins
       switch (opdef->bundling)
 	{
 	case Bundling_kv3_v1_ALL:
-	  if (kvx_insn_cnt > 1)
+	  if (lvx_insn_cnt > 1)
 	    as_fatal ("too many instructions in a singleton bundle");
 	  issued_insns[exu = 0] = insn;
 	  break;
@@ -1353,7 +1314,7 @@ kv3_reorder_bundle (struct kvx_insn *bundle_insns[], struct kvx_insn *issued_ins
 	default:
 	  as_fatal ("unhandled Bundling class %d", opdef->bundling);
 	}
-      insn->kvx_exu = exu;
+      insn->lvx_exu = exu;
       assert (exu >= 0);
 
       if (tag >= 0)
@@ -1361,14 +1322,14 @@ kv3_reorder_bundle (struct kvx_insn *bundle_insns[], struct kvx_insn *issued_ins
 	  if (issued_insns[exu]->immx0_idx >= 0)
 	    {
 	      int immx_idx = issued_insns[exu]->immx0_idx;
-	      kvx_immx_buffer[immx_idx].words[0] |= (tag << 27);
-	      kvx_immx_buffer[immx_idx].kvx_exu = exu;
+	      lvx_immx_buffer[immx_idx].words[0] |= (tag << 27);
+	      lvx_immx_buffer[immx_idx].lvx_exu = exu;
 	    }
 	  if (issued_insns[exu]->immx1_idx >= 0)
 	    {
 	      int immx_idx = issued_insns[exu]->immx1_idx;
-	      kvx_immx_buffer[immx_idx].words[0] |= (tag << 27);
-	      kvx_immx_buffer[immx_idx].kvx_exu = exu;
+	      lvx_immx_buffer[immx_idx].words[0] |= (tag << 27);
+	      lvx_immx_buffer[immx_idx].lvx_exu = exu;
 	    }
 	}
     }
@@ -1379,45 +1340,45 @@ kv3_reorder_bundle (struct kvx_insn *bundle_insns[], struct kvx_insn *issued_ins
     if (issued_insns[exu])
       bundle_insns[insn_cnt++] = issued_insns[exu];
 
-  if (insn_cnt != kvx_insn_cnt)
+  if (insn_cnt != lvx_insn_cnt)
     as_fatal ("mismatch between bundled and issued instructions");
 
-  env.stcall_info.found = (bundle_flags & KVX_OPCODE_FLAG_STORE)
-			  && (bundle_flags & KVX_OPCODE_FLAG_CALL);
+  env.stcall_info.found = (bundle_flags & LVX_OPCODE_FLAG_STORE)
+			  && (bundle_flags & LVX_OPCODE_FLAG_CALL);
 }
 
-/* Record CCB with IMMX, which will be first in KVX_IMMX_BUFFER.  */
-static struct kvx_insn *kv4_bcux_insn;
+/* Record CCB with IMMX, which will be first in LVX_IMMX_BUFFER.  */
+static struct lvx_insn *kv4_bcux_insn;
 
 /* Record the BCU opcode words to commonalize GUARD and BLEND instructions.  */
 static unsigned kv4_bcu0_word, kv4_bcu1_word;
 
 /*
  * Fill the ISSUED_INSNS array indexed by EXU with the BUNDLE_INSNS.
- * Reorder the BUNDLE_INSNS array and update the KVX_IMMX_BUFFER entries.
+ * Reorder the BUNDLE_INSNS array and update the LVX_IMMX_BUFFER entries.
  */
 static void
-kv4_reorder_bundle (struct kvx_insn *bundle_insns[], struct kvx_insn *issued_insns[])
+kv4_reorder_bundle (struct lvx_insn *bundle_insns[], struct lvx_insn *issued_insns[])
 {
   kv4_bcux_insn = 0;
   kv4_bcu0_word = kv4_bcu1_word = 0;
   unsigned bundle_flags = 0;
-  for (int i = 0; i < kvx_insn_cnt; i++)
+  for (int i = 0; i < lvx_insn_cnt; i++)
     {
-      struct kvx_insn *insn = bundle_insns[i];
-      const struct kvx_opc *opdef = insn->opdef;
+      struct lvx_insn *insn = bundle_insns[i];
+      const struct lvx_opc *opdef = insn->opdef;
       bundle_flags |= opdef->codewords[0].flags;
 
       int tag = -1, exu = -1;
       switch (opdef->bundling)
 	{
 	case Bundling_kv4_v1_ALL:
-	  if (kvx_insn_cnt > 1)
+	  if (lvx_insn_cnt > 1)
 	    as_fatal ("too many instructions in a singleton bundle");
 	  issued_insns[exu = 0] = insn;
 	  break;
 	case Bundling_kv4_v1_BCU2_X:
-	  assert (kvx_immx_cnt > 0);
+	  assert (lvx_immx_cnt > 0);
 	  kv4_bcux_insn = insn;
 	  // Fall-through.
 	case Bundling_kv4_v1_BCU2:
@@ -1548,7 +1509,7 @@ kv4_reorder_bundle (struct kvx_insn *bundle_insns[], struct kvx_insn *issued_ins
 	default:
 	  as_fatal ("unhandled Bundling class %d", opdef->bundling);
 	}
-      insn->kvx_exu = exu;
+      insn->lvx_exu = exu;
       assert (exu >= 0);
 
       if (tag >= 0)
@@ -1556,14 +1517,14 @@ kv4_reorder_bundle (struct kvx_insn *bundle_insns[], struct kvx_insn *issued_ins
 	  if (issued_insns[exu]->immx0_idx >= 0)
 	    {
 	      int immx_idx = issued_insns[exu]->immx0_idx;
-	      kvx_immx_buffer[immx_idx].words[0] |= (tag << 27);
-	      kvx_immx_buffer[immx_idx].kvx_exu = exu;
+	      lvx_immx_buffer[immx_idx].words[0] |= (tag << 27);
+	      lvx_immx_buffer[immx_idx].lvx_exu = exu;
 	    }
 	  if (issued_insns[exu]->immx1_idx >= 0)
 	    {
 	      int immx_idx = issued_insns[exu]->immx1_idx;
-	      kvx_immx_buffer[immx_idx].words[0] |= (tag << 27);
-	      kvx_immx_buffer[immx_idx].kvx_exu = exu;
+	      lvx_immx_buffer[immx_idx].words[0] |= (tag << 27);
+	      lvx_immx_buffer[immx_idx].lvx_exu = exu;
 	    }
 	}
     }
@@ -1583,30 +1544,30 @@ kv4_reorder_bundle (struct kvx_insn *bundle_insns[], struct kvx_insn *issued_ins
     if (issued_insns[exu])
       bundle_insns[insn_cnt++] = issued_insns[exu];
 
-  if (insn_cnt != kvx_insn_cnt)
+  if (insn_cnt != lvx_insn_cnt)
     as_fatal ("mismatch between bundled and issued instructions");
 
-  env.stcall_info.found = (bundle_flags & KVX_OPCODE_FLAG_STORE)
-			  && (bundle_flags & KVX_OPCODE_FLAG_CALL);
+  env.stcall_info.found = (bundle_flags & LVX_OPCODE_FLAG_STORE)
+			  && (bundle_flags & LVX_OPCODE_FLAG_CALL);
 }
 
 /* BCU part of a conditional instruction.  */
 struct kv4_cond {
-  /* A pointer to the target insn within kvx_insn_buffer.  */
-  struct kvx_insn *target_insn;
+  /* A pointer to the target insn within lvx_insn_buffer.  */
+  struct lvx_insn *target_insn;
   /* The conditional instruction as text.  */
   char line_prefix[32];
 };
 
 static bool
 kv4_cond_insn_merge (int target_exu,
-		     struct kvx_insn *bundle_insns[],
-		     struct kvx_insn *issued_insns[])
+		     struct lvx_insn *bundle_insns[],
+		     struct lvx_insn *issued_insns[])
 {
-  struct kvx_insn *insn = bundle_insns[kvx_insn_cnt - 1];
-  const struct kvx_opc *opdef = insn->opdef;
+  struct lvx_insn *insn = bundle_insns[lvx_insn_cnt - 1];
+  const struct lvx_opc *opdef = insn->opdef;
 
-  if (!(opdef->codewords[0].flags & KVX_OPCODE_FLAG_COND))
+  if (!(opdef->codewords[0].flags & LVX_OPCODE_FLAG_COND))
     as_fatal ("[kv4_cond_insn_merge] unrecognized conditional instruction prefix.");
 
   /* Try merging with an already issued BCU instruction.  */
@@ -1644,7 +1605,7 @@ kv4_cond_insn_merge (int target_exu,
     as_fatal ("[kv4_cond_insn_merge] no BCU available to merge conditional.");
 
   /* Insert the new BCU instruction into BUNDLE_INSNS[].  */
-  for (int i = kvx_insn_cnt - 2 ; i >= insn_idx; i--)
+  for (int i = lvx_insn_cnt - 2 ; i >= insn_idx; i--)
     bundle_insns[i + 1] = bundle_insns[i];
   bundle_insns[insn_idx] = insn;
 
@@ -1653,7 +1614,7 @@ kv4_cond_insn_merge (int target_exu,
 
 /* Stack of BCU insns for conditional execution.  */
 static struct {
-  struct kv4_cond cells[KVX_EXU__];
+  struct kv4_cond cells[LVX_EXU__];
   int count;
 } kv4_cond_stack[1];
 
@@ -1678,38 +1639,38 @@ kv4_cond_stack_access (int index)
 static struct kv4_cond *
 kv4_cond_stack_push (void)
 {
-  if (kv4_cond_stack->count >= KVX_EXU__)
+  if (kv4_cond_stack->count >= LVX_EXU__)
     as_fatal ("[kv4_cond_stack_push] kv4_cond_stack overflow.");
 
   return kv4_cond_stack->cells + kv4_cond_stack->count++;
 }
 
 static void
-kvx_check_resource_usage (struct kvx_insn *bundle_insns[])
+lvx_check_resource_usage (struct lvx_insn *bundle_insns[])
 {
   const int reservation_table_len =
-      (kvx_core_info->reservation_table_cycles * kvx_core_info->resource_count);
-  const int *resources = kvx_core_info->resources;
+      (lvx_core_info->reservation_table_cycles * lvx_core_info->resource_count);
+  const int *resources = lvx_core_info->resources;
   int *resources_used = malloc (reservation_table_len * sizeof (int));
   memset (resources_used, 0, reservation_table_len * sizeof (int));
 
-  for (int i = 0; i < kvx_insn_cnt; i++)
+  for (int i = 0; i < lvx_insn_cnt; i++)
     {
       int insn_reservation = bundle_insns[i]->opdef->reservation;
-      const int *reservation_table = kvx_core_info->reservation_tables[insn_reservation];
+      const int *reservation_table = lvx_core_info->reservation_tables[insn_reservation];
       for (int j = 0; j < reservation_table_len; j++)
 	resources_used[j] += reservation_table[j];
     }
 
-  for (int i = 0; i < kvx_core_info->reservation_table_cycles; i++)
+  for (int i = 0; i < lvx_core_info->reservation_table_cycles; i++)
     {
-      for (int j = 0; j < kvx_core_info->resource_count; j++)
-	if (resources_used[(i * kvx_core_info->resource_count) + j] > resources[j])
+      for (int j = 0; j < lvx_core_info->resource_count; j++)
+	if (resources_used[(i * lvx_core_info->resource_count) + j] > resources[j])
 	  {
-	    int v = resources_used[(i * kvx_core_info->resource_count) + j];
+	    int v = resources_used[(i * lvx_core_info->resource_count) + j];
 	    free (resources_used);
 	    as_fatal ("resource %s over-used in bundle: %d used, %d available",
-		kvx_core_info->resource_names[j], v, resources[j]);
+		lvx_core_info->resource_names[j], v, resources[j]);
 	  }
     }
 
@@ -1740,8 +1701,8 @@ md_assemble (char *line)
     {
       inside_bundle = 0;
       //int sec_align = bfd_get_section_alignment(stdoutput, now_seg);
-      struct kvx_insn *bundle_insns[NELEMS (kvx_insn_buffer)];
-      struct kvx_insn *issued_insns[KVX_EXU__];
+      struct lvx_insn *bundle_insns[NELEMS (lvx_insn_buffer)];
+      struct lvx_insn *issued_insns[LVX_EXU__];
       memset (issued_insns, 0, sizeof (issued_insns));
 
 #ifdef OBJ_ELF
@@ -1749,21 +1710,21 @@ md_assemble (char *line)
       dwarf2_emit_insn (0);
 #endif
 
-      /* Fill BUNDLE_INSNS[], compute kvx_insn ORDER and count bundle words.  */
+      /* Fill BUNDLE_INSNS[], compute lvx_insn ORDER and count bundle words.  */
       int word_cnt = 0;
-      for (int j = 0; j < kvx_insn_cnt; j++)
+      for (int j = 0; j < lvx_insn_cnt; j++)
 	{
-	  kvx_insn_buffer[j].order = j;
-	  bundle_insns[j] = &kvx_insn_buffer[j];
-	  word_cnt += kvx_insn_buffer[j].length;
+	  lvx_insn_buffer[j].order = j;
+	  bundle_insns[j] = &lvx_insn_buffer[j];
+	  word_cnt += lvx_insn_buffer[j].length;
 	}
-      if (word_cnt + kvx_immx_cnt > KVX_MAXBUNDLEWORDS)
+      if (word_cnt + lvx_immx_cnt > LVX_MAXBUNDLEWORDS)
 	as_fatal ("bundle has too many syllables: %d instead of %d",
-		  word_cnt + kvx_immx_cnt, KVX_MAXBUNDLEWORDS);
+		  word_cnt + lvx_immx_cnt, LVX_MAXBUNDLEWORDS);
 
       /* Issue insns into ISSUED_INSNS[] and reorder BUNDLE_INSNS[].  */
-      qsort (bundle_insns, kvx_insn_cnt, sizeof (struct kvx_insn *), kvx_insn_compare);
-      (*kvx_reorder_bundle) (bundle_insns, issued_insns);
+      qsort (bundle_insns, lvx_insn_cnt, sizeof (struct lvx_insn *), lvx_insn_compare);
+      (*lvx_reorder_bundle) (bundle_insns, issued_insns);
 
       if (kv4_cond_stack_count ())
 	/* Assemble the guard or blend line_prefix of conditional insns.  */
@@ -1773,7 +1734,7 @@ md_assemble (char *line)
 	    {
 	      struct kv4_cond *cond = kv4_cond_stack_access (i);
 	      int len = strlen (cond->line_prefix);
-	      int target_exu = cond->target_insn->kvx_exu;
+	      int target_exu = cond->target_insn->lvx_exu;
 	      unsigned exu_mask = 1 << (target_exu - KV4_EXU_ALU0);
 	      sprintf (cond->line_prefix + len, " %d", exu_mask);
 
@@ -1782,8 +1743,8 @@ md_assemble (char *line)
 	      assemble_tokens (gob_tok_lst);
 	      free_token_list (gob_tok_lst);
 
-	      bundle_insns[kvx_insn_cnt - 1] = &kvx_insn_buffer[kvx_insn_cnt - 1];
-	      kvx_insn_cnt -= kv4_cond_insn_merge (target_exu, bundle_insns, issued_insns);
+	      bundle_insns[lvx_insn_cnt - 1] = &lvx_insn_buffer[lvx_insn_cnt - 1];
+	      lvx_insn_cnt -= kv4_cond_insn_merge (target_exu, bundle_insns, issued_insns);
 	    }
 
 	    kv4_cond_stack_reset ();
@@ -1791,51 +1752,51 @@ md_assemble (char *line)
 	}
 
       if (env.opts.check_resource_usage)
-	kvx_check_resource_usage (bundle_insns);
+	lvx_check_resource_usage (bundle_insns);
 
-      /* Compute EMIT_CNT the total number of calls to kvx_emit_insn().  */
-      int emit_cnt = kvx_insn_cnt;
-      for (int i = 0; i < kvx_immx_cnt; i++)
-	if (kvx_immx_buffer[i].length)
+      /* Compute EMIT_CNT the total number of calls to lvx_emit_insn().  */
+      int emit_cnt = lvx_insn_cnt;
+      for (int i = 0; i < lvx_immx_cnt; i++)
+	if (lvx_immx_buffer[i].length)
 	  emit_cnt++;
 
       /* The ordering of the insns has been set correctly in bundle_insns.  */
       bool bcux_seen = false;
       int bcux_immx_idx = -1;
-      int8_t exu2pos[KVX_EXU__];
+      int8_t exu2pos[LVX_EXU__];
       memset(exu2pos, -1, sizeof(exu2pos));
-      for (int insn_pos = 0; insn_pos < kvx_insn_cnt; insn_pos++)
+      for (int insn_pos = 0; insn_pos < lvx_insn_cnt; insn_pos++)
 	{
-	  struct kvx_insn *insn = bundle_insns[insn_pos];
-	  int fixup_pos = kvx_insn_pcrel ? 0 : insn_pos;
-	  kvx_emit_insn (insn, fixup_pos, !--emit_cnt);
-	  assert ((unsigned)insn->kvx_exu < KVX_EXU__);
-	  exu2pos[insn->kvx_exu] = insn_pos + bcux_seen;
+	  struct lvx_insn *insn = bundle_insns[insn_pos];
+	  int fixup_pos = lvx_insn_pcrel ? 0 : insn_pos;
+	  lvx_emit_insn (insn, fixup_pos, !--emit_cnt);
+	  assert ((unsigned)insn->lvx_exu < LVX_EXU__);
+	  exu2pos[insn->lvx_exu] = insn_pos + bcux_seen;
 	  if (insn == kv4_bcux_insn)
 	    {
 	      bcux_immx_idx = insn->immx0_idx;
-	      kvx_emit_insn (&kvx_immx_buffer[bcux_immx_idx],
+	      lvx_emit_insn (&lvx_immx_buffer[bcux_immx_idx],
 			     fixup_pos + 1, !--emit_cnt);
 	      bcux_seen = true;
 	    }
 	}
 
       /* Emit the IMMX syllables, ordering them by EXU tags, 0 to 3.  */
-      int immx_pos = kvx_insn_cnt;
+      int immx_pos = lvx_insn_cnt;
       for (int tag = 0; tag < 4; tag++)
-	for (int j = 0; j < kvx_immx_cnt; j++)
+	for (int j = 0; j < lvx_immx_cnt; j++)
 	  {
 	    if (j == bcux_immx_idx)
 	      continue;
 
-	    struct kvx_insn *immx = &kvx_immx_buffer[j];
-	    if (kvx_exu_tag (immx->words[0]) == tag)
+	    struct lvx_insn *immx = &lvx_immx_buffer[j];
+	    if (lvx_exu_tag (immx->words[0]) == tag)
 	      {
-		assert ((unsigned)immx->kvx_exu < KVX_EXU__);
-		int insn_pos = exu2pos[immx->kvx_exu];
+		assert ((unsigned)immx->lvx_exu < LVX_EXU__);
+		int insn_pos = exu2pos[immx->lvx_exu];
 		assert (insn_pos >= 0);
-		int fixup_pos = kvx_insn_pcrel ? immx_pos - insn_pos : immx_pos;
-		kvx_emit_insn (immx, fixup_pos, !--emit_cnt);
+		int fixup_pos = lvx_insn_pcrel ? immx_pos - insn_pos : immx_pos;
+		lvx_emit_insn (immx, fixup_pos, !--emit_cnt);
 		immx_pos++;
 	      }
 	  }
@@ -1856,19 +1817,19 @@ md_assemble (char *line)
 	}
 
       /* Reset global state for the next bundle.  */
-      memset (kvx_insn_buffer, 0, sizeof (kvx_insn_buffer));
-      memset (kvx_immx_buffer, 0, sizeof (kvx_immx_buffer));
-      kvx_insn_cnt = kvx_immx_cnt = 0;
+      memset (lvx_insn_buffer, 0, sizeof (lvx_insn_buffer));
+      memset (lvx_immx_buffer, 0, sizeof (lvx_immx_buffer));
+      lvx_insn_cnt = lvx_immx_cnt = 0;
 
       return;
     }
 
   int cond_len = 0;
-  if (env.params.core == ELF_KVX_CORE_KV4_1
+  if (env.params.core == ELF_LVX_CORE_KV4_1
       && (cond_len = insn_cond_len (line)))
     {
       struct kv4_cond *cond = kv4_cond_stack_push ();
-      cond->target_insn = kvx_insn_buffer + kvx_insn_cnt;
+      cond->target_insn = lvx_insn_buffer + lvx_insn_cnt;
       strncpy (cond->line_prefix, line, cond_len);
       line_cursor += cond_len;
     }
@@ -1893,66 +1854,66 @@ md_assemble (char *line)
 }
 
 static void
-kvx_set_cpu (void)
+lvx_set_cpu (void)
 {
-  if (!kvx_core_info)
-    kvx_core_info = &kv3_v1_core_info;
+  if (!lvx_core_info)
+    lvx_core_info = &kv3_v1_core_info;
 
-  if (!kvx_registers)
-    kvx_registers = kv3_v1_registers;
+  if (!lvx_registers)
+    lvx_registers = kv3_v1_registers;
 
-  if (!kvx_regfiles) {
-    kvx_regfiles = kv3_v1_regfiles;
-    kvx_regfiles_size = KV3_V1_REGFILE_REGISTERS;
+  if (!lvx_regfiles) {
+    lvx_regfiles = kv3_v1_regfiles;
+    lvx_regfiles_size = KV3_V1_REGFILE_REGISTERS;
   }
 
-  if (!kvx_modifiers)
-    kvx_modifiers = kv3_v1_modifiers;
+  if (!lvx_modifiers)
+    lvx_modifiers = kv3_v1_modifiers;
 
   if (env.params.core == -1)
-      env.params.core = kvx_core_info->elf_core;
+      env.params.core = lvx_core_info->elf_core;
 
-  int kvx_bfd_mach;
+  int lvx_bfd_mach;
 
-  switch (kvx_core_info->elf_core)
+  switch (lvx_core_info->elf_core)
     {
-    case ELF_KVX_CORE_KV3_1:
-      kvx_bfd_mach = env.params.arch_size == 32 ? bfd_mach_kv3_1 : bfd_mach_kv3_1_64;
-      kvx_base_bundling = kv3_v1_base_bundling;
-      kvx_reorder_bundle = kv3_reorder_bundle;
-      kvx_dump_opc = kv3_dump_opc;
-      kvx_insn_pcrel = false;
-      setup (ELF_KVX_CORE_KV3_1);
+    case ELF_LVX_CORE_KV3_1:
+      lvx_bfd_mach = env.params.arch_size == 32 ? bfd_mach_kv3_1 : bfd_mach_kv3_1_64;
+      lvx_base_bundling = kv3_v1_base_bundling;
+      lvx_reorder_bundle = kv3_reorder_bundle;
+      lvx_dump_opc = kv3_dump_opc;
+      lvx_insn_pcrel = false;
+      setup (ELF_LVX_CORE_KV3_1);
       break;
-    case ELF_KVX_CORE_KV3_2:
-      kvx_bfd_mach = env.params.arch_size == 32 ? bfd_mach_kv3_2 : bfd_mach_kv3_2_64;
-      kvx_base_bundling = kv3_v2_base_bundling;
-      kvx_reorder_bundle = kv3_reorder_bundle;
-      kvx_dump_opc = kv3_dump_opc;
-      kvx_insn_pcrel = false;
-      setup (ELF_KVX_CORE_KV3_2);
+    case ELF_LVX_CORE_KV3_2:
+      lvx_bfd_mach = env.params.arch_size == 32 ? bfd_mach_kv3_2 : bfd_mach_kv3_2_64;
+      lvx_base_bundling = kv3_v2_base_bundling;
+      lvx_reorder_bundle = kv3_reorder_bundle;
+      lvx_dump_opc = kv3_dump_opc;
+      lvx_insn_pcrel = false;
+      setup (ELF_LVX_CORE_KV3_2);
       break;
-    case ELF_KVX_CORE_KV4_1:
-      kvx_bfd_mach = env.params.arch_size == 32 ? bfd_mach_kv4_1 : bfd_mach_kv4_1_64;
-      kvx_base_bundling = kv4_v1_base_bundling;
-      kvx_reorder_bundle = kv4_reorder_bundle;
-      kvx_dump_opc = kv4_dump_opc;
-      kvx_insn_pcrel = true;
-      setup (ELF_KVX_CORE_KV4_1);
+    case ELF_LVX_CORE_KV4_1:
+      lvx_bfd_mach = env.params.arch_size == 32 ? bfd_mach_kv4_1 : bfd_mach_kv4_1_64;
+      lvx_base_bundling = kv4_v1_base_bundling;
+      lvx_reorder_bundle = kv4_reorder_bundle;
+      lvx_dump_opc = kv4_dump_opc;
+      lvx_insn_pcrel = true;
+      setup (ELF_LVX_CORE_KV4_1);
       break;
     default:
-      as_fatal ("unknown elf core: 0x%x", kvx_core_info->elf_core);
+      as_fatal ("unknown elf core: 0x%x", lvx_core_info->elf_core);
     }
 
-  if (!bfd_set_arch_mach (stdoutput, TARGET_ARCH, kvx_bfd_mach))
+  if (!bfd_set_arch_mach (stdoutput, TARGET_ARCH, lvx_bfd_mach))
     as_warn (_("could not set architecture and machine"));
 }
 
 static int
-kvx_opc_compare (const void *a, const void *b)
+lvx_opc_compare (const void *a, const void *b)
 {
-  const struct kvx_opc *opa = (const struct kvx_opc *) a;
-  const struct kvx_opc *opb = (const struct kvx_opc *) b;
+  const struct lvx_opc *opa = (const struct lvx_opc *) a;
+  const struct lvx_opc *opb = (const struct lvx_opc *) b;
   int res = strcmp (opa->as_op, opb->as_op);
 
   if (res)
@@ -1991,7 +1952,7 @@ declare_register (const char *name, int number)
 void
 md_begin ()
 {
-  kvx_set_cpu ();
+  lvx_set_cpu ();
 
   /*
    * Declare register names with symbols
@@ -1999,16 +1960,16 @@ md_begin ()
 
   env.reg_hash = str_htab_create ();
 
-  for (int i = 0; i < kvx_regfiles[kvx_regfiles_size]; i++)
-    declare_register (kvx_registers[i].name, kvx_registers[i].id);
+  for (int i = 0; i < lvx_regfiles[lvx_regfiles_size]; i++)
+    declare_register (lvx_registers[i].name, lvx_registers[i].id);
 
   /* Sort optab, so that identical mnemonics appear consecutively.  */
   {
     int nel;
-    for (nel = 0; !STREQ ("", kvx_core_info->optab[nel].as_op); nel++)
+    for (nel = 0; !STREQ ("", lvx_core_info->optab[nel].as_op); nel++)
       ;
-    qsort (kvx_core_info->optab, nel, sizeof (kvx_core_info->optab[0]),
-	   kvx_opc_compare);
+    qsort (lvx_core_info->optab, nel, sizeof (lvx_core_info->optab[0]),
+	   lvx_opc_compare);
   }
 
   /* The '?' is an operand separator.  */
@@ -2021,9 +1982,9 @@ md_begin ()
   env.reloc_hash = str_htab_create ();
 
   {
-    struct kvx_opc *opc;
+    struct lvx_opc *opc;
     const char *name = 0;
-    for (opc = kvx_core_info->optab; !(STREQ ("", opc->as_op)); opc++)
+    for (opc = lvx_core_info->optab; !(STREQ ("", opc->as_op)); opc++)
       {
 	/* Enter in hash table if this is a new name.  */
 	if (!(STREQ (name, opc->as_op)))
@@ -2054,8 +2015,8 @@ md_begin ()
 
   if (env.opts.dump_insn)
     {
-      for (struct kvx_opc *opc = kvx_core_info->optab; !(STREQ ("", opc->as_op)); opc++)
-	(*kvx_dump_opc) (opc);
+      for (struct lvx_opc *opc = lvx_core_info->optab; !(STREQ ("", opc->as_op)); opc++)
+	(*lvx_dump_opc) (opc);
       exit (0);
     }
 
@@ -2089,10 +2050,10 @@ md_begin ()
 
 #undef MK_SYMBOL
 
-  for (int i = 0; i < kvx_core_info->nb_pseudo_funcs; ++i)
+  for (int i = 0; i < lvx_core_info->nb_pseudo_funcs; ++i)
     {
 #define PSEUDO_FUNC_IS(pf) \
-  !strcmp (kvx_core_info->pseudo_funcs[i].name, (pf))
+  !strcmp (lvx_core_info->pseudo_funcs[i].name, (pf))
 
       symbolS *sym;
       if (PSEUDO_FUNC_IS ("gotoff"))
@@ -2123,9 +2084,9 @@ md_begin ()
 	sym = signed32_sym;
       else
 	as_fatal ("unknown pseudo func `%s'",
-	    kvx_core_info->pseudo_funcs[i].name);
+	    lvx_core_info->pseudo_funcs[i].name);
 
-      kvx_core_info->pseudo_funcs[i].sym = sym;
+      lvx_core_info->pseudo_funcs[i].sym = sym;
     }
 #undef PSEUDO_FUNC_IS
 }
@@ -2184,33 +2145,33 @@ md_apply_fix (fixS * fixP, valueT * valueP, segT segmentP ATTRIBUTE_UNUSED)
     {
       switch (fixP->fx_r_type)
 	{
-	case BFD_RELOC_KVX_S37_TLS_LE_UP27:
-	case BFD_RELOC_KVX_S37_TLS_LE_LO10:
+	case BFD_RELOC_LVX_S37_TLS_LE_UP27:
+	case BFD_RELOC_LVX_S37_TLS_LE_LO10:
 
-	case BFD_RELOC_KVX_S43_TLS_LE_EX6:
-	case BFD_RELOC_KVX_S43_TLS_LE_UP27:
-	case BFD_RELOC_KVX_S43_TLS_LE_LO10:
+	case BFD_RELOC_LVX_S43_TLS_LE_EX6:
+	case BFD_RELOC_LVX_S43_TLS_LE_UP27:
+	case BFD_RELOC_LVX_S43_TLS_LE_LO10:
 
-	case BFD_RELOC_KVX_S37_TLS_GD_LO10:
-	case BFD_RELOC_KVX_S37_TLS_GD_UP27:
+	case BFD_RELOC_LVX_S37_TLS_GD_LO10:
+	case BFD_RELOC_LVX_S37_TLS_GD_UP27:
 
-	case BFD_RELOC_KVX_S43_TLS_GD_LO10:
-	case BFD_RELOC_KVX_S43_TLS_GD_UP27:
-	case BFD_RELOC_KVX_S43_TLS_GD_EX6:
+	case BFD_RELOC_LVX_S43_TLS_GD_LO10:
+	case BFD_RELOC_LVX_S43_TLS_GD_UP27:
+	case BFD_RELOC_LVX_S43_TLS_GD_EX6:
 
-	case BFD_RELOC_KVX_S37_TLS_IE_LO10:
-	case BFD_RELOC_KVX_S37_TLS_IE_UP27:
+	case BFD_RELOC_LVX_S37_TLS_IE_LO10:
+	case BFD_RELOC_LVX_S37_TLS_IE_UP27:
 
-	case BFD_RELOC_KVX_S43_TLS_IE_LO10:
-	case BFD_RELOC_KVX_S43_TLS_IE_UP27:
-	case BFD_RELOC_KVX_S43_TLS_IE_EX6:
+	case BFD_RELOC_LVX_S43_TLS_IE_LO10:
+	case BFD_RELOC_LVX_S43_TLS_IE_UP27:
+	case BFD_RELOC_LVX_S43_TLS_IE_EX6:
 
-	case BFD_RELOC_KVX_S37_TLS_LD_LO10:
-	case BFD_RELOC_KVX_S37_TLS_LD_UP27:
+	case BFD_RELOC_LVX_S37_TLS_LD_LO10:
+	case BFD_RELOC_LVX_S37_TLS_LD_UP27:
 
-	case BFD_RELOC_KVX_S43_TLS_LD_LO10:
-	case BFD_RELOC_KVX_S43_TLS_LD_UP27:
-	case BFD_RELOC_KVX_S43_TLS_LD_EX6:
+	case BFD_RELOC_LVX_S43_TLS_LD_LO10:
+	case BFD_RELOC_LVX_S43_TLS_LD_UP27:
+	case BFD_RELOC_LVX_S43_TLS_LD_EX6:
 
 	  S_SET_THREAD_LOCAL (fixP->fx_addsy);
 	  break;
@@ -2229,80 +2190,80 @@ md_apply_fix (fixS * fixP, valueT * valueP, segT segmentP ATTRIBUTE_UNUSED)
 	case BFD_RELOC_32:
 	case BFD_RELOC_64:
 
-	case BFD_RELOC_KVX_GLOB_DAT:
-	case BFD_RELOC_KVX_32_GOT:
-	case BFD_RELOC_KVX_64_GOT:
-	case BFD_RELOC_KVX_64_GOTOFF:
-	case BFD_RELOC_KVX_32_GOTOFF:
+	case BFD_RELOC_LVX_GLOB_DAT:
+	case BFD_RELOC_LVX_32_GOT:
+	case BFD_RELOC_LVX_64_GOT:
+	case BFD_RELOC_LVX_64_GOTOFF:
+	case BFD_RELOC_LVX_32_GOTOFF:
 	  image = value;
 	  md_number_to_chars (fixpos, image, fixP->fx_size);
 	  break;
 
-	case BFD_RELOC_KVX_S11S2_PCREL:
+	case BFD_RELOC_LVX_S11S2_PCREL:
 	  if (signed_overflow (value, 11 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("branch out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_PCREL17:
-	case BFD_RELOC_KVX_S17S2_PCREL:
+	case BFD_RELOC_LVX_PCREL17:
+	case BFD_RELOC_LVX_S17S2_PCREL:
 	  if (signed_overflow (value, 17 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("branch out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_PCREL27:
-	case BFD_RELOC_KVX_S27S2_PCREL:
+	case BFD_RELOC_LVX_PCREL27:
+	case BFD_RELOC_LVX_S27S2_PCREL:
 	  if (signed_overflow (value, 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("branch out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S38S2_PCREL_LO11:
-	case BFD_RELOC_KVX_S38S2_PCREL_UP27:
+	case BFD_RELOC_LVX_S38S2_PCREL_LO11:
+	case BFD_RELOC_LVX_S38S2_PCREL_UP27:
 	  if (signed_overflow (value, 11 + 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed38 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S44S2_PCREL_LO17:
-	case BFD_RELOC_KVX_S44S2_PCREL_UP27:
+	case BFD_RELOC_LVX_S44S2_PCREL_LO17:
+	case BFD_RELOC_LVX_S44S2_PCREL_UP27:
 	  if (signed_overflow (value, 17 + 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed44 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S54S2_PCREL_LO27:
-	case BFD_RELOC_KVX_S54S2_PCREL_UP27:
+	case BFD_RELOC_LVX_S54S2_PCREL_LO27:
+	case BFD_RELOC_LVX_S54S2_PCREL_UP27:
 	  if (signed_overflow (value, 27 + 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed54 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S16_PCREL:
+	case BFD_RELOC_LVX_S16_PCREL:
 	  if (signed_overflow (value, 16))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed16 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S43_PCREL_LO10:
-	case BFD_RELOC_KVX_S43_PCREL_UP27:
-	case BFD_RELOC_KVX_S43_PCREL_EX6:
+	case BFD_RELOC_LVX_S43_PCREL_LO10:
+	case BFD_RELOC_LVX_S43_PCREL_UP27:
+	case BFD_RELOC_LVX_S43_PCREL_EX6:
 	  if (signed_overflow (value, 10 + 27 + 6))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed43 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S37_PCREL_LO10:
-	case BFD_RELOC_KVX_S37_PCREL_UP27:
+	case BFD_RELOC_LVX_S37_PCREL_LO10:
+	case BFD_RELOC_LVX_S37_PCREL_UP27:
 	  if (signed_overflow (value, 10 + 27))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("signed37 PCREL value out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_KVX_S64_PCREL_LO10:
-	case BFD_RELOC_KVX_S64_PCREL_UP27:
-	case BFD_RELOC_KVX_S64_PCREL_EX27:
+	case BFD_RELOC_LVX_S64_PCREL_LO10:
+	case BFD_RELOC_LVX_S64_PCREL_UP27:
+	case BFD_RELOC_LVX_S64_PCREL_EX27:
 
 	pcrel_common:
 	  if (fixP->fx_pcrel || fixP->fx_addsy)
@@ -2314,58 +2275,58 @@ md_apply_fix (fixS * fixP, valueT * valueP, segT segmentP ATTRIBUTE_UNUSED)
 	  md_number_to_chars (fixpos, image, fixP->fx_size);
 	  break;
 
-	case BFD_RELOC_KVX_S64_GOTADDR_LO10:
-	case BFD_RELOC_KVX_S64_GOTADDR_UP27:
-	case BFD_RELOC_KVX_S64_GOTADDR_EX27:
+	case BFD_RELOC_LVX_S64_GOTADDR_LO10:
+	case BFD_RELOC_LVX_S64_GOTADDR_UP27:
+	case BFD_RELOC_LVX_S64_GOTADDR_EX27:
 
-	case BFD_RELOC_KVX_S43_GOTADDR_LO10:
-	case BFD_RELOC_KVX_S43_GOTADDR_UP27:
-	case BFD_RELOC_KVX_S43_GOTADDR_EX6:
+	case BFD_RELOC_LVX_S43_GOTADDR_LO10:
+	case BFD_RELOC_LVX_S43_GOTADDR_UP27:
+	case BFD_RELOC_LVX_S43_GOTADDR_EX6:
 
-	case BFD_RELOC_KVX_S37_GOTADDR_LO10:
-	case BFD_RELOC_KVX_S37_GOTADDR_UP27:
+	case BFD_RELOC_LVX_S37_GOTADDR_LO10:
+	case BFD_RELOC_LVX_S37_GOTADDR_UP27:
 	  value = 0;
 	  /* Fallthrough.  */
 
-	case BFD_RELOC_KVX_S32_UP27:
+	case BFD_RELOC_LVX_S32_UP27:
 
-	case BFD_RELOC_KVX_S37_UP27:
+	case BFD_RELOC_LVX_S37_UP27:
 
-	case BFD_RELOC_KVX_S43_UP27:
+	case BFD_RELOC_LVX_S43_UP27:
 
-	case BFD_RELOC_KVX_S64_UP27:
-	case BFD_RELOC_KVX_S64_EX27:
-	case BFD_RELOC_KVX_S64_LO10:
+	case BFD_RELOC_LVX_S64_UP27:
+	case BFD_RELOC_LVX_S64_EX27:
+	case BFD_RELOC_LVX_S64_LO10:
 
-	case BFD_RELOC_KVX_S43_TLS_LE_UP27:
-	case BFD_RELOC_KVX_S43_TLS_LE_EX6:
+	case BFD_RELOC_LVX_S43_TLS_LE_UP27:
+	case BFD_RELOC_LVX_S43_TLS_LE_EX6:
 
-	case BFD_RELOC_KVX_S37_TLS_LE_UP27:
+	case BFD_RELOC_LVX_S37_TLS_LE_UP27:
 
-	case BFD_RELOC_KVX_S37_GOTOFF_UP27:
+	case BFD_RELOC_LVX_S37_GOTOFF_UP27:
 
-	case BFD_RELOC_KVX_S43_GOTOFF_UP27:
-	case BFD_RELOC_KVX_S43_GOTOFF_EX6:
+	case BFD_RELOC_LVX_S43_GOTOFF_UP27:
+	case BFD_RELOC_LVX_S43_GOTOFF_EX6:
 
-	case BFD_RELOC_KVX_S43_GOT_UP27:
-	case BFD_RELOC_KVX_S43_GOT_EX6:
+	case BFD_RELOC_LVX_S43_GOT_UP27:
+	case BFD_RELOC_LVX_S43_GOT_EX6:
 
-	case BFD_RELOC_KVX_S37_GOT_UP27:
+	case BFD_RELOC_LVX_S37_GOT_UP27:
 
-	case BFD_RELOC_KVX_S32_LO5:
-	case BFD_RELOC_KVX_S37_LO10:
+	case BFD_RELOC_LVX_S32_LO5:
+	case BFD_RELOC_LVX_S37_LO10:
 
-	case BFD_RELOC_KVX_S43_LO10:
-	case BFD_RELOC_KVX_S43_EX6:
+	case BFD_RELOC_LVX_S43_LO10:
+	case BFD_RELOC_LVX_S43_EX6:
 
-	case BFD_RELOC_KVX_S43_TLS_LE_LO10:
-	case BFD_RELOC_KVX_S37_TLS_LE_LO10:
+	case BFD_RELOC_LVX_S43_TLS_LE_LO10:
+	case BFD_RELOC_LVX_S37_TLS_LE_LO10:
 
-	case BFD_RELOC_KVX_S37_GOTOFF_LO10:
-	case BFD_RELOC_KVX_S43_GOTOFF_LO10:
+	case BFD_RELOC_LVX_S37_GOTOFF_LO10:
+	case BFD_RELOC_LVX_S43_GOTOFF_LO10:
 
-	case BFD_RELOC_KVX_S43_GOT_LO10:
-	case BFD_RELOC_KVX_S37_GOT_LO10:
+	case BFD_RELOC_LVX_S43_GOT_LO10:
+	case BFD_RELOC_LVX_S37_GOT_LO10:
 
 	default:
 	  as_fatal ("[md_apply_fix]:"
@@ -2381,7 +2342,7 @@ md_apply_fix (fixS * fixP, valueT * valueP, segT segmentP ATTRIBUTE_UNUSED)
  * has been updated by calling symbol_get_value_expression(...->X_add_symbol)
  */
 int
-kvx_validate_sub_fix (fixS * fixP)
+lvx_validate_sub_fix (fixS * fixP)
 {
   segT add_symbol_segment, sub_symbol_segment;
 
@@ -2413,19 +2374,19 @@ kvx_validate_sub_fix (fixS * fixP)
 
 /* Called whenever some data item (not an instruction) needs a fixup.  */
 void
-kvx_cons_fix_new (fragS * f, int where, int nbytes, expressionS * exp,
+lvx_cons_fix_new (fragS * f, int where, int nbytes, expressionS * exp,
 		  bfd_reloc_code_real_type code)
 {
   if (exp->X_op == O_pseudo_fixup)
     {
       exp->X_op = O_symbol;
       struct pseudo_func *pf =
-	kvx_get_pseudo_func_data_scn (exp->X_op_symbol);
+	lvx_get_pseudo_func_data_scn (exp->X_op_symbol);
       assert (pf != NULL);
       code = pf->pseudo_relocs.single;
 
       if (code == BFD_RELOC_UNUSED)
-	as_fatal ("[kvx_cons_fix_new] unsupported relocation");
+	as_fatal ("[lvx_cons_fix_new] unsupported relocation");
     }
   else
     {
@@ -2496,7 +2457,7 @@ tc_gen_reloc (asection * sec ATTRIBUTE_UNUSED, fixS * fixp)
    * of thing, and as a result we need to fake it out here.
    */
 
-  /* GD I'm not sure what this is used for in the kvx case but it sure
+  /* GD I'm not sure what this is used for in the lvx case but it sure
      messes up the relocs when emit_all_relocs is used as they are not
      resolved with respect to a global sysmbol (e.g. .text), and hence
      they are ALWAYS resolved at link time.  */
@@ -2578,7 +2539,7 @@ md_convert_frag (bfd * abfd ATTRIBUTE_UNUSED,
 		 asection * sec ATTRIBUTE_UNUSED,
 		 fragS * fragp ATTRIBUTE_UNUSED)
 {
-  as_fatal ("kvx convert_frag");
+  as_fatal ("lvx convert_frag");
 }
 
 symbolS *
@@ -2616,7 +2577,7 @@ static symbolS *last_proc_sym = NULL;
 static int update_last_proc_sym = 0;
 
 void
-kvx_frob_label (symbolS *sym)
+lvx_frob_label (symbolS *sym)
 {
   if (update_last_proc_sym)
     {
@@ -2637,7 +2598,7 @@ kvx_frob_label (symbolS *sym)
 }
 
 void
-kvx_check_label (symbolS *sym)
+lvx_check_label (symbolS *sym)
 {
   /* Labels followed by a second semi-colon are considered external symbols.  */
   if (*input_line_pointer == ':')
@@ -2652,7 +2613,7 @@ kvx_check_label (symbolS *sym)
  * using BE pseudo op
  */
 void
-kvx_emit_single_noop (void)
+lvx_emit_single_noop (void)
 {
   char *nop;
   char *end_of_bundle;
@@ -2677,7 +2638,7 @@ kvx_emit_single_noop (void)
     lines.  Thus, '\n' must be scanned for as well as '\0'.  */
 
 void
-kvx_md_start_line_hook (void)
+lvx_md_start_line_hook (void)
 {
   char *t;
 
@@ -2743,37 +2704,37 @@ kvx_md_start_line_hook (void)
 }
 
 static void
-kvx_check_resources (int f)
+lvx_check_resources (int f)
 {
   env.opts.check_resource_usage = f;
 }
 
 /* Called before write_object_file.  */
 void
-kvx_end (void)
+lvx_end (void)
 {
   int newflags;
 
   if (!env.params.core_set)
-    env.params.core = kvx_core_info->elf_core;
+    env.params.core = lvx_core_info->elf_core;
 
   /* (pp) the flags must be set at once.  */
   newflags = env.params.core | env.params.abi | env.params.pic_flags;
 
   if (env.params.arch_size == 64)
-    newflags |= ELF_KVX_ABI_64B_ADDR_BIT;
+    newflags |= ELF_LVX_ABI_64B_ADDR_BIT;
 
   bfd_set_private_flags (stdoutput, newflags);
 
   cleanup ();
 
-  if (inside_bundle && kvx_insn_cnt != 0)
+  if (inside_bundle && lvx_insn_cnt != 0)
     as_bad ("unexpected end-of-file while processing a bundle."
 	    "  Please check that ;; is on its own line.");
 }
 
 static void
-kvx_type (int start ATTRIBUTE_UNUSED)
+lvx_type (int start ATTRIBUTE_UNUSED)
 {
   char *name;
   char c;
@@ -2857,7 +2818,7 @@ kvx_type (int start ATTRIBUTE_UNUSED)
 static int proc_endp_status = 0;
 
 static void
-kvx_endp (int start ATTRIBUTE_UNUSED)
+lvx_endp (int start ATTRIBUTE_UNUSED)
 {
   char c;
   char *name;
@@ -2940,7 +2901,7 @@ kvx_endp (int start ATTRIBUTE_UNUSED)
 }
 
 static void
-kvx_proc (int start ATTRIBUTE_UNUSED)
+lvx_proc (int start ATTRIBUTE_UNUSED)
 {
   char c;
   char *name;
@@ -2970,14 +2931,14 @@ kvx_proc (int start ATTRIBUTE_UNUSED)
      the symbol emitted has a name formed by the original function name
      concatenated with $endproc so if _foo is a function name the symbol
      marking the end of it is _foo$endproc.  */
-  /* It is also required for generation of .size directive in kvx_endp().  */
+  /* It is also required for generation of .size directive in lvx_endp().  */
 
   if (size_type_function)
     update_last_proc_sym = 1;
 }
 
 int
-kvx_force_reloc (fixS * fixP)
+lvx_force_reloc (fixS * fixP)
 {
   symbolS *sym;
   asection *symsec;
@@ -2987,21 +2948,21 @@ kvx_force_reloc (fixS * fixP)
 
   switch (fixP->fx_r_type)
     {
-    case BFD_RELOC_KVX_32_GOTOFF:
-    case BFD_RELOC_KVX_S37_GOTOFF_UP27:
-    case BFD_RELOC_KVX_S37_GOTOFF_LO10:
+    case BFD_RELOC_LVX_32_GOTOFF:
+    case BFD_RELOC_LVX_S37_GOTOFF_UP27:
+    case BFD_RELOC_LVX_S37_GOTOFF_LO10:
 
-    case BFD_RELOC_KVX_64_GOTOFF:
-    case BFD_RELOC_KVX_S43_GOTOFF_UP27:
-    case BFD_RELOC_KVX_S43_GOTOFF_LO10:
-    case BFD_RELOC_KVX_S43_GOTOFF_EX6:
+    case BFD_RELOC_LVX_64_GOTOFF:
+    case BFD_RELOC_LVX_S43_GOTOFF_UP27:
+    case BFD_RELOC_LVX_S43_GOTOFF_LO10:
+    case BFD_RELOC_LVX_S43_GOTOFF_EX6:
 
-    case BFD_RELOC_KVX_32_GOT:
-    case BFD_RELOC_KVX_64_GOT:
-    case BFD_RELOC_KVX_S37_GOT_UP27:
-    case BFD_RELOC_KVX_S37_GOT_LO10:
+    case BFD_RELOC_LVX_32_GOT:
+    case BFD_RELOC_LVX_64_GOT:
+    case BFD_RELOC_LVX_S37_GOT_UP27:
+    case BFD_RELOC_LVX_S37_GOT_LO10:
 
-    case BFD_RELOC_KVX_GLOB_DAT:
+    case BFD_RELOC_LVX_GLOB_DAT:
       return 1;
     default:
       return 0;
@@ -3019,7 +2980,7 @@ kvx_force_reloc (fixS * fixP)
 }
 
 int
-kvx_force_reloc_sub_same (fixS * fixP, segT sec)
+lvx_force_reloc_sub_same (fixS * fixP, segT sec)
 {
   symbolS *sym;
   asection *symsec;
@@ -3030,24 +2991,24 @@ kvx_force_reloc_sub_same (fixS * fixP, segT sec)
 
   switch (fixP->fx_r_type)
     {
-    case BFD_RELOC_KVX_32_GOTOFF:
-    case BFD_RELOC_KVX_S37_GOTOFF_UP27:
-    case BFD_RELOC_KVX_S37_GOTOFF_LO10:
+    case BFD_RELOC_LVX_32_GOTOFF:
+    case BFD_RELOC_LVX_S37_GOTOFF_UP27:
+    case BFD_RELOC_LVX_S37_GOTOFF_LO10:
 
-    case BFD_RELOC_KVX_64_GOTOFF:
-    case BFD_RELOC_KVX_S43_GOTOFF_UP27:
-    case BFD_RELOC_KVX_S43_GOTOFF_LO10:
-    case BFD_RELOC_KVX_S43_GOTOFF_EX6:
+    case BFD_RELOC_LVX_64_GOTOFF:
+    case BFD_RELOC_LVX_S43_GOTOFF_UP27:
+    case BFD_RELOC_LVX_S43_GOTOFF_LO10:
+    case BFD_RELOC_LVX_S43_GOTOFF_EX6:
 
-    case BFD_RELOC_KVX_32_GOT:
-    case BFD_RELOC_KVX_64_GOT:
-    case BFD_RELOC_KVX_S37_GOT_UP27:
-    case BFD_RELOC_KVX_S37_GOT_LO10:
+    case BFD_RELOC_LVX_32_GOT:
+    case BFD_RELOC_LVX_64_GOT:
+    case BFD_RELOC_LVX_S37_GOT_UP27:
+    case BFD_RELOC_LVX_S37_GOT_LO10:
 
-    case BFD_RELOC_KVX_S37_LO10:
-    case BFD_RELOC_KVX_S37_UP27:
+    case BFD_RELOC_LVX_S37_LO10:
+    case BFD_RELOC_LVX_S37_UP27:
 
-    case BFD_RELOC_KVX_GLOB_DAT:
+    case BFD_RELOC_LVX_GLOB_DAT:
       return 1;
 
     default:
@@ -3082,7 +3043,7 @@ kvx_force_reloc_sub_same (fixS * fixP, segT sec)
 /* Implement HANDLE_ALIGN.  */
 
 static void
-kvx_make_nops (char *buf, bfd_vma bytes)
+lvx_make_nops (char *buf, bfd_vma bytes)
 {
   bfd_vma i = 0;
   unsigned int j;
@@ -3091,8 +3052,8 @@ kvx_make_nops (char *buf, bfd_vma bytes)
 
   if (!nop_single)
     {
-      const struct kvx_opc *opcode =
-	(struct kvx_opc *) str_hash_find (env.opcode_hash, "nop");
+      const struct lvx_opc *opcode =
+	(struct lvx_opc *) str_hash_find (env.opcode_hash, "nop");
 
       if (opcode == NULL)
 	as_fatal ("could not find opcode for 'nop' during padding");
@@ -3100,7 +3061,7 @@ kvx_make_nops (char *buf, bfd_vma bytes)
       nop_single = opcode->codewords[0].opcode;
     }
 
-  /* KVX instructions are always 4-bytes aligned. If we are at a position
+  /* LVX instructions are always 4-bytes aligned. If we are at a position
      that is not 4 bytes aligned, it means this is not part of an instruction,
      so it is safe to use a zero byte for padding.  */
 
@@ -3117,7 +3078,7 @@ kvx_make_nops (char *buf, bfd_vma bytes)
       // 12 = offset when writting the last nop possible in a 4 nops bundle
       // bytes-i-4 = offset for the last 4-words in the padding
       if (j % (4 * 4) != 12 && j != (bytes - i - 4))
-	nop |= KVX_PARALLEL_BIT;
+	nop |= LVX_PARALLEL_BIT;
 
       memcpy (buf + i + j, &nop, sizeof (nop));
     }
@@ -3125,7 +3086,7 @@ kvx_make_nops (char *buf, bfd_vma bytes)
 
 /* Pads code section with bundle of nops when possible, 0 if not.  */
 void
-kvx_handle_align (fragS *fragP)
+lvx_handle_align (fragS *fragP)
 {
   switch (fragP->fr_type)
     {
@@ -3139,7 +3100,7 @@ kvx_handle_align (fragS *fragP)
 	  break;
 
 	/* Insert zeros or nops to get 4 byte alignment.  */
-	kvx_make_nops (p, bytes);
+	lvx_make_nops (p, bytes);
 	fragP->fr_fix += bytes;
       }
       break;
@@ -3161,7 +3122,7 @@ print_operand (expressionS * e, FILE * out)
       switch (e->X_op)
 	{
 	case O_register:
-	  fprintf (out, "%s", kvx_registers[e->X_add_number].name);
+	  fprintf (out, "%s", lvx_registers[e->X_add_number].name);
 	  break;
 
 	case O_constant:
@@ -3197,13 +3158,13 @@ print_operand (expressionS * e, FILE * out)
 }
 
 void
-kvx_cfi_frame_initial_instructions (void)
+lvx_cfi_frame_initial_instructions (void)
 {
-  cfi_add_CFA_def_cfa (KVX_SP_REGNO, 0);
+  cfi_add_CFA_def_cfa (LVX_SP_REGNO, 0);
 }
 
 int
-kvx_regname_to_dw2regnum (const char *regname)
+lvx_regname_to_dw2regnum (const char *regname)
 {
   unsigned int regnum = -1;
   const char *p;

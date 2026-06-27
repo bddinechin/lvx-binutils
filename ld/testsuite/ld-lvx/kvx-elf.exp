@@ -1,4 +1,4 @@
-# Expect script for various KVX ELF tests.
+# Expect script for various LVX ELF tests.
 # Copyright (C) 2009-2024 Free Software Foundation, Inc.
 #   Contributed by Kalray Inc.
 #
@@ -19,8 +19,8 @@
 # see <http://www.gnu.org/licenses/>.
 #
 
-# Exclude non-kvx-ELF targets.
-if { ![istarget "kvx-*-*"] } {
+# Exclude non-lvx-ELF targets.
+if { ![istarget "lvx-*-*"] } {
     return
 }
 
@@ -51,8 +51,8 @@ run_dump_test "farcall-call-section"
 run_dump_test "pcrel-reloc"
 
 ## 32bits tests
-if { ![istarget "kvx*-linux-*"] } {
-  set extra_32bits [list [list as -m32] [list ld -melf32kvx]]
+if { ![istarget "lvx*-linux-*"] } {
+  set extra_32bits [list [list as -m32] [list ld -melf32lvx]]
     run_dump_test "limit-call" $extra_32bits
     run_dump_test "limit-goto" $extra_32bits
     run_dump_test "farcall-back" $extra_32bits
@@ -67,5 +67,5 @@ if { ![istarget "kvx*-linux-*"] } {
     run_dump_test "farcall-call-none-function" $extra_32bits
     run_dump_test "farcall-goto-section" $extra_32bits
     run_dump_test "farcall-call-section" $extra_32bits
-    run_dump_test "pcrel-reloc" [list [list as -m32] [list ld -melf32kvx] [list dump pcrel-reloc-32bits.d]]
+    run_dump_test "pcrel-reloc" [list [list as -m32] [list ld -melf32lvx] [list dump pcrel-reloc-32bits.d]]
 }

@@ -134176,11 +134176,27 @@ struct kvx_opc kv4_v1_optab[] = {
   {"", { }, 0, 0, 0, { }, ""}
 };
 
+/* LVX cores: share kv4-1 instruction tables until LVX MDS is ready. */
+const struct kvx_core_info lvx_1_core_info = {
+  kv4_v1_optab, "lvx-1", kv4_v1_resources, ELF_LVX_CORE_LVX_1,
+  kv4_v1_pseudo_func, 26,
+  (int **) kv4_v1_reservation_tables,
+  kv4_v1_RESERVATION_TABLE_CYCLES, kv4_v1_RESOURCE_COUNT,
+  (char **) kv4_v1_resource_names
+};
+
+const struct kvx_core_info lvx_2_core_info = {
+  kv4_v1_optab, "lvx-2", kv4_v1_resources, ELF_LVX_CORE_LVX_2,
+  kv4_v1_pseudo_func, 26,
+  (int **) kv4_v1_reservation_tables,
+  kv4_v1_RESERVATION_TABLE_CYCLES, kv4_v1_RESOURCE_COUNT,
+  (char **) kv4_v1_resource_names
+};
+
 const struct kvx_core_info *kvx_core_info_table[] =
 {
-  & kv3_v1_core_info,
-  & kv3_v2_core_info,
-  & kv4_v1_core_info
+  &lvx_1_core_info,
+  &lvx_2_core_info
 };
 
 const struct kvx_register *kvx_registers_table[] =

@@ -166,7 +166,7 @@ TARGET_CPU_CFILES = \
 	config/tc-i386.c \
 	config/tc-ip2k.c \
 	config/tc-iq2000.c \
-	config/tc-kvx.c \
+	config/tc-lvx.c \
 	config/tc-lm32.c \
 	config/tc-loongarch.c \
 	config/tc-m32c.c \
@@ -242,7 +242,7 @@ TARGET_CPU_HFILES = \
 	config/tc-i386.h \
 	config/tc-ip2k.h \
 	config/tc-iq2000.h \
-	config/tc-kvx.h \
+	config/tc-lvx.h \
 	config/tc-lm32.h \
 	config/tc-m32c.h \
 	config/tc-m32r.h \
@@ -295,8 +295,8 @@ TARGET_EXTRA_FILES = \
 	config/bfin-lex-wrapper.c \
 	config/xtensa-relax.c \
 	config/xtensa-relax.h \
-	config/kvx-parse.h \
-	config/kvx-parse.c
+	config/lvx-parse.h \
+	config/lvx-parse.c
 
 # OBJ files in config
 

@@ -1,4 +1,4 @@
-/* KVX assembler/disassembler support.
+/* LVX assembler/disassembler support.
 
    Copyright (C) 2009-2024 Free Software Foundation, Inc.
    Contributed by Kalray SA.
@@ -20,14 +20,14 @@
    see <http://www.gnu.org/licenses/>.  */
 
 
-#ifndef OPCODE_KVX_H
-#define OPCODE_KVX_H
+#ifndef OPCODE_LVX_H
+#define OPCODE_LVX_H
 
-#define KVX_NUMCORES 3
-#define KVX_MAXSYLLABLES 3
-#define KVX_MAXOPERANDS 7
-#define KVX_MAXBUNDLEISSUE 10
-#define KVX_MAXBUNDLEWORDS 18
+#define LVX_NUMCORES 2
+#define LVX_MAXSYLLABLES 3
+#define LVX_MAXOPERANDS 7
+#define LVX_MAXBUNDLEISSUE 10
+#define LVX_MAXBUNDLEWORDS 18
 
 
 /*
@@ -51,33 +51,33 @@
 /*  Operand definition -- used in building     */
 /*  format table                               */
 
-enum kvx_rel {
+enum lvx_rel {
   /* Absolute relocation. */
-  KVX_REL_ABS,
+  LVX_REL_ABS,
   /* PC relative relocation. */
-  KVX_REL_PC,
+  LVX_REL_PC,
   /* GP relative relocation. */
-  KVX_REL_GP,
+  LVX_REL_GP,
   /* TP relative relocation. */
-  KVX_REL_TP,
+  LVX_REL_TP,
   /* GOT relative relocation. */
-  KVX_REL_GOT,
+  LVX_REL_GOT,
   /* BASE load address relative relocation. */
-  KVX_REL_BASE,
+  LVX_REL_BASE,
 };
 
-struct kvx_reloc {
+struct lvx_reloc {
   /* Size in bits. */
   int bitsize;
   /* Type of relative relocation. */
-  enum kvx_rel relative;
+  enum lvx_rel relative;
   /* Number of BFD relocations. */
   int reloc_nb;
   /* List of BFD relocations. */
   unsigned int relocs[];
 };
 
-struct kvx_bitfield {
+struct lvx_bitfield {
   /* Number of bits.  */
   int size;
   /* Offset in abstract value.  */
@@ -86,7 +86,7 @@ struct kvx_bitfield {
   int to_offset;
 };
 
-struct kvx_operand {
+struct lvx_operand {
   /* Operand type name.  */
   const char *tname;
   /* Type of operand.  */
@@ -106,14 +106,14 @@ struct kvx_operand {
   /* Number of relocations.  */
   int reloc_nb;
   /* List of relocations that can be applied to this operand.  */
-  struct kvx_reloc **relocs;
+  struct lvx_reloc **relocs;
   /* Number of given bitfields.  */
   int bitfields;
   /* Bitfields in most to least significant order.  */
-  struct kvx_bitfield bfield[];
+  struct lvx_bitfield bfield[];
 };
 
-struct kvx_pseudo_relocs
+struct lvx_pseudo_relocs
 {
   enum
   {
@@ -130,7 +130,7 @@ struct kvx_pseudo_relocs
 
   /* Used when pseudo func should expand to different relocations
      based on the 32/64 bits mode.
-     Enum values should match the kvx_arch_size var set by -m32
+     Enum values should match the lvx_arch_size var set by -m32
    */
   enum
   {
@@ -144,7 +144,7 @@ struct kvx_pseudo_relocs
 
   bfd_reloc_code_real_type reloc_lo5, reloc_lo10, reloc_up27, reloc_ex;
   bfd_reloc_code_real_type single;
-  struct kvx_reloc *kreloc;
+  struct lvx_reloc *kreloc;
 };
 
 typedef struct symbol symbolS;
@@ -154,28 +154,28 @@ struct pseudo_func
   const char *name;
 
   symbolS *sym;
-  struct kvx_pseudo_relocs pseudo_relocs;
+  struct lvx_pseudo_relocs pseudo_relocs;
 };
 
-/* Flags for kvx_operand  */
-#define KVX_OPERAND_SIGNED    1
-#define KVX_OPERAND_CANEXTEND 2
-#define KVX_OPERAND_BITMASK   4
-#define KVX_OPERAND_WRAPPED   8
+/* Flags for lvx_operand  */
+#define LVX_OPERAND_SIGNED    1
+#define LVX_OPERAND_CANEXTEND 2
+#define LVX_OPERAND_BITMASK   4
+#define LVX_OPERAND_WRAPPED   8
 
-#define KVX_OPCODE_FLAG_UNDEF 0
-#define KVX_OPCODE_FLAG_IMMX 1
-#define KVX_OPCODE_FLAG_COND 2
-#define KVX_OPCODE_FLAG_CALL 4
-#define KVX_OPCODE_FLAG_LOAD 8
-#define KVX_OPCODE_FLAG_STORE 16
-#define KVX_OPCODE_FLAG_MODE32 32
-#define KVX_OPCODE_FLAG_MODE64 64
-#define KVX_OPCODE_FLAG_RISCV 128
+#define LVX_OPCODE_FLAG_UNDEF 0
+#define LVX_OPCODE_FLAG_IMMX 1
+#define LVX_OPCODE_FLAG_COND 2
+#define LVX_OPCODE_FLAG_CALL 4
+#define LVX_OPCODE_FLAG_LOAD 8
+#define LVX_OPCODE_FLAG_STORE 16
+#define LVX_OPCODE_FLAG_MODE32 32
+#define LVX_OPCODE_FLAG_MODE64 64
+#define LVX_OPCODE_FLAG_RISCV 128
 
 /* Opcode definition.  */
 
-struct kvx_codeword {
+struct lvx_codeword {
   /* The opcode.  */
   unsigned opcode;
   /* Disassembly mask.  */
@@ -184,11 +184,11 @@ struct kvx_codeword {
   unsigned flags;
 };
 
-struct kvx_opc {
+struct lvx_opc {
   /* asm name */
   const char *as_op;
   /* 32 bits code words. */
-  struct kvx_codeword codewords[KVX_MAXSYLLABLES];
+  struct lvx_codeword codewords[LVX_MAXSYLLABLES];
   /* Number of words in codewords[].  */
   int wordcount;
   /* Bundling class.  */
@@ -196,13 +196,13 @@ struct kvx_opc {
   /* Reservation class.  */
   short reservation;
   /* 0 terminated.  */
-  struct kvx_operand *format[KVX_MAXOPERANDS + 1];
+  struct lvx_operand *format[LVX_MAXOPERANDS + 1];
   /* Formating string.  */
   const char *fmtstring;
 };
 
-struct kvx_core_info {
-  struct kvx_opc *optab;
+struct lvx_core_info {
+  struct lvx_opc *optab;
   const char *name;
   const int *resources;
   int elf_core;
@@ -214,52 +214,42 @@ struct kvx_core_info {
   char **resource_names;
 };
 
-struct kvx_register {
+struct lvx_register {
   int id;
   const char *name;
 };
 
-extern const int kv3_v1_reservation_table_cycles;
-extern const int *kv3_v1_reservation_tables[];
-extern const char *kv3_v1_resource_names[];
-
-extern const int kv3_v1_resources[];
-extern struct kvx_opc kv3_v1_optab[];
-extern const struct kvx_core_info kv3_v1_core_info;
-extern const int kv3_v2_reservation_table_cycles;
-extern const int *kv3_v2_reservation_tables[];
-extern const char *kv3_v2_resource_names[];
-
-extern const int kv3_v2_resources[];
-extern struct kvx_opc kv3_v2_optab[];
-extern const struct kvx_core_info kv3_v2_core_info;
+/* kv4-1 tables (MDS-generated; shared by lvx-1 and lvx-2 until LVX MDS is ready) */
 extern const int kv4_v1_reservation_table_cycles;
 extern const int *kv4_v1_reservation_tables[];
 extern const char *kv4_v1_resource_names[];
-
 extern const int kv4_v1_resources[];
-extern struct kvx_opc kv4_v1_optab[];
-extern const struct kvx_core_info kv4_v1_core_info;
-extern const struct kvx_core_info *kvx_core_info_table[];
-extern const char ***kvx_modifiers_table[];
-extern const struct kvx_register *kvx_registers_table[];
-extern const int *kvx_regfiles_table[];
-extern const int kvx_regfiles_size_table[];
+extern struct lvx_opc kv4_v1_optab[];
+extern const struct lvx_core_info kv4_v1_core_info;
 
-#define KVX_REGFILE_FIRST_SFR 0
-#define KVX_REGFILE_LAST_SFR 1
-#define KVX_REGFILE_DEC_SFR 2
-#define KVX_REGFILE_FIRST_GPR 3
-#define KVX_REGFILE_LAST_GPR 4
-#define KVX_REGFILE_DEC_GPR 5
+/* LVX cores */
+extern const struct lvx_core_info lvx_1_core_info;
+extern const struct lvx_core_info lvx_2_core_info;
+extern const struct lvx_core_info *lvx_core_info_table[];
+extern const char ***lvx_modifiers_table[];
+extern const struct lvx_register *lvx_registers_table[];
+extern const int *lvx_regfiles_table[];
+extern const int lvx_regfiles_size_table[];
+
+#define LVX_REGFILE_FIRST_SFR 0
+#define LVX_REGFILE_LAST_SFR 1
+#define LVX_REGFILE_DEC_SFR 2
+#define LVX_REGFILE_FIRST_GPR 3
+#define LVX_REGFILE_LAST_GPR 4
+#define LVX_REGFILE_DEC_GPR 5
 
 
-#define KV3_V1_REGFILE_FIRST_SFR KVX_REGFILE_FIRST_SFR
-#define KV3_V1_REGFILE_LAST_SFR KVX_REGFILE_LAST_SFR
-#define KV3_V1_REGFILE_DEC_SFR KVX_REGFILE_DEC_SFR
-#define KV3_V1_REGFILE_FIRST_GPR KVX_REGFILE_FIRST_GPR
-#define KV3_V1_REGFILE_LAST_GPR KVX_REGFILE_LAST_GPR
-#define KV3_V1_REGFILE_DEC_GPR KVX_REGFILE_DEC_GPR
+#define KV3_V1_REGFILE_FIRST_SFR LVX_REGFILE_FIRST_SFR
+#define KV3_V1_REGFILE_LAST_SFR LVX_REGFILE_LAST_SFR
+#define KV3_V1_REGFILE_DEC_SFR LVX_REGFILE_DEC_SFR
+#define KV3_V1_REGFILE_FIRST_GPR LVX_REGFILE_FIRST_GPR
+#define KV3_V1_REGFILE_LAST_GPR LVX_REGFILE_LAST_GPR
+#define KV3_V1_REGFILE_DEC_GPR LVX_REGFILE_DEC_GPR
 #define KV3_V1_REGFILE_FIRST_PGR 6
 #define KV3_V1_REGFILE_LAST_PGR 7
 #define KV3_V1_REGFILE_DEC_PGR 8
@@ -305,7 +295,7 @@ extern const int kvx_regfiles_size_table[];
 
 extern int kv3_v1_regfiles[];
 extern const char **kv3_v1_modifiers[];
-extern struct kvx_register kv3_v1_registers[];
+extern struct lvx_register kv3_v1_registers[];
 
 extern int kv3_v1_dec_registers[];
 
@@ -1047,58 +1037,58 @@ typedef enum {
   Reservation_kv3_v1_MAU_AUXR_Y,
 } Reservation_kv3_v1;
 
-extern struct kvx_reloc kv3_v1_rel16_reloc;
-extern struct kvx_reloc kv3_v1_rel32_reloc;
-extern struct kvx_reloc kv3_v1_rel64_reloc;
-extern struct kvx_reloc kv3_v1_pcrel_signed16_reloc;
-extern struct kvx_reloc kv3_v1_pcrel17_reloc;
-extern struct kvx_reloc kv3_v1_pcrel27_reloc;
-extern struct kvx_reloc kv3_v1_pcrel32_reloc;
-extern struct kvx_reloc kv3_v1_pcrel_signed37_reloc;
-extern struct kvx_reloc kv3_v1_pcrel_signed43_reloc;
-extern struct kvx_reloc kv3_v1_pcrel_signed64_reloc;
-extern struct kvx_reloc kv3_v1_pcrel64_reloc;
-extern struct kvx_reloc kv3_v1_signed16_reloc;
-extern struct kvx_reloc kv3_v1_signed32_reloc;
-extern struct kvx_reloc kv3_v1_signed37_reloc;
-extern struct kvx_reloc kv3_v1_gotoff_signed37_reloc;
-extern struct kvx_reloc kv3_v1_gotoff_signed43_reloc;
-extern struct kvx_reloc kv3_v1_gotoff_32_reloc;
-extern struct kvx_reloc kv3_v1_gotoff_64_reloc;
-extern struct kvx_reloc kv3_v1_got_32_reloc;
-extern struct kvx_reloc kv3_v1_got_signed37_reloc;
-extern struct kvx_reloc kv3_v1_got_signed43_reloc;
-extern struct kvx_reloc kv3_v1_got_64_reloc;
-extern struct kvx_reloc kv3_v1_glob_dat_reloc;
-extern struct kvx_reloc kv3_v1_copy_reloc;
-extern struct kvx_reloc kv3_v1_jump_slot_reloc;
-extern struct kvx_reloc kv3_v1_relative_reloc;
-extern struct kvx_reloc kv3_v1_signed43_reloc;
-extern struct kvx_reloc kv3_v1_signed64_reloc;
-extern struct kvx_reloc kv3_v1_gotaddr_signed37_reloc;
-extern struct kvx_reloc kv3_v1_gotaddr_signed43_reloc;
-extern struct kvx_reloc kv3_v1_gotaddr_signed64_reloc;
-extern struct kvx_reloc kv3_v1_dtpmod64_reloc;
-extern struct kvx_reloc kv3_v1_dtpoff64_reloc;
-extern struct kvx_reloc kv3_v1_dtpoff_signed37_reloc;
-extern struct kvx_reloc kv3_v1_dtpoff_signed43_reloc;
-extern struct kvx_reloc kv3_v1_tlsgd_signed37_reloc;
-extern struct kvx_reloc kv3_v1_tlsgd_signed43_reloc;
-extern struct kvx_reloc kv3_v1_tlsld_signed37_reloc;
-extern struct kvx_reloc kv3_v1_tlsld_signed43_reloc;
-extern struct kvx_reloc kv3_v1_tpoff64_reloc;
-extern struct kvx_reloc kv3_v1_tlsie_signed37_reloc;
-extern struct kvx_reloc kv3_v1_tlsie_signed43_reloc;
-extern struct kvx_reloc kv3_v1_tlsle_signed37_reloc;
-extern struct kvx_reloc kv3_v1_tlsle_signed43_reloc;
-extern struct kvx_reloc kv3_v1_rel8_reloc;
+extern struct lvx_reloc kv3_v1_rel16_reloc;
+extern struct lvx_reloc kv3_v1_rel32_reloc;
+extern struct lvx_reloc kv3_v1_rel64_reloc;
+extern struct lvx_reloc kv3_v1_pcrel_signed16_reloc;
+extern struct lvx_reloc kv3_v1_pcrel17_reloc;
+extern struct lvx_reloc kv3_v1_pcrel27_reloc;
+extern struct lvx_reloc kv3_v1_pcrel32_reloc;
+extern struct lvx_reloc kv3_v1_pcrel_signed37_reloc;
+extern struct lvx_reloc kv3_v1_pcrel_signed43_reloc;
+extern struct lvx_reloc kv3_v1_pcrel_signed64_reloc;
+extern struct lvx_reloc kv3_v1_pcrel64_reloc;
+extern struct lvx_reloc kv3_v1_signed16_reloc;
+extern struct lvx_reloc kv3_v1_signed32_reloc;
+extern struct lvx_reloc kv3_v1_signed37_reloc;
+extern struct lvx_reloc kv3_v1_gotoff_signed37_reloc;
+extern struct lvx_reloc kv3_v1_gotoff_signed43_reloc;
+extern struct lvx_reloc kv3_v1_gotoff_32_reloc;
+extern struct lvx_reloc kv3_v1_gotoff_64_reloc;
+extern struct lvx_reloc kv3_v1_got_32_reloc;
+extern struct lvx_reloc kv3_v1_got_signed37_reloc;
+extern struct lvx_reloc kv3_v1_got_signed43_reloc;
+extern struct lvx_reloc kv3_v1_got_64_reloc;
+extern struct lvx_reloc kv3_v1_glob_dat_reloc;
+extern struct lvx_reloc kv3_v1_copy_reloc;
+extern struct lvx_reloc kv3_v1_jump_slot_reloc;
+extern struct lvx_reloc kv3_v1_relative_reloc;
+extern struct lvx_reloc kv3_v1_signed43_reloc;
+extern struct lvx_reloc kv3_v1_signed64_reloc;
+extern struct lvx_reloc kv3_v1_gotaddr_signed37_reloc;
+extern struct lvx_reloc kv3_v1_gotaddr_signed43_reloc;
+extern struct lvx_reloc kv3_v1_gotaddr_signed64_reloc;
+extern struct lvx_reloc kv3_v1_dtpmod64_reloc;
+extern struct lvx_reloc kv3_v1_dtpoff64_reloc;
+extern struct lvx_reloc kv3_v1_dtpoff_signed37_reloc;
+extern struct lvx_reloc kv3_v1_dtpoff_signed43_reloc;
+extern struct lvx_reloc kv3_v1_tlsgd_signed37_reloc;
+extern struct lvx_reloc kv3_v1_tlsgd_signed43_reloc;
+extern struct lvx_reloc kv3_v1_tlsld_signed37_reloc;
+extern struct lvx_reloc kv3_v1_tlsld_signed43_reloc;
+extern struct lvx_reloc kv3_v1_tpoff64_reloc;
+extern struct lvx_reloc kv3_v1_tlsie_signed37_reloc;
+extern struct lvx_reloc kv3_v1_tlsie_signed43_reloc;
+extern struct lvx_reloc kv3_v1_tlsle_signed37_reloc;
+extern struct lvx_reloc kv3_v1_tlsle_signed43_reloc;
+extern struct lvx_reloc kv3_v1_rel8_reloc;
 
-#define KV3_V2_REGFILE_FIRST_SFR KVX_REGFILE_FIRST_SFR
-#define KV3_V2_REGFILE_LAST_SFR KVX_REGFILE_LAST_SFR
-#define KV3_V2_REGFILE_DEC_SFR KVX_REGFILE_DEC_SFR
-#define KV3_V2_REGFILE_FIRST_GPR KVX_REGFILE_FIRST_GPR
-#define KV3_V2_REGFILE_LAST_GPR KVX_REGFILE_LAST_GPR
-#define KV3_V2_REGFILE_DEC_GPR KVX_REGFILE_DEC_GPR
+#define KV3_V2_REGFILE_FIRST_SFR LVX_REGFILE_FIRST_SFR
+#define KV3_V2_REGFILE_LAST_SFR LVX_REGFILE_LAST_SFR
+#define KV3_V2_REGFILE_DEC_SFR LVX_REGFILE_DEC_SFR
+#define KV3_V2_REGFILE_FIRST_GPR LVX_REGFILE_FIRST_GPR
+#define KV3_V2_REGFILE_LAST_GPR LVX_REGFILE_LAST_GPR
+#define KV3_V2_REGFILE_DEC_GPR LVX_REGFILE_DEC_GPR
 #define KV3_V2_REGFILE_FIRST_PGR 6
 #define KV3_V2_REGFILE_LAST_PGR 7
 #define KV3_V2_REGFILE_DEC_PGR 8
@@ -1144,7 +1134,7 @@ extern struct kvx_reloc kv3_v1_rel8_reloc;
 
 extern int kv3_v2_regfiles[];
 extern const char **kv3_v2_modifiers[];
-extern struct kvx_register kv3_v2_registers[];
+extern struct lvx_register kv3_v2_registers[];
 
 extern int kv3_v2_dec_registers[];
 
@@ -2079,58 +2069,58 @@ typedef enum {
   Reservation_kv3_v2_MAU_AUXR_Y,
 } Reservation_kv3_v2;
 
-extern struct kvx_reloc kv3_v2_rel16_reloc;
-extern struct kvx_reloc kv3_v2_rel32_reloc;
-extern struct kvx_reloc kv3_v2_rel64_reloc;
-extern struct kvx_reloc kv3_v2_pcrel_signed16_reloc;
-extern struct kvx_reloc kv3_v2_pcrel17_reloc;
-extern struct kvx_reloc kv3_v2_pcrel27_reloc;
-extern struct kvx_reloc kv3_v2_pcrel32_reloc;
-extern struct kvx_reloc kv3_v2_pcrel_signed37_reloc;
-extern struct kvx_reloc kv3_v2_pcrel_signed43_reloc;
-extern struct kvx_reloc kv3_v2_pcrel_signed64_reloc;
-extern struct kvx_reloc kv3_v2_pcrel64_reloc;
-extern struct kvx_reloc kv3_v2_signed16_reloc;
-extern struct kvx_reloc kv3_v2_signed32_reloc;
-extern struct kvx_reloc kv3_v2_signed37_reloc;
-extern struct kvx_reloc kv3_v2_gotoff_signed37_reloc;
-extern struct kvx_reloc kv3_v2_gotoff_signed43_reloc;
-extern struct kvx_reloc kv3_v2_gotoff_32_reloc;
-extern struct kvx_reloc kv3_v2_gotoff_64_reloc;
-extern struct kvx_reloc kv3_v2_got_32_reloc;
-extern struct kvx_reloc kv3_v2_got_signed37_reloc;
-extern struct kvx_reloc kv3_v2_got_signed43_reloc;
-extern struct kvx_reloc kv3_v2_got_64_reloc;
-extern struct kvx_reloc kv3_v2_glob_dat_reloc;
-extern struct kvx_reloc kv3_v2_copy_reloc;
-extern struct kvx_reloc kv3_v2_jump_slot_reloc;
-extern struct kvx_reloc kv3_v2_relative_reloc;
-extern struct kvx_reloc kv3_v2_signed43_reloc;
-extern struct kvx_reloc kv3_v2_signed64_reloc;
-extern struct kvx_reloc kv3_v2_gotaddr_signed37_reloc;
-extern struct kvx_reloc kv3_v2_gotaddr_signed43_reloc;
-extern struct kvx_reloc kv3_v2_gotaddr_signed64_reloc;
-extern struct kvx_reloc kv3_v2_dtpmod64_reloc;
-extern struct kvx_reloc kv3_v2_dtpoff64_reloc;
-extern struct kvx_reloc kv3_v2_dtpoff_signed37_reloc;
-extern struct kvx_reloc kv3_v2_dtpoff_signed43_reloc;
-extern struct kvx_reloc kv3_v2_tlsgd_signed37_reloc;
-extern struct kvx_reloc kv3_v2_tlsgd_signed43_reloc;
-extern struct kvx_reloc kv3_v2_tlsld_signed37_reloc;
-extern struct kvx_reloc kv3_v2_tlsld_signed43_reloc;
-extern struct kvx_reloc kv3_v2_tpoff64_reloc;
-extern struct kvx_reloc kv3_v2_tlsie_signed37_reloc;
-extern struct kvx_reloc kv3_v2_tlsie_signed43_reloc;
-extern struct kvx_reloc kv3_v2_tlsle_signed37_reloc;
-extern struct kvx_reloc kv3_v2_tlsle_signed43_reloc;
-extern struct kvx_reloc kv3_v2_rel8_reloc;
+extern struct lvx_reloc kv3_v2_rel16_reloc;
+extern struct lvx_reloc kv3_v2_rel32_reloc;
+extern struct lvx_reloc kv3_v2_rel64_reloc;
+extern struct lvx_reloc kv3_v2_pcrel_signed16_reloc;
+extern struct lvx_reloc kv3_v2_pcrel17_reloc;
+extern struct lvx_reloc kv3_v2_pcrel27_reloc;
+extern struct lvx_reloc kv3_v2_pcrel32_reloc;
+extern struct lvx_reloc kv3_v2_pcrel_signed37_reloc;
+extern struct lvx_reloc kv3_v2_pcrel_signed43_reloc;
+extern struct lvx_reloc kv3_v2_pcrel_signed64_reloc;
+extern struct lvx_reloc kv3_v2_pcrel64_reloc;
+extern struct lvx_reloc kv3_v2_signed16_reloc;
+extern struct lvx_reloc kv3_v2_signed32_reloc;
+extern struct lvx_reloc kv3_v2_signed37_reloc;
+extern struct lvx_reloc kv3_v2_gotoff_signed37_reloc;
+extern struct lvx_reloc kv3_v2_gotoff_signed43_reloc;
+extern struct lvx_reloc kv3_v2_gotoff_32_reloc;
+extern struct lvx_reloc kv3_v2_gotoff_64_reloc;
+extern struct lvx_reloc kv3_v2_got_32_reloc;
+extern struct lvx_reloc kv3_v2_got_signed37_reloc;
+extern struct lvx_reloc kv3_v2_got_signed43_reloc;
+extern struct lvx_reloc kv3_v2_got_64_reloc;
+extern struct lvx_reloc kv3_v2_glob_dat_reloc;
+extern struct lvx_reloc kv3_v2_copy_reloc;
+extern struct lvx_reloc kv3_v2_jump_slot_reloc;
+extern struct lvx_reloc kv3_v2_relative_reloc;
+extern struct lvx_reloc kv3_v2_signed43_reloc;
+extern struct lvx_reloc kv3_v2_signed64_reloc;
+extern struct lvx_reloc kv3_v2_gotaddr_signed37_reloc;
+extern struct lvx_reloc kv3_v2_gotaddr_signed43_reloc;
+extern struct lvx_reloc kv3_v2_gotaddr_signed64_reloc;
+extern struct lvx_reloc kv3_v2_dtpmod64_reloc;
+extern struct lvx_reloc kv3_v2_dtpoff64_reloc;
+extern struct lvx_reloc kv3_v2_dtpoff_signed37_reloc;
+extern struct lvx_reloc kv3_v2_dtpoff_signed43_reloc;
+extern struct lvx_reloc kv3_v2_tlsgd_signed37_reloc;
+extern struct lvx_reloc kv3_v2_tlsgd_signed43_reloc;
+extern struct lvx_reloc kv3_v2_tlsld_signed37_reloc;
+extern struct lvx_reloc kv3_v2_tlsld_signed43_reloc;
+extern struct lvx_reloc kv3_v2_tpoff64_reloc;
+extern struct lvx_reloc kv3_v2_tlsie_signed37_reloc;
+extern struct lvx_reloc kv3_v2_tlsie_signed43_reloc;
+extern struct lvx_reloc kv3_v2_tlsle_signed37_reloc;
+extern struct lvx_reloc kv3_v2_tlsle_signed43_reloc;
+extern struct lvx_reloc kv3_v2_rel8_reloc;
 
-#define KV4_V1_REGFILE_FIRST_SFR KVX_REGFILE_FIRST_SFR
-#define KV4_V1_REGFILE_LAST_SFR KVX_REGFILE_LAST_SFR
-#define KV4_V1_REGFILE_DEC_SFR KVX_REGFILE_DEC_SFR
-#define KV4_V1_REGFILE_FIRST_GPR KVX_REGFILE_FIRST_GPR
-#define KV4_V1_REGFILE_LAST_GPR KVX_REGFILE_LAST_GPR
-#define KV4_V1_REGFILE_DEC_GPR KVX_REGFILE_DEC_GPR
+#define KV4_V1_REGFILE_FIRST_SFR LVX_REGFILE_FIRST_SFR
+#define KV4_V1_REGFILE_LAST_SFR LVX_REGFILE_LAST_SFR
+#define KV4_V1_REGFILE_DEC_SFR LVX_REGFILE_DEC_SFR
+#define KV4_V1_REGFILE_FIRST_GPR LVX_REGFILE_FIRST_GPR
+#define KV4_V1_REGFILE_LAST_GPR LVX_REGFILE_LAST_GPR
+#define KV4_V1_REGFILE_DEC_GPR LVX_REGFILE_DEC_GPR
 #define KV4_V1_REGFILE_FIRST_CSR 6
 #define KV4_V1_REGFILE_LAST_CSR 7
 #define KV4_V1_REGFILE_DEC_CSR 8
@@ -2188,7 +2178,7 @@ extern struct kvx_reloc kv3_v2_rel8_reloc;
 
 extern int kv4_v1_regfiles[];
 extern const char **kv4_v1_modifiers[];
-extern struct kvx_register kv4_v1_registers[];
+extern struct lvx_register kv4_v1_registers[];
 
 extern int kv4_v1_dec_registers[];
 
@@ -3379,55 +3369,55 @@ typedef enum {
   Reservation_kv4_v1_EXT_MISC_AUXW,
 } Reservation_kv4_v1;
 
-extern struct kvx_reloc kv4_v1_rel16_reloc;
-extern struct kvx_reloc kv4_v1_rel32_reloc;
-extern struct kvx_reloc kv4_v1_rel64_reloc;
-extern struct kvx_reloc kv4_v1_pcrel_signed16_reloc;
-extern struct kvx_reloc kv4_v1_pcrel32_reloc;
-extern struct kvx_reloc kv4_v1_pcrel_signed37_reloc;
-extern struct kvx_reloc kv4_v1_pcrel_signed43_reloc;
-extern struct kvx_reloc kv4_v1_pcrel_signed64_reloc;
-extern struct kvx_reloc kv4_v1_pcrel64_reloc;
-extern struct kvx_reloc kv4_v1_signed16_reloc;
-extern struct kvx_reloc kv4_v1_signed32_reloc;
-extern struct kvx_reloc kv4_v1_signed37_reloc;
-extern struct kvx_reloc kv4_v1_gotoff_signed37_reloc;
-extern struct kvx_reloc kv4_v1_gotoff_signed43_reloc;
-extern struct kvx_reloc kv4_v1_gotoff_32_reloc;
-extern struct kvx_reloc kv4_v1_gotoff_64_reloc;
-extern struct kvx_reloc kv4_v1_got_32_reloc;
-extern struct kvx_reloc kv4_v1_got_signed37_reloc;
-extern struct kvx_reloc kv4_v1_got_signed43_reloc;
-extern struct kvx_reloc kv4_v1_got_64_reloc;
-extern struct kvx_reloc kv4_v1_glob_dat_reloc;
-extern struct kvx_reloc kv4_v1_copy_reloc;
-extern struct kvx_reloc kv4_v1_jump_slot_reloc;
-extern struct kvx_reloc kv4_v1_relative_reloc;
-extern struct kvx_reloc kv4_v1_signed43_reloc;
-extern struct kvx_reloc kv4_v1_signed64_reloc;
-extern struct kvx_reloc kv4_v1_gotaddr_signed37_reloc;
-extern struct kvx_reloc kv4_v1_gotaddr_signed43_reloc;
-extern struct kvx_reloc kv4_v1_gotaddr_signed64_reloc;
-extern struct kvx_reloc kv4_v1_dtpmod64_reloc;
-extern struct kvx_reloc kv4_v1_dtpoff64_reloc;
-extern struct kvx_reloc kv4_v1_dtpoff_signed37_reloc;
-extern struct kvx_reloc kv4_v1_dtpoff_signed43_reloc;
-extern struct kvx_reloc kv4_v1_tlsgd_signed37_reloc;
-extern struct kvx_reloc kv4_v1_tlsgd_signed43_reloc;
-extern struct kvx_reloc kv4_v1_tlsld_signed37_reloc;
-extern struct kvx_reloc kv4_v1_tlsld_signed43_reloc;
-extern struct kvx_reloc kv4_v1_tpoff64_reloc;
-extern struct kvx_reloc kv4_v1_tlsie_signed37_reloc;
-extern struct kvx_reloc kv4_v1_tlsie_signed43_reloc;
-extern struct kvx_reloc kv4_v1_tlsle_signed37_reloc;
-extern struct kvx_reloc kv4_v1_tlsle_signed43_reloc;
-extern struct kvx_reloc kv4_v1_rel8_reloc;
-extern struct kvx_reloc kv4_v1_pcrel11s2_reloc;
-extern struct kvx_reloc kv4_v1_pcrel17s2_reloc;
-extern struct kvx_reloc kv4_v1_pcrel27s2_reloc;
-extern struct kvx_reloc kv4_v1_pcrel38s2_reloc;
-extern struct kvx_reloc kv4_v1_pcrel44s2_reloc;
-extern struct kvx_reloc kv4_v1_pcrel54s2_reloc;
+extern struct lvx_reloc kv4_v1_rel16_reloc;
+extern struct lvx_reloc kv4_v1_rel32_reloc;
+extern struct lvx_reloc kv4_v1_rel64_reloc;
+extern struct lvx_reloc kv4_v1_pcrel_signed16_reloc;
+extern struct lvx_reloc kv4_v1_pcrel32_reloc;
+extern struct lvx_reloc kv4_v1_pcrel_signed37_reloc;
+extern struct lvx_reloc kv4_v1_pcrel_signed43_reloc;
+extern struct lvx_reloc kv4_v1_pcrel_signed64_reloc;
+extern struct lvx_reloc kv4_v1_pcrel64_reloc;
+extern struct lvx_reloc kv4_v1_signed16_reloc;
+extern struct lvx_reloc kv4_v1_signed32_reloc;
+extern struct lvx_reloc kv4_v1_signed37_reloc;
+extern struct lvx_reloc kv4_v1_gotoff_signed37_reloc;
+extern struct lvx_reloc kv4_v1_gotoff_signed43_reloc;
+extern struct lvx_reloc kv4_v1_gotoff_32_reloc;
+extern struct lvx_reloc kv4_v1_gotoff_64_reloc;
+extern struct lvx_reloc kv4_v1_got_32_reloc;
+extern struct lvx_reloc kv4_v1_got_signed37_reloc;
+extern struct lvx_reloc kv4_v1_got_signed43_reloc;
+extern struct lvx_reloc kv4_v1_got_64_reloc;
+extern struct lvx_reloc kv4_v1_glob_dat_reloc;
+extern struct lvx_reloc kv4_v1_copy_reloc;
+extern struct lvx_reloc kv4_v1_jump_slot_reloc;
+extern struct lvx_reloc kv4_v1_relative_reloc;
+extern struct lvx_reloc kv4_v1_signed43_reloc;
+extern struct lvx_reloc kv4_v1_signed64_reloc;
+extern struct lvx_reloc kv4_v1_gotaddr_signed37_reloc;
+extern struct lvx_reloc kv4_v1_gotaddr_signed43_reloc;
+extern struct lvx_reloc kv4_v1_gotaddr_signed64_reloc;
+extern struct lvx_reloc kv4_v1_dtpmod64_reloc;
+extern struct lvx_reloc kv4_v1_dtpoff64_reloc;
+extern struct lvx_reloc kv4_v1_dtpoff_signed37_reloc;
+extern struct lvx_reloc kv4_v1_dtpoff_signed43_reloc;
+extern struct lvx_reloc kv4_v1_tlsgd_signed37_reloc;
+extern struct lvx_reloc kv4_v1_tlsgd_signed43_reloc;
+extern struct lvx_reloc kv4_v1_tlsld_signed37_reloc;
+extern struct lvx_reloc kv4_v1_tlsld_signed43_reloc;
+extern struct lvx_reloc kv4_v1_tpoff64_reloc;
+extern struct lvx_reloc kv4_v1_tlsie_signed37_reloc;
+extern struct lvx_reloc kv4_v1_tlsie_signed43_reloc;
+extern struct lvx_reloc kv4_v1_tlsle_signed37_reloc;
+extern struct lvx_reloc kv4_v1_tlsle_signed43_reloc;
+extern struct lvx_reloc kv4_v1_rel8_reloc;
+extern struct lvx_reloc kv4_v1_pcrel11s2_reloc;
+extern struct lvx_reloc kv4_v1_pcrel17s2_reloc;
+extern struct lvx_reloc kv4_v1_pcrel27s2_reloc;
+extern struct lvx_reloc kv4_v1_pcrel38s2_reloc;
+extern struct lvx_reloc kv4_v1_pcrel44s2_reloc;
+extern struct lvx_reloc kv4_v1_pcrel54s2_reloc;
 
 
-#endif /* OPCODE_KVX_H */
+#endif /* OPCODE_LVX_H */

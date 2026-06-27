@@ -15,7 +15,7 @@
 #   along with this program; see the file COPYING3. If not,
 #   see <http://www.gnu.org/licenses/>.  */
 
-if {!([istarget "kvx*-*-*"])
+if {!([istarget "lvx*-*-*"])
     || ![is_elf_format]
     || [is_remote host]} then {
     return
@@ -23,8 +23,8 @@ if {!([istarget "kvx*-*-*"])
 
 global tempfile
 global copyfile
-set tempfile tmpdir/kvxtemp.o
-set copyfile tmpdir/kvxcopy
+set tempfile tmpdir/lvxtemp.o
+set copyfile tmpdir/lvxcopy
 
 ## binutils test framework does not support the 'dump' EXTRA args to
 ## simply share a single .s for 32 and 64bits test.

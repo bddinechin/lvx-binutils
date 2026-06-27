@@ -1,4 +1,4 @@
-/* KVX-specific backend routines.
+/* LVX-specific backend routines.
    Copyright (C) 2009-2024 Free Software Foundation, Inc.
    Contributed by Kalray SA.
 
@@ -23,44 +23,44 @@
 #include "stdint.h"
 
 
-/* KVX stub generation support for ELF64.  Called from the linker.  */
-extern int elf64_kvx_setup_section_lists
+/* LVX stub generation support for ELF64.  Called from the linker.  */
+extern int elf64_lvx_setup_section_lists
   (bfd *, struct bfd_link_info *);
-extern void elf64_kvx_next_input_section
+extern void elf64_lvx_next_input_section
   (struct bfd_link_info *, struct bfd_section *);
-extern bool elf64_kvx_size_stubs
+extern bool elf64_lvx_size_stubs
   (bfd *, bfd *, struct bfd_link_info *, bfd_signed_vma,
    struct bfd_section * (*) (const char *, struct bfd_section *),
    void (*) (void));
-extern bool elf64_kvx_build_stubs
+extern bool elf64_lvx_build_stubs
   (struct bfd_link_info *);
-/* Kvx stub generation support for ELF32.  Called from the linker.  */
-extern int elf32_kvx_setup_section_lists
+/* Lvx stub generation support for ELF32.  Called from the linker.  */
+extern int elf32_lvx_setup_section_lists
   (bfd *, struct bfd_link_info *);
-extern void elf32_kvx_next_input_section
+extern void elf32_lvx_next_input_section
   (struct bfd_link_info *, struct bfd_section *);
-extern bool elf32_kvx_size_stubs
+extern bool elf32_lvx_size_stubs
   (bfd *, bfd *, struct bfd_link_info *, bfd_signed_vma,
    struct bfd_section * (*) (const char *, struct bfd_section *),
    void (*) (void));
-extern bool elf32_kvx_build_stubs
+extern bool elf32_lvx_build_stubs
   (struct bfd_link_info *);
 
 
 extern bfd_reloc_status_type
-_bfd_kvx_elf_put_addend (bfd *, bfd_byte *, bfd_reloc_code_real_type,
+_bfd_lvx_elf_put_addend (bfd *, bfd_byte *, bfd_reloc_code_real_type,
 			     reloc_howto_type *, bfd_signed_vma);
 
 bool
-kvx_elf32_init_stub_bfd (struct bfd_link_info *info,
+lvx_elf32_init_stub_bfd (struct bfd_link_info *info,
 			bfd *stub_bfd);
 bool
-kvx_elf64_init_stub_bfd (struct bfd_link_info *info,
+lvx_elf64_init_stub_bfd (struct bfd_link_info *info,
 			bfd *stub_bfd);
 
-bool _bfd_kvx_elf_grok_prstatus (bfd *abfd, Elf_Internal_Note *note);
+bool _bfd_lvx_elf_grok_prstatus (bfd *abfd, Elf_Internal_Note *note);
 
-bool _bfd_kvx_elf_grok_psinfo (bfd *abfd, Elf_Internal_Note *note);
+bool _bfd_lvx_elf_grok_psinfo (bfd *abfd, Elf_Internal_Note *note);
 
-#define elf_backend_grok_prstatus _bfd_kvx_elf_grok_prstatus
-#define elf_backend_grok_psinfo _bfd_kvx_elf_grok_psinfo
+#define elf_backend_grok_prstatus _bfd_lvx_elf_grok_prstatus
+#define elf_backend_grok_psinfo _bfd_lvx_elf_grok_psinfo

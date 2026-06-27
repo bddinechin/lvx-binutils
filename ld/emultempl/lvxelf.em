@@ -19,21 +19,21 @@
 # see <http://www.gnu.org/licenses/>.
 #
 
-# This file is sourced from elf32.em, and defines extra kvx-elf
+# This file is sourced from elf32.em, and defines extra lvx-elf
 # specific routines.
 #
 fragment <<EOF
 
 #include "ldctor.h"
-#include "elf/kvx.h"
-#include "elfxx-kvx.h"
+#include "elf/lvx.h"
+#include "elfxx-lvx.h"
 
 
 static void
-elf${ELFSIZE}_kvx_before_allocation (void)
+elf${ELFSIZE}_lvx_before_allocation (void)
 {
 EOF
-if test x"${EMULATION_NAME}" != x"elf64kvx_linux"; then
+if test x"${EMULATION_NAME}" != x"elf64lvx_linux"; then
 fragment <<EOF
   if (bfd_link_pie (&link_info)) {
           einfo (_("%F:%P: -pie not supported\n"));
@@ -136,13 +136,13 @@ hook_in_stub (struct hook_stub_info *info, lang_statement_union_type **lp)
 }
 
 
-/* Call-back for elf${ELFSIZE}_kvx_size_stubs.  */
+/* Call-back for elf${ELFSIZE}_lvx_size_stubs.  */
 
 /* Create a new stub section, and arrange for it to be linked
    immediately after INPUT_SECTION.  */
 
 static asection *
-elf${ELFSIZE}_kvx_add_stub_section (const char *stub_sec_name,
+elf${ELFSIZE}_lvx_add_stub_section (const char *stub_sec_name,
                                     asection *input_section)
 {
   asection *stub_sec;
@@ -178,10 +178,10 @@ elf${ELFSIZE}_kvx_add_stub_section (const char *stub_sec_name,
   return NULL;
 }
 
-/* Another call-back for elf${ELFSIZE}_kvx_size_stubs.  */
+/* Another call-back for elf${ELFSIZE}_lvx_size_stubs.  */
 
 static void
-gldkvx_layout_sections_again (void)
+gldlvx_layout_sections_again (void)
 {
   /* If we have changed sizes of the stub sections, then we need
      to recalculate all the section offsets.  This may mean we need to
@@ -201,7 +201,7 @@ build_section_lists (lang_statement_union_type *statement)
 	  && (i->flags & SEC_EXCLUDE) == 0
 	  && i->output_section != NULL
 	  && i->output_section->owner == link_info.output_bfd)
-	elf${ELFSIZE}_kvx_next_input_section (& link_info, i);
+	elf${ELFSIZE}_lvx_next_input_section (& link_info, i);
     }
 }
 
@@ -227,7 +227,7 @@ gld${EMULATION_NAME}_after_allocation (void)
      have to examine the relocs.  */
   if (stub_file != NULL && !bfd_link_relocatable (&link_info))
     {
-      ret = elf${ELFSIZE}_kvx_setup_section_lists (link_info.output_bfd,
+      ret = elf${ELFSIZE}_lvx_setup_section_lists (link_info.output_bfd,
 						       &link_info);
       if (ret != 0)
 	{
@@ -240,12 +240,12 @@ gld${EMULATION_NAME}_after_allocation (void)
 	  lang_for_each_statement (build_section_lists);
 
 	  /* Call into the BFD backend to do the real work.  */
-	  if (! elf${ELFSIZE}_kvx_size_stubs (link_info.output_bfd,
+	  if (! elf${ELFSIZE}_lvx_size_stubs (link_info.output_bfd,
 					  stub_file->the_bfd,
 					  & link_info,
 					  group_size,
-					  & elf${ELFSIZE}_kvx_add_stub_section,
-					  & gldkvx_layout_sections_again))
+					  & elf${ELFSIZE}_lvx_add_stub_section,
+					  & gldlvx_layout_sections_again))
 	    {
 	      einfo ("%X%P: cannot size stub section: %E\n");
 	      return;
@@ -266,7 +266,7 @@ gld${EMULATION_NAME}_finish (void)
       if (stub_file != NULL
 	  && stub_file->the_bfd->sections != NULL)
 	{
-	  if (! elf${ELFSIZE}_kvx_build_stubs (& link_info))
+	  if (! elf${ELFSIZE}_lvx_build_stubs (& link_info))
 	    einfo ("%X%P: can not build stubs: %E\n");
 	}
     }
@@ -277,10 +277,10 @@ gld${EMULATION_NAME}_finish (void)
 /* This is a convenient point to tell BFD about target specific flags.
    After the output has been created, but before inputs are read.  */
 static void
-kvx_elf_create_output_section_statements (void)
+lvx_elf_create_output_section_statements (void)
 {
   if (!(bfd_get_flavour (link_info.output_bfd) == bfd_target_elf_flavour
-        && elf_object_id (link_info.output_bfd) == KVX_ELF_DATA))
+        && elf_object_id (link_info.output_bfd) == LVX_ELF_DATA))
     return;
 
   stub_file = lang_add_input_file ("linker stubs",
@@ -299,18 +299,18 @@ kvx_elf_create_output_section_statements (void)
   stub_file->the_bfd->flags |= BFD_LINKER_CREATED;
   ldlang_add_file (stub_file);
 
-  if (!kvx_elf${ELFSIZE}_init_stub_bfd (&link_info, stub_file->the_bfd))
+  if (!lvx_elf${ELFSIZE}_init_stub_bfd (&link_info, stub_file->the_bfd))
     einfo ("%F%P: can not init BFD: %E\n");
 }
 
 
-#define lang_for_each_input_file kvx_lang_for_each_input_file
+#define lang_for_each_input_file lvx_lang_for_each_input_file
 
 EOF
 
-LDEMUL_BEFORE_ALLOCATION=elf${ELFSIZE}_kvx_before_allocation
+LDEMUL_BEFORE_ALLOCATION=elf${ELFSIZE}_lvx_before_allocation
 LDEMUL_AFTER_ALLOCATION=gld${EMULATION_NAME}_after_allocation
-LDEMUL_CREATE_OUTPUT_SECTION_STATEMENTS=kvx_elf_create_output_section_statements
+LDEMUL_CREATE_OUTPUT_SECTION_STATEMENTS=lvx_elf_create_output_section_statements
 
 # Call the extra arm-elf function
 LDEMUL_FINISH=gld${EMULATION_NAME}_finish
