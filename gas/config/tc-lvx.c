@@ -64,7 +64,6 @@ struct lvx_as_env env = {
     .abi_set = 0,
     .osabi_set = 0,
     .pic_flags = 0,
-    .arch_size = 64
   },
   .opts = {
     .march = NULL,
@@ -233,7 +232,7 @@ get_byte_counter (asection * sec)
 const char *
 lvx_target_format (void)
 {
-  return env.params.arch_size == 64 ? "elf64-lvx" : "elf32-lvx";
+  return "elf64-lvx";
 }
 
 /****************************************************/
@@ -369,7 +368,6 @@ const char *md_shortopts = "hV";	/* Catted to std short options.  */
 #define OPTION_PIC                   (OPTION_MD_BASE + 4)
 #define OPTION_BIGPIC                (OPTION_MD_BASE + 5)
 #define OPTION_NOPIC                 (OPTION_MD_BASE + 6)
-#define OPTION_32                    (OPTION_MD_BASE + 7)
 #define OPTION_DUMPINSN              (OPTION_MD_BASE + 8)
 #define OPTION_ALL_SFR               (OPTION_MD_BASE + 9)
 #define OPTION_DIAGNOSTICS           (OPTION_MD_BASE + 10)
@@ -385,7 +383,6 @@ struct option md_longopts[] = {
   { "mpic",                  no_argument,       NULL, OPTION_PIC                   },
   { "mPIC",                  no_argument,       NULL, OPTION_BIGPIC                },
   { "mnopic",                no_argument,       NULL, OPTION_NOPIC                 },
-  { "m32",                   no_argument,       NULL, OPTION_32                    },
   { "dump-insn",             no_argument,       NULL, OPTION_DUMPINSN              },
   { "all-sfr",               no_argument,       NULL, OPTION_ALL_SFR               },
   { "diagnostics",           no_argument,       NULL, OPTION_DIAGNOSTICS           },
@@ -470,10 +467,6 @@ md_parse_option (int c, const char *arg ATTRIBUTE_UNUSED)
     case OPTION_NOPIC:
       env.params.pic_flags &= ~(ELF_LVX_ABI_PIC_BIT);
       break;
-    case OPTION_32:
-      env.params.arch_size = 32;
-      break;
-
     default:
       return 0;
     }
@@ -541,8 +534,7 @@ lvx_get_pseudo_func2 (symbolS *sym, struct lvx_operand * opnd)
     if (sym == lvx_core_info->pseudo_funcs[i].sym)
       for (int rel_idx = 0; rel_idx < opnd->reloc_nb; rel_idx++)
 	if (opnd->relocs[rel_idx] == lvx_core_info->pseudo_funcs[i].pseudo_relocs.kreloc
-	    && (env.params.arch_size == (int) lvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes
-	      || lvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes == PSEUDO_ALL))
+	    && lvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes != PSEUDO_32_ONLY)
 	  return &lvx_core_info->pseudo_funcs[i];
 
   return NULL;
@@ -2483,8 +2475,7 @@ lvx_end (void)
   /* (pp) the flags must be set at once.  */
   newflags = env.params.core | env.params.abi | env.params.pic_flags;
 
-  if (env.params.arch_size == 64)
-    newflags |= ELF_LVX_ABI_64B_ADDR_BIT;
+  newflags |= ELF_LVX_ABI_64B_ADDR_BIT;
 
   bfd_set_private_flags (stdoutput, newflags);
 

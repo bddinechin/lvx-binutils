@@ -546,7 +546,6 @@ BFD64_BACKENDS = \
 	coff64-rs6000.lo \
 	elf32-aarch64.lo \
 	elf32-ia64.lo \
-	elf32-lvx.lo \
 	elf32-loongarch.lo \
 	elf32-mips.lo \
 	elf32-riscv.lo \
@@ -690,7 +689,7 @@ SOURCE_CFILES = \
 
 BUILD_CFILES = \
 	elf32-aarch64.c elf64-aarch64.c \
-	elf32-lvx.c elf64-lvx.c \
+	elf64-lvx.c \
 	elf32-ia64.c elf64-ia64.c \
 	elf32-loongarch.c elf64-loongarch.c \
 	elf32-riscv.c elf64-riscv.c \
@@ -860,10 +859,6 @@ elf32-ia64.c : elfnn-ia64.c
 elf64-ia64.c : elfnn-ia64.c
 	$(AM_V_at)echo "#line 1 \"$<\"" > $@
 	$(AM_V_GEN)$(SED) -e s/NN/64/g < $< >> $@
-
-elf32-lvx.c : elfnn-lvx.c
-	$(AM_V_at)echo "#line 1 \"$<\"" > $@
-	$(AM_V_GEN)$(SED) -e s/NN/32/g < $< >> $@
 
 elf64-lvx.c : elfnn-lvx.c
 	$(AM_V_at)echo "#line 1 \"$<\"" > $@

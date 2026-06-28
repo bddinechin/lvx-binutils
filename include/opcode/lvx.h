@@ -129,9 +129,8 @@ struct lvx_pseudo_relocs
   int bitsize;
 
   /* Used when pseudo func should expand to different relocations
-     based on the 32/64 bits mode.
-     Enum values should match the lvx_arch_size var set by -m32
-   */
+     based on the address size mode.  LVX is LP64 only, so PSEUDO_32_ONLY
+     entries are never selected.  */
   enum
   {
     PSEUDO_ALL = 0,

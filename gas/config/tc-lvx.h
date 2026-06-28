@@ -149,8 +149,6 @@ struct lvx_as_params {
   int osabi_set;
   /* Flags controlling Position-Independent Code.  */
   flagword pic_flags;
-  /* Either 32 or 64.  */
-  int arch_size;
 };
 
 extern struct lvx_as_params lvx_params;

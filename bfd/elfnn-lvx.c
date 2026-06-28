@@ -30,13 +30,7 @@
 
 #define ARCH_SIZE	NN
 
-#if ARCH_SIZE == 64
 #define LOG_FILE_ALIGN	3
-#endif
-
-#if ARCH_SIZE == 32
-#define LOG_FILE_ALIGN	2
-#endif
 
 #define IS_LVX_TLS_RELOC(R_TYPE)			\
   ((R_TYPE) == BFD_RELOC_LVX_S37_TLS_LE_LO10	\
@@ -100,21 +94,13 @@ static const bfd_byte elfNN_lvx_small_plt_entry[][PLT_SMALL_ENTRY_SIZE] =
 {
   {	/* bfd_mach_lvx_major_3 */
     0x10, 0x00, 0xc4, 0x0f,	/* get $r16 = $pc     ;; */
-#if ARCH_SIZE == 32
-    0x10, 0x00, 0x40, 0xb0,	/* lwz $r16 = 0[$r16]   ;; */
-#else
     0x10, 0x00, 0x40, 0xb8,	/* ld $r16 = 0[$r16] ;; */
-#endif
     0x00, 0x00, 0x00, 0x18,	/* zero upper 27 bits for LSU, exunum = 3 */
     0x10, 0x00, 0xd8, 0x0f,	/* igoto $r16          ;; */
   },
   {	/* bfd_mach_lvx_major_4 */
     0x10, 0x00, 0xc4, 0x0f,	/* get $r16 = $pc     ;; */
-#if ARCH_SIZE == 32
-    0x10, 0x00, 0x40, 0xb0,	/* lwz $r16 = 0[$r16]   ;; */
-#else
     0x10, 0x00, 0x40, 0xb8,	/* ld $r16 = 0[$r16] ;; */
-#endif
     0x00, 0x00, 0x00, 0x10,	/* zero upper 27 bits for LSU0, exunum = 2 */
     0x10, 0x00, 0xd8, 0x0f,	/* igoto $r16          ;; */
   }
@@ -237,14 +223,6 @@ elfNN_lvx_howto_from_type (bfd *abfd, unsigned int r_type)
 {
   bfd_reloc_code_real_type val;
   reloc_howto_type *howto;
-
-#if ARCH_SIZE == 32
-  if (r_type > 256)
-    {
-      bfd_set_error (bfd_error_bad_value);
-      return NULL;
-    }
-#endif
 
   val = elfNN_lvx_bfd_reloc_from_type (abfd, r_type);
   howto = elfNN_lvx_howto_from_bfd_reloc (val);
