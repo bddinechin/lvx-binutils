@@ -47,7 +47,7 @@ struct node_s {
 static int
 has_relocation_of_size (const struct lvx_reloc **relocs)
 {
-  const int symbol_size = env.params.arch_size;
+  const int symbol_size = 64;
 
   /*
    * This is a bit hackish: in case of PCREL here, it means we are
@@ -120,7 +120,7 @@ lvx_get_pseudo_func2 (symbolS *sym, struct lvx_reloc **relocs)
       while (*relocs_it)
 	{
 	  if (*relocs_it == lvx_core_info->pseudo_funcs[i].pseudo_relocs.kreloc
-	      && (env.params.arch_size == (int) lvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes
+	      && (64 == (int) lvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes
 		|| lvx_core_info->pseudo_funcs[i].pseudo_relocs.avail_modes == PSEUDO_ALL))
 	    return &lvx_core_info->pseudo_funcs[i];
 	  relocs_it++;
@@ -1177,8 +1177,8 @@ setup (int core)
 {
   switch (core)
   {
-  case ELF_LVX_CORE_LVX_1:
-  case ELF_LVX_CORE_LVX_2:
+  case ELF_LVX_CORE_LVX_V1:
+  case ELF_LVX_CORE_LVX_V2:
     setup_lvx_v1 ();
     break;
   default:

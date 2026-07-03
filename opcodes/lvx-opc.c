@@ -19084,6 +19084,25 @@ struct lvx_opc lvx_v1_optab[] = {
     },
     .fmtstring = " %s = %s",
   },
+  { /* Opcode-lvx_v1-ABSSWP_registerW_registerZ_simple */
+    .as_op = "absswp",
+    .codewords = {
+      {
+        .opcode = 0x6f03a380,
+        .mask = 0x7f03efc0,
+        .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
+      },
+    },
+    .wordcount = 1,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
+    .format = {
+      &lvx_v1_registerw_opnd,
+      &lvx_v1_registerz_opnd,
+      NULL
+    },
+    .fmtstring = " %s = %s",
+  },
   { /* Opcode-lvx_v1-ABSWP_registerWe_registerZe_simple */
     .as_op = "abswp",
     .codewords = {
@@ -19127,6 +19146,25 @@ struct lvx_opc lvx_v1_optab[] = {
     .codewords = {
       {
         .opcode = 0x6f03a100,
+        .mask = 0x7f03efc0,
+        .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
+      },
+    },
+    .wordcount = 1,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
+    .format = {
+      &lvx_v1_registerw_opnd,
+      &lvx_v1_registerz_opnd,
+      NULL
+    },
+    .fmtstring = " %s = %s",
+  },
+  { /* Opcode-lvx_v1-ABSWP_registerW_registerZ_simple */
+    .as_op = "abswp",
+    .codewords = {
+      {
+        .opcode = 0x6f03a180,
         .mask = 0x7f03efc0,
         .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
       },
@@ -32696,6 +32734,25 @@ struct lvx_opc lvx_v1_optab[] = {
     },
     .fmtstring = " %s = %s",
   },
+  { /* Opcode-lvx_v1-CBSWP_registerW_registerZ_simple */
+    .as_op = "cbswp",
+    .codewords = {
+      {
+        .opcode = 0x6f03a680,
+        .mask = 0x7f03efc0,
+        .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
+      },
+    },
+    .wordcount = 1,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
+    .format = {
+      &lvx_v1_registerw_opnd,
+      &lvx_v1_registerz_opnd,
+      NULL
+    },
+    .fmtstring = " %s = %s",
+  },
   { /* Opcode-lvx_v1-CBX_bcucond_registerZ_s044_double */
     .as_op = "cbx",
     .codewords = {
@@ -32962,6 +33019,25 @@ struct lvx_opc lvx_v1_optab[] = {
     },
     .fmtstring = " %s = %s",
   },
+  { /* Opcode-lvx_v1-CLSWP_registerW_registerZ_simple */
+    .as_op = "clswp",
+    .codewords = {
+      {
+        .opcode = 0x6f03a580,
+        .mask = 0x7f03efc0,
+        .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
+      },
+    },
+    .wordcount = 1,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
+    .format = {
+      &lvx_v1_registerw_opnd,
+      &lvx_v1_registerz_opnd,
+      NULL
+    },
+    .fmtstring = " %s = %s",
+  },
   { /* Opcode-lvx_v1-CLZD_registerW_registerZ_simple */
     .as_op = "clzd",
     .codewords = {
@@ -33095,6 +33171,25 @@ struct lvx_opc lvx_v1_optab[] = {
     },
     .fmtstring = " %s = %s",
   },
+  { /* Opcode-lvx_v1-CLZWP_registerW_registerZ_simple */
+    .as_op = "clzwp",
+    .codewords = {
+      {
+        .opcode = 0x6f03a480,
+        .mask = 0x7f03efc0,
+        .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
+      },
+    },
+    .wordcount = 1,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
+    .format = {
+      &lvx_v1_registerw_opnd,
+      &lvx_v1_registerz_opnd,
+      NULL
+    },
+    .fmtstring = " %s = %s",
+  },
   { /* Opcode-lvx_v1-CLZ_rd_rs1_riscv */
     .as_op = "clz",
     .codewords = {
@@ -33124,8 +33219,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_lanecond_opnd,
       &lvx_v1_registerze_opnd,
@@ -33172,8 +33267,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_lanecond_opnd,
       &lvx_v1_registerzo_opnd,
@@ -33220,8 +33315,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_cmovecond_opnd,
       &lvx_v1_registerz_opnd,
@@ -33268,8 +33363,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_lanecond_opnd,
       &lvx_v1_registerze_opnd,
@@ -33316,8 +33411,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_lanecond_opnd,
       &lvx_v1_registerzo_opnd,
@@ -33364,8 +33459,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_cmovecond_opnd,
       &lvx_v1_registerz_opnd,
@@ -33385,8 +33480,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_lanecond_opnd,
       &lvx_v1_registerze_opnd,
@@ -33433,8 +33528,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_lanecond_opnd,
       &lvx_v1_registerzo_opnd,
@@ -33470,6 +33565,27 @@ struct lvx_opc lvx_v1_optab[] = {
       NULL
     },
     .fmtstring = "%s %s? %s = %s%s",
+  },
+  { /* Opcode-lvx_v1-CMOVEWP_lanecond_registerZ_registerW_registerY_simple */
+    .as_op = "cmovewp",
+    .codewords = {
+      {
+        .opcode = 0x60036000,
+        .mask = 0x7103E000,
+        .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
+      },
+    },
+    .wordcount = 1,
+    .bundling = (int)Bundling_lvx_v1_LITE,
+    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .format = {
+      &lvx_v1_lanecond_opnd,
+      &lvx_v1_registerz_opnd,
+      &lvx_v1_registerw_opnd,
+      &lvx_v1_registery_opnd,
+      NULL
+    },
+    .fmtstring = "%s %s? %s = %s",
   },
   { /* Opcode-lvx_v1-COMPBO_intcomp_registerWe_registerZe_registerYe_simple */
     .as_op = "compbo",
@@ -33816,8 +33932,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_intcomp_opnd,
       &lvx_v1_registerwe_opnd,
@@ -33864,8 +33980,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_intcomp_opnd,
       &lvx_v1_registerwo_opnd,
@@ -33912,8 +34028,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_intcomp_opnd,
       &lvx_v1_registerwe_opnd,
@@ -33960,8 +34076,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_intcomp_opnd,
       &lvx_v1_registerwo_opnd,
@@ -34736,6 +34852,25 @@ struct lvx_opc lvx_v1_optab[] = {
     .codewords = {
       {
         .opcode = 0x6f03a700,
+        .mask = 0x7f03efc0,
+        .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
+      },
+    },
+    .wordcount = 1,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
+    .format = {
+      &lvx_v1_registerw_opnd,
+      &lvx_v1_registerz_opnd,
+      NULL
+    },
+    .fmtstring = " %s = %s",
+  },
+  { /* Opcode-lvx_v1-CTZWP_registerW_registerZ_simple */
+    .as_op = "ctzwp",
+    .codewords = {
+      {
+        .opcode = 0x6f03a780,
         .mask = 0x7f03efc0,
         .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
       },
@@ -36430,8 +36565,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_floatcomp_opnd,
       &lvx_v1_registerw_opnd,
@@ -36620,8 +36755,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_floatcomp_opnd,
       &lvx_v1_registerwe_opnd,
@@ -36668,8 +36803,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_floatcomp_opnd,
       &lvx_v1_registerwo_opnd,
@@ -36716,8 +36851,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_floatcomp_opnd,
       &lvx_v1_registerwe_opnd,
@@ -36764,8 +36899,8 @@ struct lvx_opc lvx_v1_optab[] = {
       },
     },
     .wordcount = 1,
-    .bundling = (int)Bundling_lvx_v1_LITE,
-    .reservation = (int)Reservation_lvx_v1_ALU_LITE,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
     .format = {
       &lvx_v1_floatcomp_opnd,
       &lvx_v1_registerwo_opnd,
@@ -47495,6 +47630,25 @@ struct lvx_opc lvx_v1_optab[] = {
     },
     .fmtstring = " %s = %s",
   },
+  { /* Opcode-lvx_v1-NEGSWP_registerW_registerZ_simple */
+    .as_op = "negswp",
+    .codewords = {
+      {
+        .opcode = 0x6f03a280,
+        .mask = 0x7f03efc0,
+        .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
+      },
+    },
+    .wordcount = 1,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
+    .format = {
+      &lvx_v1_registerw_opnd,
+      &lvx_v1_registerz_opnd,
+      NULL
+    },
+    .fmtstring = " %s = %s",
+  },
   { /* Opcode-lvx_v1-NEGWP_registerWe_registerZe_simple */
     .as_op = "negwp",
     .codewords = {
@@ -47538,6 +47692,25 @@ struct lvx_opc lvx_v1_optab[] = {
     .codewords = {
       {
         .opcode = 0x6f03a000,
+        .mask = 0x7f03efc0,
+        .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
+      },
+    },
+    .wordcount = 1,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
+    .format = {
+      &lvx_v1_registerw_opnd,
+      &lvx_v1_registerz_opnd,
+      NULL
+    },
+    .fmtstring = " %s = %s",
+  },
+  { /* Opcode-lvx_v1-NEGWP_registerW_registerZ_simple */
+    .as_op = "negwp",
+    .codewords = {
+      {
+        .opcode = 0x6f03a080,
         .mask = 0x7f03efc0,
         .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
       },
@@ -48040,6 +48213,25 @@ struct lvx_opc lvx_v1_optab[] = {
     .codewords = {
       {
         .opcode = 0x6f03a800,
+        .mask = 0x7f03efc0,
+        .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
+      },
+    },
+    .wordcount = 1,
+    .bundling = (int)Bundling_lvx_v1_TINY,
+    .reservation = (int)Reservation_lvx_v1_ALU_TINY,
+    .format = {
+      &lvx_v1_registerw_opnd,
+      &lvx_v1_registerz_opnd,
+      NULL
+    },
+    .fmtstring = " %s = %s",
+  },
+  { /* Opcode-lvx_v1-NOTWP_registerW_registerZ_simple */
+    .as_op = "notwp",
+    .codewords = {
+      {
+        .opcode = 0x6f03a880,
         .mask = 0x7f03efc0,
         .flags = LVX_OPCODE_FLAG_MODE64|LVX_OPCODE_FLAG_MODE32
       },
@@ -59623,16 +59815,16 @@ struct lvx_opc lvx_v1_optab[] = {
 };
 
 /* LVX cores */
-const struct lvx_core_info lvx_1_core_info = {
-  lvx_v1_optab, "lvx-1", lvx_v1_resources, ELF_LVX_CORE_LVX_1,
+const struct lvx_core_info lvx_v1_core_info = {
+  lvx_v1_optab, "lvx-1", lvx_v1_resources, ELF_LVX_CORE_LVX_V1,
   lvx_v1_pseudo_func, 26,
   (int **) lvx_v1_reservation_tables,
   lvx_v1_RESERVATION_TABLE_CYCLES, lvx_v1_RESOURCE_COUNT,
   (char **) lvx_v1_resource_names
 };
 
-const struct lvx_core_info lvx_2_core_info = {
-  lvx_v1_optab, "lvx-2", lvx_v1_resources, ELF_LVX_CORE_LVX_2,
+const struct lvx_core_info lvx_v2_core_info = {
+  lvx_v1_optab, "lvx-2", lvx_v1_resources, ELF_LVX_CORE_LVX_V2,
   lvx_v1_pseudo_func, 26,
   (int **) lvx_v1_reservation_tables,
   lvx_v1_RESERVATION_TABLE_CYCLES, lvx_v1_RESOURCE_COUNT,
@@ -59641,8 +59833,8 @@ const struct lvx_core_info lvx_2_core_info = {
 
 const struct lvx_core_info *lvx_core_info_table[] =
 {
-  &lvx_1_core_info,
-  &lvx_2_core_info
+  &lvx_v1_core_info,
+  &lvx_v2_core_info
 };
 
 const struct lvx_register *lvx_registers_table[] =

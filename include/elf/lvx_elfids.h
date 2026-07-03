@@ -60,8 +60,8 @@
 
 /* LVX core IDs */
 #define ELF_LVX_CORE_LVX         (0x05 << ELF_LVX_CORE_BIT_SHIFT)
-#define ELF_LVX_CORE_LVX_1      (ELF_LVX_CORE_LVX | (1 << (ELF_LVX_CORE_MINOR_SHIFT)))
-#define ELF_LVX_CORE_LVX_2      (ELF_LVX_CORE_LVX | (2 << (ELF_LVX_CORE_MINOR_SHIFT)))
+#define ELF_LVX_CORE_LVX_V1      (ELF_LVX_CORE_LVX | (1 << (ELF_LVX_CORE_MINOR_SHIFT)))
+#define ELF_LVX_CORE_LVX_V2      (ELF_LVX_CORE_LVX | (2 << (ELF_LVX_CORE_MINOR_SHIFT)))
 #define ELF_LVX_IS_LVX(flags)   (((flags) & ELF_LVX_CORE_MAJOR_MASK) == (ELF_LVX_CORE_LVX))
 #define ELF_LVX_CHECK_CORE(flags,m) (((flags) & ELF_LVX_CORE_MASK)==(m))
 

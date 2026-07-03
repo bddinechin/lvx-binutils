@@ -2844,15 +2844,15 @@ static bool
 elfNN_lvx_object_p (bfd *abfd)
 {
   /* must be coherent with default arch in cpu-lvx.c */
-  int e_set = bfd_mach_lvx_1_64;
+  int e_set = bfd_mach_lvx_v1_64;
 
   if (elf_elfheader (abfd)->e_machine == EM_KVX)
     {
       int e_core = elf_elfheader (abfd)->e_flags & ELF_LVX_CORE_MASK;
       switch(e_core)
 	{
-	case ELF_LVX_CORE_LVX_1 : e_set = bfd_mach_lvx_1_64; break;
-	case ELF_LVX_CORE_LVX_2 : e_set = bfd_mach_lvx_2_64; break;
+	case ELF_LVX_CORE_LVX_V1 : e_set = bfd_mach_lvx_v1_64; break;
+	case ELF_LVX_CORE_LVX_V2 : e_set = bfd_mach_lvx_v2_64; break;
 	default:
 	  (*_bfd_error_handler)(_("%s: Bad ELF id: `%d'"),
 				abfd->filename, e_core);
@@ -3006,9 +3006,9 @@ elfNN_lvx_print_private_bfd_data (bfd *abfd, void *ptr)
   fprintf (file, _("Private flags = 0x%lx : "), elf_elfheader (abfd)->e_flags);
   if((flags & ELF_LVX_ABI_64B_ADDR_BIT) == ELF_LVX_ABI_64B_ADDR_BIT)
     {
-      if (ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_LVX_1))
+      if (ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_LVX_V1))
 	fprintf (file, _("LVX-1 64 bits"));
-      else if (ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_LVX_2))
+      else if (ELF_LVX_CHECK_CORE(flags,ELF_LVX_CORE_LVX_V2))
 	fprintf (file, _("LVX-2 64 bits"));
     }
   else
@@ -4329,10 +4329,10 @@ elfNN_lvx_create_small_pltn_entry (struct elf_link_hash_entry *h,
   int plt_entry_index = -1;
   switch (bfd_get_mach (output_bfd))
     {
-      case bfd_mach_lvx_1:
-      case bfd_mach_lvx_1_64:
-      case bfd_mach_lvx_2:
-      case bfd_mach_lvx_2_64:
+      case bfd_mach_lvx_v1:
+      case bfd_mach_lvx_v1_64:
+      case bfd_mach_lvx_v2:
+      case bfd_mach_lvx_v2_64:
 	plt_entry_index = 1;
 	break;
       default:

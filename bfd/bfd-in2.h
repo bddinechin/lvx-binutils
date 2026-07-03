@@ -1777,10 +1777,10 @@ enum bfd_architecture
 #define bfd_mach_lm32          1
   bfd_arch_microblaze,/* Xilinx MicroBlaze.  */
   bfd_arch_lvx,        /* LVX VLIW processor */
-#define bfd_mach_lvx_1             1
-#define bfd_mach_lvx_1_64          2
-#define bfd_mach_lvx_2             3
-#define bfd_mach_lvx_2_64          4
+#define bfd_mach_lvx_v1             1
+#define bfd_mach_lvx_v1_64          2
+#define bfd_mach_lvx_v2             3
+#define bfd_mach_lvx_v2_64          4
   bfd_arch_tilepro,   /* Tilera TILEPro.  */
   bfd_arch_tilegx,    /* Tilera TILE-Gx.  */
 #define bfd_mach_tilepro       1

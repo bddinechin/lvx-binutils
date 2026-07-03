@@ -209,10 +209,10 @@ lvx_dis_init (struct disassemble_info *info)
   env.lvx_arch_size = 64;
   switch (info->mach)
     {
-    case bfd_mach_lvx_2:
-    case bfd_mach_lvx_2_64:
-    case bfd_mach_lvx_1:
-    case bfd_mach_lvx_1_64:
+    case bfd_mach_lvx_v2:
+    case bfd_mach_lvx_v2_64:
+    case bfd_mach_lvx_v1:
+    case bfd_mach_lvx_v1_64:
     default:
       env.opc_table = lvx_v1_optab;
       env.lvx_regfiles = lvx_v1_regfiles;
@@ -419,10 +419,10 @@ lvx_steer_bundle_insns (struct disassemble_info *info,
 {
   switch (info->mach)
     {
-    case bfd_mach_lvx_1:
-    case bfd_mach_lvx_1_64:
-    case bfd_mach_lvx_2:
-    case bfd_mach_lvx_2_64:
+    case bfd_mach_lvx_v1:
+    case bfd_mach_lvx_v1_64:
+    case bfd_mach_lvx_v2:
+    case bfd_mach_lvx_v2_64:
     default:
       return lvx_v1_steer_bundle_insns (word_cnt, _insn_cnt);
       break;

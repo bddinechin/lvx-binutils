@@ -226,8 +226,8 @@ extern const int lvx_v1_resources[];
 extern struct lvx_opc lvx_v1_optab[];
 
 /* LVX cores */
-extern const struct lvx_core_info lvx_1_core_info;
-extern const struct lvx_core_info lvx_2_core_info;
+extern const struct lvx_core_info lvx_v1_core_info;
+extern const struct lvx_core_info lvx_v2_core_info;
 extern const struct lvx_core_info *lvx_core_info_table[];
 extern const char ***lvx_modifiers_table[];
 extern const struct lvx_register *lvx_registers_table[];

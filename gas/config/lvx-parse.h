@@ -1096,6 +1096,7 @@ static const char *insn_lvx_v1_not[] = { "not" };
 static const char *insn_lvx_v1_notd[] = { "notd" };
 static const char *insn_lvx_v1_notq[] = { "notq" };
 static const char *insn_lvx_v1_notw[] = { "notw" };
+static const char *insn_lvx_v1_notwp[] = { "notwp" };
 static const char *insn_lvx_v1_or[] = { "or" };
 static const char *insn_lvx_v1_orc_b[] = { "orc.b" };
 static const char *insn_lvx_v1_ori[] = { "ori" };
@@ -3502,9 +3503,9 @@ static struct token_class insn_classes_lvx_v1[] = {
   { insn_lvx_v1_abssd, Instruction_lvx_v1_abssd, arr_len (insn_lvx_v1_abssd) },
   { insn_lvx_v1_absshq, Instruction_lvx_v1_absshq, arr_len (insn_lvx_v1_absshq) },
   { insn_lvx_v1_abssw, Instruction_lvx_v1_abssw, arr_len (insn_lvx_v1_abssw) },
-  { insn_lvx_v1_absswp, Instruction_lvx_v1_absswp, arr_len (insn_lvx_v1_absswp) },
+  { insn_lvx_v1_absswp, Instruction_lvx_v1_abssw, arr_len (insn_lvx_v1_absswp) },
   { insn_lvx_v1_absw, Instruction_lvx_v1_absw, arr_len (insn_lvx_v1_absw) },
-  { insn_lvx_v1_abswp, Instruction_lvx_v1_abswp, arr_len (insn_lvx_v1_abswp) },
+  { insn_lvx_v1_abswp, Instruction_lvx_v1_absw, arr_len (insn_lvx_v1_abswp) },
   { insn_lvx_v1_acswapb, Instruction_lvx_v1_acswapb, arr_len (insn_lvx_v1_acswapb) },
   { insn_lvx_v1_acswapd, Instruction_lvx_v1_acswapd, arr_len (insn_lvx_v1_acswapd) },
   { insn_lvx_v1_acswaph, Instruction_lvx_v1_acswaph, arr_len (insn_lvx_v1_acswaph) },
@@ -3744,7 +3745,7 @@ static struct token_class insn_classes_lvx_v1[] = {
   { insn_lvx_v1_cbsd, Instruction_lvx_v1_cbsd, arr_len (insn_lvx_v1_cbsd) },
   { insn_lvx_v1_cbshq, Instruction_lvx_v1_cbshq, arr_len (insn_lvx_v1_cbshq) },
   { insn_lvx_v1_cbsw, Instruction_lvx_v1_cbsw, arr_len (insn_lvx_v1_cbsw) },
-  { insn_lvx_v1_cbswp, Instruction_lvx_v1_cbswp, arr_len (insn_lvx_v1_cbswp) },
+  { insn_lvx_v1_cbswp, Instruction_lvx_v1_cbsw, arr_len (insn_lvx_v1_cbswp) },
   { insn_lvx_v1_cbx, Instruction_lvx_v1_cbx, arr_len (insn_lvx_v1_cbx) },
   { insn_lvx_v1_ccb, Instruction_lvx_v1_ccb, arr_len (insn_lvx_v1_ccb) },
   { insn_lvx_v1_ccbx, Instruction_lvx_v1_ccbx, arr_len (insn_lvx_v1_ccbx) },
@@ -3754,12 +3755,12 @@ static struct token_class insn_classes_lvx_v1[] = {
   { insn_lvx_v1_clsd, Instruction_lvx_v1_clsd, arr_len (insn_lvx_v1_clsd) },
   { insn_lvx_v1_clshq, Instruction_lvx_v1_clshq, arr_len (insn_lvx_v1_clshq) },
   { insn_lvx_v1_clsw, Instruction_lvx_v1_clsw, arr_len (insn_lvx_v1_clsw) },
-  { insn_lvx_v1_clswp, Instruction_lvx_v1_clswp, arr_len (insn_lvx_v1_clswp) },
+  { insn_lvx_v1_clswp, Instruction_lvx_v1_clsw, arr_len (insn_lvx_v1_clswp) },
   { insn_lvx_v1_clz, Instruction_lvx_v1_clz, arr_len (insn_lvx_v1_clz) },
   { insn_lvx_v1_clzd, Instruction_lvx_v1_clzd, arr_len (insn_lvx_v1_clzd) },
   { insn_lvx_v1_clzhq, Instruction_lvx_v1_clzhq, arr_len (insn_lvx_v1_clzhq) },
   { insn_lvx_v1_clzw, Instruction_lvx_v1_clzw, arr_len (insn_lvx_v1_clzw) },
-  { insn_lvx_v1_clzwp, Instruction_lvx_v1_clzwp, arr_len (insn_lvx_v1_clzwp) },
+  { insn_lvx_v1_clzwp, Instruction_lvx_v1_clzw, arr_len (insn_lvx_v1_clzwp) },
   { insn_lvx_v1_cmovebo, Instruction_lvx_v1_cmovebo, arr_len (insn_lvx_v1_cmovebo) },
   { insn_lvx_v1_cmoved, Instruction_lvx_v1_cmoved, arr_len (insn_lvx_v1_cmoved) },
   { insn_lvx_v1_cmovehq, Instruction_lvx_v1_cmovehq, arr_len (insn_lvx_v1_cmovehq) },
@@ -3797,7 +3798,7 @@ static struct token_class insn_classes_lvx_v1[] = {
   { insn_lvx_v1_ctzd, Instruction_lvx_v1_ctzd, arr_len (insn_lvx_v1_ctzd) },
   { insn_lvx_v1_ctzhq, Instruction_lvx_v1_ctzhq, arr_len (insn_lvx_v1_ctzhq) },
   { insn_lvx_v1_ctzw, Instruction_lvx_v1_ctzw, arr_len (insn_lvx_v1_ctzw) },
-  { insn_lvx_v1_ctzwp, Instruction_lvx_v1_ctzwp, arr_len (insn_lvx_v1_ctzwp) },
+  { insn_lvx_v1_ctzwp, Instruction_lvx_v1_ctzw, arr_len (insn_lvx_v1_ctzwp) },
   { insn_lvx_v1_czero_eqz, Instruction_lvx_v1_czero_eqz, arr_len (insn_lvx_v1_czero_eqz) },
   { insn_lvx_v1_czero_nez, Instruction_lvx_v1_czero_nez, arr_len (insn_lvx_v1_czero_nez) },
   { insn_lvx_v1_d1inval, Instruction_lvx_v1_d1inval, arr_len (insn_lvx_v1_d1inval) },
@@ -4193,9 +4194,9 @@ static struct token_class insn_classes_lvx_v1[] = {
   { insn_lvx_v1_negsd, Instruction_lvx_v1_negsd, arr_len (insn_lvx_v1_negsd) },
   { insn_lvx_v1_negshq, Instruction_lvx_v1_negshq, arr_len (insn_lvx_v1_negshq) },
   { insn_lvx_v1_negsw, Instruction_lvx_v1_negsw, arr_len (insn_lvx_v1_negsw) },
-  { insn_lvx_v1_negswp, Instruction_lvx_v1_negswp, arr_len (insn_lvx_v1_negswp) },
+  { insn_lvx_v1_negswp, Instruction_lvx_v1_negsw, arr_len (insn_lvx_v1_negswp) },
   { insn_lvx_v1_negw, Instruction_lvx_v1_negw, arr_len (insn_lvx_v1_negw) },
-  { insn_lvx_v1_negwp, Instruction_lvx_v1_negwp, arr_len (insn_lvx_v1_negwp) },
+  { insn_lvx_v1_negwp, Instruction_lvx_v1_negw, arr_len (insn_lvx_v1_negwp) },
   { insn_lvx_v1_neord, Instruction_lvx_v1_neord, arr_len (insn_lvx_v1_neord) },
   { insn_lvx_v1_neorq, Instruction_lvx_v1_neorq, arr_len (insn_lvx_v1_neorq) },
   { insn_lvx_v1_neorw, Instruction_lvx_v1_neorw, arr_len (insn_lvx_v1_neorw) },
@@ -4207,6 +4208,7 @@ static struct token_class insn_classes_lvx_v1[] = {
   { insn_lvx_v1_notd, Instruction_lvx_v1_notd, arr_len (insn_lvx_v1_notd) },
   { insn_lvx_v1_notq, Instruction_lvx_v1_notq, arr_len (insn_lvx_v1_notq) },
   { insn_lvx_v1_notw, Instruction_lvx_v1_notw, arr_len (insn_lvx_v1_notw) },
+  { insn_lvx_v1_notwp, Instruction_lvx_v1_notw, arr_len (insn_lvx_v1_notwp) },
   { insn_lvx_v1_or, Instruction_lvx_v1_or, arr_len (insn_lvx_v1_or) },
   { insn_lvx_v1_orc_b, Instruction_lvx_v1_orc_b, arr_len (insn_lvx_v1_orc_b) },
   { insn_lvx_v1_ori, Instruction_lvx_v1_ori, arr_len (insn_lvx_v1_ori) },
@@ -15935,6 +15937,7 @@ static struct steering_rule rule_lvx_v1_2064[] = {
 };
 
 static struct steering_rule rule_lvx_v1_2065[] = {
+  { .steering =   78, .jump_target = 2074, .stack_it =   78 },
   { .steering =   80, .jump_target = 1363, .stack_it = 2056 },
   { .steering =   81, .jump_target = 1366, .stack_it = 2057 },
   { .steering =   -1, .jump_target =   -1, .stack_it =   -1 },
@@ -15988,6 +15991,18 @@ static struct steering_rule rule_lvx_v1_2072[] = {
   { .steering =   64, .jump_target = 1223, .stack_it =   -1 },
   { .steering =   65, .jump_target = 1224, .stack_it =   -1 },
   { .steering =   66, .jump_target = 1225, .stack_it =   -1 },
+  { .steering =   -1, .jump_target =   -1, .stack_it =   -1 },
+};
+
+/* cmovewp unrestricted-register: accepts '? $rdest =' */
+static struct steering_rule rule_lvx_v1_2073[] = {
+  { .steering = 1003, .jump_target = 1135, .stack_it = 1002 },
+  { .steering =   -1, .jump_target =   -1, .stack_it =   -1 },
+};
+
+/* cmovewp unrestricted-register: accepts '$rguard ? $rdest =' */
+static struct steering_rule rule_lvx_v1_2074[] = {
+  { .steering =   78, .jump_target =   78, .stack_it = 2073 },
   { .steering =   -1, .jump_target =   -1, .stack_it =   -1 },
 };
 
@@ -16407,6 +16422,7 @@ static struct rule rules_lvx_v1[] = {
   { rule_lvx_v1_2060 }, { rule_lvx_v1_2061 }, { rule_lvx_v1_2062 }, { rule_lvx_v1_2063 }, { rule_lvx_v1_2064 },
   { rule_lvx_v1_2065 }, { rule_lvx_v1_2066 }, { rule_lvx_v1_2067 }, { rule_lvx_v1_2068 }, { rule_lvx_v1_2069 },
   { rule_lvx_v1_2070 }, { rule_lvx_v1_2071 }, { rule_lvx_v1_2072 },
+  { rule_lvx_v1_2073 }, { rule_lvx_v1_2074 },
 };
 
 static inline /* enum lvx_tokens_lvx_v1 */ int

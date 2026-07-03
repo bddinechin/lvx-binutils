@@ -88,14 +88,14 @@ scan (const struct bfd_arch_info *info, const char *string)
 }
 
 
-const bfd_arch_info_type bfd_lvx_2_64_arch =
-  N (64 , bfd_mach_lvx_2_64  , "lvx:lvx-2:64"  , false , NULL);
+const bfd_arch_info_type bfd_lvx_v2_64_arch =
+  N (64 , bfd_mach_lvx_v2_64  , "lvx:lvx-2:64"  , false , NULL);
 
-const bfd_arch_info_type bfd_lvx_1_64_arch =
-  N (64 , bfd_mach_lvx_1_64  , "lvx:lvx-1:64"  , false , &bfd_lvx_2_64_arch);
+const bfd_arch_info_type bfd_lvx_v1_64_arch =
+  N (64 , bfd_mach_lvx_v1_64  , "lvx:lvx-1:64"  , false , &bfd_lvx_v2_64_arch);
 
-const bfd_arch_info_type bfd_lvx_2_arch =
-  N (64 , bfd_mach_lvx_2     , "lvx:lvx-2"     , false , &bfd_lvx_1_64_arch);
+const bfd_arch_info_type bfd_lvx_v2_arch =
+  N (64 , bfd_mach_lvx_v2     , "lvx:lvx-2"     , false , &bfd_lvx_v1_64_arch);
 
 const bfd_arch_info_type bfd_lvx_arch =
-  N (64 , bfd_mach_lvx_1     , "lvx:lvx-1"     , true  , &bfd_lvx_2_arch);
+  N (64 , bfd_mach_lvx_v1     , "lvx:lvx-1"     , true  , &bfd_lvx_v2_arch);

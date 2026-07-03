@@ -968,8 +968,18 @@ assemble_tokens (struct token_list *tok_list)
 	continue;
 
       struct token_list *toks_ = toks;
+      int is_tiny = (try_opc->bundling == (int)Bundling_lvx_v1_TINY
+		     || try_opc->bundling == (int)Bundling_lvx_v1_TINY_X
+		     || try_opc->bundling == (int)Bundling_lvx_v1_TINY_Y);
       for (int i = 0 ; toks_ && try_opc->format[i]
-	   && toks_->class_id == try_opc->format[i]->type ;)
+	   && (toks_->class_id == try_opc->format[i]->type
+	       || (is_tiny
+		   && toks_->category == CAT_REGISTER
+		   && try_opc->format[i]->reg_nb > 0
+		   && try_opc->format[i]->regs != NULL
+		   && ({ unsigned _rn = (unsigned)S_GET_VALUE(str_hash_find(env.reg_hash, toks_->tok));
+			 _rn < (unsigned)try_opc->format[i]->reg_nb
+			 && try_opc->format[i]->regs[_rn]; }))) ;)
 	{
 	  toks_ = toks_->next;
 	  while (toks_ && toks_->category == CAT_SEPARATOR)
@@ -1596,6 +1606,16 @@ md_assemble (char *line)
       return;
     }
 
+  int cond_len = 0;
+  if (env.params.core == ELF_LVX_CORE_LVX_V1
+      && (cond_len = insn_cond_len (line)))
+    {
+      struct lvx_cond *cond = lvx_cond_stack_push ();
+      cond->target_insn = lvx_insn_buffer + lvx_insn_cnt;
+      strncpy (cond->line_prefix, line, cond_len);
+      line_cursor += cond_len;
+    }
+
   char *buf = NULL;
   sscanf (line_cursor, "%m[^\n]", &buf);
   struct token_s my_tok = TOK_FROM_STR (buf);
@@ -1619,7 +1639,7 @@ static void
 lvx_set_cpu (void)
 {
   if (!lvx_core_info)
-    lvx_core_info = &lvx_1_core_info;
+    lvx_core_info = &lvx_v1_core_info;
 
   if (!lvx_registers)
     lvx_registers = lvx_v1_registers;
@@ -1639,21 +1659,21 @@ lvx_set_cpu (void)
 
   switch (lvx_core_info->elf_core)
     {
-    case ELF_LVX_CORE_LVX_1:
-      lvx_bfd_mach = bfd_mach_lvx_1_64;
+    case ELF_LVX_CORE_LVX_V1:
+      lvx_bfd_mach = bfd_mach_lvx_v1_64;
       lvx_base_bundling = lvx_v1_base_bundling;
       lvx_reorder_bundle = lvx_v1_reorder_bundle;
       lvx_dump_opc = lvx_v1_dump_opc;
       lvx_insn_pcrel = true;
-      setup (ELF_LVX_CORE_LVX_1);
+      setup (ELF_LVX_CORE_LVX_V1);
       break;
-    case ELF_LVX_CORE_LVX_2:
-      lvx_bfd_mach = bfd_mach_lvx_2_64;
+    case ELF_LVX_CORE_LVX_V2:
+      lvx_bfd_mach = bfd_mach_lvx_v2_64;
       lvx_base_bundling = lvx_v1_base_bundling;
       lvx_reorder_bundle = lvx_v1_reorder_bundle;
       lvx_dump_opc = lvx_v1_dump_opc;
       lvx_insn_pcrel = true;
-      setup (ELF_LVX_CORE_LVX_2);
+      setup (ELF_LVX_CORE_LVX_V2);
       break;
     default:
       as_fatal ("unknown elf core: 0x%x", lvx_core_info->elf_core);

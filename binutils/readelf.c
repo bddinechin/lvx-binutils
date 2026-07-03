@@ -5172,9 +5172,9 @@ get_machine_flags (Filedata * filedata, unsigned e_flags, unsigned e_machine)
 	  break;
 
 	case EM_KVX:
-	  if ((e_flags & ELF_LVX_CORE_MASK) == ELF_LVX_CORE_LVX_1)
+	  if ((e_flags & ELF_LVX_CORE_MASK) == ELF_LVX_CORE_LVX_V1)
 	    strcat (buf, ", LVX lvx-1");
-	  else if ((e_flags & ELF_LVX_CORE_MASK) == ELF_LVX_CORE_LVX_2)
+	  else if ((e_flags & ELF_LVX_CORE_MASK) == ELF_LVX_CORE_LVX_V2)
 	    strcat (buf, ", LVX lvx-2");
 	  else
 	    strcat (buf, ", unknown LVX core");
