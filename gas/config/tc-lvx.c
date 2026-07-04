@@ -1979,14 +1979,12 @@ md_apply_fix (fixS * fixP, valueT * valueP, segT segmentP ATTRIBUTE_UNUSED)
 			  _("branch out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_LVX_PCREL17:
 	case BFD_RELOC_LVX_S17S2_PCREL:
 	  if (signed_overflow (value, 17 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,
 			  _("branch out of range"));
 	  goto pcrel_common;
 
-	case BFD_RELOC_LVX_PCREL27:
 	case BFD_RELOC_LVX_S27S2_PCREL:
 	  if (signed_overflow (value, 27 + 2))
 	    as_bad_where (fixP->fx_file, fixP->fx_line,

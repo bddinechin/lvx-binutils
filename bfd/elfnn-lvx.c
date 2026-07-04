@@ -2159,8 +2159,6 @@ elfNN_lvx_final_link_relocate (reloc_howto_type *howto,
 				       addend);
       break;
 
-    case BFD_RELOC_LVX_PCREL17:
-    case BFD_RELOC_LVX_PCREL27:
     case BFD_RELOC_LVX_S11S2_PCREL:
     case BFD_RELOC_LVX_S17S2_PCREL:
     case BFD_RELOC_LVX_S27S2_PCREL:
@@ -3499,8 +3497,6 @@ elfNN_lvx_check_relocs (bfd *abfd, struct bfd_link_info *info,
 	    return false;
 	  break;
 
-	case BFD_RELOC_LVX_PCREL27:
-	case BFD_RELOC_LVX_PCREL17:
 	case BFD_RELOC_LVX_S27S2_PCREL:
 	case BFD_RELOC_LVX_S17S2_PCREL:
 	  /* If this is a local symbol then we resolve it
