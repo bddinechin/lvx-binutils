@@ -601,9 +601,7 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		    case Immediate_lvx_v1_brknumber:
 		    case Immediate_lvx_v1_sysnumber:
 		    case Immediate_lvx_v1_signed10:
-		    case Immediate_lvx_v1_signed12:
 		    case Immediate_lvx_v1_signed16:
-		    case Immediate_lvx_v1_signed20:
 		    case Immediate_lvx_v1_signed27:
 		    case Immediate_lvx_v1_wrapped32:
 		    case Immediate_lvx_v1_signed37:
@@ -618,10 +616,8 @@ decode_insn (bfd_vma memaddr, struct raw_insn *raw_insn, struct decoded_insn *re
 		      res->operands[idx].pcrel = 0;
 		      idx++;
 		      break;
-		    case Immediate_lvx_v1_pcrel12s1:
 		    case Immediate_lvx_v1_pcrel11s2:
 		    case Immediate_lvx_v1_pcrel17s2:
-		    case Immediate_lvx_v1_pcrel20s1:
 		    case Immediate_lvx_v1_pcrel27s2:
 		    case Immediate_lvx_v1_pcrel38s2:
 		    case Immediate_lvx_v1_pcrel44s2:
@@ -1153,9 +1149,7 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 	  else if (   chk_type (lvx_v1, Immediate_lvx_v1_sysnumber)
 		   || chk_type (lvx_v1, Immediate_lvx_v1_wrapped8)
 		   || chk_type (lvx_v1, Immediate_lvx_v1_signed10)
-		   || chk_type (lvx_v1, Immediate_lvx_v1_signed12)
 		   || chk_type (lvx_v1, Immediate_lvx_v1_signed16)
-		   || chk_type (lvx_v1, Immediate_lvx_v1_signed20)
 		   || chk_type (lvx_v1, Immediate_lvx_v1_signed27)
 		   || chk_type (lvx_v1, Immediate_lvx_v1_wrapped32)
 		   || chk_type (lvx_v1, Immediate_lvx_v1_signed37)
@@ -1165,9 +1159,7 @@ decode_prologue_epilogue_bundle (bfd_vma memaddr,
 		   || chk_type (lvx_v1, Immediate_lvx_v1_unsigned6))
 	    crt_peb_insn->immediate = value;
 	  else if (   chk_type (lvx_v1, Immediate_lvx_v1_pcrel11s2)
-		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel12s1)
 		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel17s2)
-		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel20s1)
 		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel27s2)
 		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel38s2)
 		   || chk_type (lvx_v1, Immediate_lvx_v1_pcrel44s2)

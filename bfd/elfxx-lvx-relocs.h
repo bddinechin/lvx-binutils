@@ -86,32 +86,6 @@ static reloc_howto_type elf_lvx_howto_table[] =
 	 0x0,				/* src_mask */
 	 0xffff,			/* dst_mask */
 	 true),			/* pc_offset */
-  HOWTO (R_LVX_PCREL17,			/* type */
-	 2,				/* rightshift */
-	 3,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
-	 17,				/* bitsize */
-	 true,				/* pc_relative */
-	 6,				/* bitpos (bit field offset) */
-	 complain_overflow_signed,	/* complain_on_overflow */
-	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_LVX_PCREL17",			/* name */
-	 false,				/* partial_inplace */
-	 0x0,				/* src_mask */
-	 0x7fffc0,			/* dst_mask */
-	 true),			/* pc_offset */
-  HOWTO (R_LVX_PCREL27,			/* type */
-	 2,				/* rightshift */
-	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */
-	 27,				/* bitsize */
-	 true,				/* pc_relative */
-	 0,				/* bitpos (bit field offset) */
-	 complain_overflow_signed,	/* complain_on_overflow */
-	 bfd_elf_generic_reloc,		/* special_function */
-	 "R_LVX_PCREL27",			/* name */
-	 false,				/* partial_inplace */
-	 0x0,				/* src_mask */
-	 0x7ffffff,			/* dst_mask */
-	 true),			/* pc_offset */
   HOWTO (R_LVX_32_PCREL,			/* type */
 	 0,				/* rightshift */
 	 4,				/* size (0 = byte, 1 = short, 2 = long, 3 = invalid, 4 = 64bits, 8 = 128bits) */

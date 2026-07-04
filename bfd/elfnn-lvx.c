@@ -693,7 +693,7 @@ lvx_type_of_stub (asection *input_sec,
   /* We don't want to redirect any old unconditional jump in this way,
      only one which is being used for a sibcall, where it is
      acceptable for the R16 and R17 registers to be clobbered.  */
-  if ((r_type == R_LVX_PCREL27 || r_type == R_LVX_S27S2_PCREL)
+  if ((r_type == R_LVX_S27S2_PCREL)
       && (branch_offset > LVX_MAX_FWD_CALL_OFFSET
 	  || branch_offset < LVX_MAX_BWD_CALL_OFFSET))
     {
@@ -1367,8 +1367,7 @@ elfNN_lvx_size_stubs (bfd *output_bfd,
 		  /* Only look for stubs on unconditional branch and
 		     branch and link instructions.  */
 		  /* This catches CALL and GOTO insn */
-		  if (r_type != (unsigned int) R_LVX_PCREL27
-		      && r_type != (unsigned int) R_LVX_S27S2_PCREL)
+		  if (r_type != (unsigned int) R_LVX_S27S2_PCREL)
 		    continue;
 
 		  /* Now determine the call target, its name, value,
