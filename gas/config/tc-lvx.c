@@ -2520,7 +2520,7 @@ lvx_type (int start ATTRIBUTE_UNUSED)
   *input_line_pointer = c;
 
   if (!*S_GET_NAME (sym))
-    as_bad (_("missing symbol name in directive"));
+    as_bad (_("Missing symbol name in directive"));
 
   SKIP_WHITESPACE ();
 
