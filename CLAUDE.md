@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is the **LVX binutils** repo: a GNU Binutils checkout with a full LVX target port (`bfd`, `opcodes`, `gas`, `ld`, `binutils`) for the `lvx-mbr` triple. See the parent project's `/home/bd3/LVX/CLAUDE.md` first for architectural background (LVX vs KVX, the MDS pipeline, build/install instructions, LVX-specific source file layout) — this file only covers implementation gotchas specific to this repo that aren't obvious from the code.
+This is the **LVX binutils** repo: a GNU Binutils checkout with a full LVX target port (`bfd`, `opcodes`, `gas`, `ld`, `binutils`) for the `lvx-mbr` triple. See the parent project's `/home/bd3/lvx-csw/CLAUDE.md` first for architectural background (LVX vs KVX, the MDS pipeline, build/install instructions, LVX-specific source file layout) — this file only covers implementation gotchas specific to this repo that aren't obvious from the code.
 
 Most LVX-specific source in `bfd/`, `opcodes/`, `gas/`, `ld/`, `include/` is either MDS-generated (see the parent CLAUDE.md's "Do not hand-edit" table) or gets reinstalled from `lvx-mds`'s `BE/GBU` backend (`make -C build_lvx/BE/GBU install`, from the sibling `lvx-mds` repo).
 
