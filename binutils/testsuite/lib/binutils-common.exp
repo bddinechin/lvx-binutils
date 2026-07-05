@@ -42,6 +42,7 @@ proc is_elf_format {} {
 	 && ![istarget *-*-irix6*]
 	 && ![istarget *-*-kaos*]
    && ![istarget kvx-*-*]
+	 && ![istarget lvx-*-*]
 	 && ![istarget *-*-*linux*]
 	 && ![istarget *-*-lynxos*]
 	 && ![istarget *-*-nacl*]
@@ -257,6 +258,7 @@ proc supports_gnu_osabi {} {
 	 || [istarget "msp430-*-*"]
 	 || [istarget "hppa-unknown-elf"]
 	 || [istarget "kvx*-*-*"]
+	 || [istarget "lvx*-*-*"]
 	 || [istarget "visium-*-*"] } {
 	return 0
     }
@@ -396,6 +398,11 @@ proc check_pie_support { } {
 
     ## kvx-*-* does support -shared but not PIE.
     if { [istarget "kvx*-*-*"] && ![istarget "kvx*-linux-*"] } {
+        set pie_available_saved 0
+    }
+
+    ## lvx-mbr does not support PIE either.
+    if { [istarget "lvx*-*-*"] } {
         set pie_available_saved 0
     }
 
