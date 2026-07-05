@@ -1,5 +1,5 @@
 @c Copyright (C) 2023-2024 Free Software Foundation, Inc.
-@c Contributed by Kalray SA.
+@c Contributed by Liesme Tech.
 @c This is part of the GAS manual.
 @c For copying conditions, see the file as.texinfo.
 @c man end
