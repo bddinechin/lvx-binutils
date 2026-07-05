@@ -15632,7 +15632,7 @@ is_32bit_pcrel_reloc (Filedata * filedata, unsigned int reloc_type)
     case EM_XTENSA:
       return reloc_type == 14; /* R_XTENSA_32_PCREL.  */
     case EM_KVX:
-      return reloc_type == 7; /* R_LVX_32_PCREL */
+      return reloc_type == 5; /* R_LVX_32_PCREL */
     default:
       /* Do not abort or issue an error message here.  Not all targets use
 	 pc-relative 32-bit relocs in their DWARF debug information and we
